@@ -13,6 +13,7 @@
 <img src="https://img.shields.io/badge/Postgres%2016-pgvector-2B7FD4?style=flat-square&logo=postgresql&logoColor=white" alt="Postgres + pgvector">
 <img src="https://img.shields.io/badge/Docker-first-2B7FD4?style=flat-square&logo=docker&logoColor=white" alt="Docker">
 <img src="https://img.shields.io/badge/tests-7%2C600%2B-3FB27F?style=flat-square" alt="7,600+ tests">
+<a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-D4952B?style=flat-square" alt="MIT License"></a>
 </p>
 
 <p>
@@ -330,5 +331,5 @@ docs/                    dashboard contract + JSON schemas the code and tests pi
 <br>
 
 <div align="center">
-<sub>Built by <a href="https://github.com/naman113">Naman Sherasia</a> · Intelligence Corner</sub>
+<sub>Built by <a href="https://github.com/naman113">Naman Sherasia</a> · Intelligence Corner · <a href="LICENSE">MIT License</a></sub>
 </div>
