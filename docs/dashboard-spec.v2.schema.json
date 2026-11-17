@@ -1,0 +1,5341 @@
+{
+  "$defs": {
+    "AgingTile": {
+      "additionalProperties": false,
+      "properties": {
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "date": {
+          "default": "fixed",
+          "description": "control follows the page date control.",
+          "enum": [
+            "fixed",
+            "control"
+          ],
+          "title": "Date",
+          "type": "string"
+        },
+        "follow_filters": {
+          "default": false,
+          "description": "Follow the page filters (needs control).",
+          "title": "Follow Filters",
+          "type": "boolean"
+        },
+        "format": {
+          "default": "number",
+          "enum": [
+            "number",
+            "integer",
+            "decimal1",
+            "decimal2",
+            "percent",
+            "percent_value",
+            "currency",
+            "compact"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "grain": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "quarter",
+                "year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grain"
+        },
+        "hidden": {
+          "default": false,
+          "description": "Hide the tile without deleting it.",
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "measure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasureBindingV2"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "measures": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasuresBinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_]{0,47}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Query"
+        },
+        "series": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Target"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "title": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "const": "aging",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "enum": [
+                "quarter",
+                "third",
+                "half",
+                "two_thirds",
+                "full"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tile width; defaults by tile type.",
+          "title": "Width"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "x_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X Label"
+        },
+        "y": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SeriesRefV2"
+          },
+          "maxItems": 1,
+          "title": "Y",
+          "type": "array"
+        },
+        "y_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y Label"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "type"
+      ],
+      "title": "AgingTile",
+      "type": "object"
+    },
+    "AreaTileV2": {
+      "additionalProperties": false,
+      "properties": {
+        "band": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Band"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "date": {
+          "default": "fixed",
+          "description": "control follows the page date control.",
+          "enum": [
+            "fixed",
+            "control"
+          ],
+          "title": "Date",
+          "type": "string"
+        },
+        "follow_filters": {
+          "default": false,
+          "description": "Follow the page filters (needs control).",
+          "title": "Follow Filters",
+          "type": "boolean"
+        },
+        "format": {
+          "default": "number",
+          "enum": [
+            "number",
+            "integer",
+            "decimal1",
+            "decimal2",
+            "percent",
+            "percent_value",
+            "currency",
+            "compact"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "ghost": {
+          "default": "none",
+          "description": "Grey copy of the previous period or last year.",
+          "enum": [
+            "none",
+            "previous_period",
+            "last_year"
+          ],
+          "title": "Ghost",
+          "type": "string"
+        },
+        "grain": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "quarter",
+                "year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grain"
+        },
+        "hidden": {
+          "default": false,
+          "description": "Hide the tile without deleting it.",
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "measure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasureBindingV2"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "measures": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasuresBinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_]{0,47}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Query"
+        },
+        "series": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Target"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "title": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "const": "area",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "enum": [
+                "quarter",
+                "third",
+                "half",
+                "two_thirds",
+                "full"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tile width; defaults by tile type.",
+          "title": "Width"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "x_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X Label"
+        },
+        "y": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SeriesRefV2"
+          },
+          "maxItems": 6,
+          "title": "Y",
+          "type": "array"
+        },
+        "y_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y Label"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "type"
+      ],
+      "title": "AreaTileV2",
+      "type": "object"
+    },
+    "Band": {
+      "additionalProperties": false,
+      "properties": {
+        "high": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+          "title": "High",
+          "type": "string"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        },
+        "low": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+          "title": "Low",
+          "type": "string"
+        }
+      },
+      "required": [
+        "low",
+        "high"
+      ],
+      "title": "Band",
+      "type": "object"
+    },
+    "BarTileV2": {
+      "additionalProperties": false,
+      "properties": {
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "date": {
+          "default": "fixed",
+          "description": "control follows the page date control.",
+          "enum": [
+            "fixed",
+            "control"
+          ],
+          "title": "Date",
+          "type": "string"
+        },
+        "follow_filters": {
+          "default": false,
+          "description": "Follow the page filters (needs control).",
+          "title": "Follow Filters",
+          "type": "boolean"
+        },
+        "format": {
+          "default": "number",
+          "enum": [
+            "number",
+            "integer",
+            "decimal1",
+            "decimal2",
+            "percent",
+            "percent_value",
+            "currency",
+            "compact"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "ghost": {
+          "default": "none",
+          "description": "Grey copy of the previous period or last year.",
+          "enum": [
+            "none",
+            "previous_period",
+            "last_year"
+          ],
+          "title": "Ghost",
+          "type": "string"
+        },
+        "grain": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "quarter",
+                "year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grain"
+        },
+        "hidden": {
+          "default": false,
+          "description": "Hide the tile without deleting it.",
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "horizontal": {
+          "default": false,
+          "title": "Horizontal",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "measure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasureBindingV2"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "measures": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasuresBinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_]{0,47}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Query"
+        },
+        "series": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Target"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "title": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "const": "bar",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "enum": [
+                "quarter",
+                "third",
+                "half",
+                "two_thirds",
+                "full"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tile width; defaults by tile type.",
+          "title": "Width"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "x_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X Label"
+        },
+        "y": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SeriesRefV2"
+          },
+          "maxItems": 6,
+          "title": "Y",
+          "type": "array"
+        },
+        "y_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y Label"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "type"
+      ],
+      "title": "BarTileV2",
+      "type": "object"
+    },
+    "BulletTile": {
+      "additionalProperties": false,
+      "properties": {
+        "bands": {
+          "anyOf": [
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ]
+              },
+              "maxItems": 3,
+              "minItems": 1,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bands"
+        },
+        "column": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Query column holding the actual value.",
+          "title": "Column"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "date": {
+          "default": "fixed",
+          "description": "control follows the page date control.",
+          "enum": [
+            "fixed",
+            "control"
+          ],
+          "title": "Date",
+          "type": "string"
+        },
+        "follow_filters": {
+          "default": false,
+          "description": "Follow the page filters (needs control).",
+          "title": "Follow Filters",
+          "type": "boolean"
+        },
+        "format": {
+          "default": "number",
+          "enum": [
+            "number",
+            "integer",
+            "decimal1",
+            "decimal2",
+            "percent",
+            "percent_value",
+            "currency",
+            "compact"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "grain": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "quarter",
+                "year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grain"
+        },
+        "hidden": {
+          "default": false,
+          "description": "Hide the tile without deleting it.",
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "measure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasureBindingV2"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "measures": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasuresBinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_]{0,47}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Query"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Target"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "title": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "const": "bullet",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "enum": [
+                "quarter",
+                "third",
+                "half",
+                "two_thirds",
+                "full"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tile width; defaults by tile type.",
+          "title": "Width"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "type"
+      ],
+      "title": "BulletTile",
+      "type": "object"
+    },
+    "CalendarTile": {
+      "additionalProperties": false,
+      "properties": {
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "date": {
+          "default": "fixed",
+          "description": "control follows the page date control.",
+          "enum": [
+            "fixed",
+            "control"
+          ],
+          "title": "Date",
+          "type": "string"
+        },
+        "follow_filters": {
+          "default": false,
+          "description": "Follow the page filters (needs control).",
+          "title": "Follow Filters",
+          "type": "boolean"
+        },
+        "format": {
+          "default": "number",
+          "enum": [
+            "number",
+            "integer",
+            "decimal1",
+            "decimal2",
+            "percent",
+            "percent_value",
+            "currency",
+            "compact"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "grain": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "quarter",
+                "year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grain"
+        },
+        "hidden": {
+          "default": false,
+          "description": "Hide the tile without deleting it.",
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "measure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasureBindingV2"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "measures": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasuresBinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_]{0,47}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Query"
+        },
+        "series": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Target"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "title": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "const": "calendar",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "enum": [
+                "quarter",
+                "third",
+                "half",
+                "two_thirds",
+                "full"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tile width; defaults by tile type.",
+          "title": "Width"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "x_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X Label"
+        },
+        "y": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SeriesRefV2"
+          },
+          "maxItems": 1,
+          "title": "Y",
+          "type": "array"
+        },
+        "y_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y Label"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "type"
+      ],
+      "title": "CalendarTile",
+      "type": "object"
+    },
+    "ComboTile": {
+      "additionalProperties": false,
+      "properties": {
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "date": {
+          "default": "fixed",
+          "description": "control follows the page date control.",
+          "enum": [
+            "fixed",
+            "control"
+          ],
+          "title": "Date",
+          "type": "string"
+        },
+        "follow_filters": {
+          "default": false,
+          "description": "Follow the page filters (needs control).",
+          "title": "Follow Filters",
+          "type": "boolean"
+        },
+        "format": {
+          "default": "number",
+          "enum": [
+            "number",
+            "integer",
+            "decimal1",
+            "decimal2",
+            "percent",
+            "percent_value",
+            "currency",
+            "compact"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "grain": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "quarter",
+                "year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grain"
+        },
+        "hidden": {
+          "default": false,
+          "description": "Hide the tile without deleting it.",
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "measure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasureBindingV2"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "measures": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasuresBinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_]{0,47}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Query"
+        },
+        "series": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Target"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "title": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "const": "combo",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "enum": [
+                "quarter",
+                "third",
+                "half",
+                "two_thirds",
+                "full"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tile width; defaults by tile type.",
+          "title": "Width"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "x_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X Label"
+        },
+        "y": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SeriesRefV2"
+          },
+          "maxItems": 4,
+          "title": "Y",
+          "type": "array"
+        },
+        "y_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y Label"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "type"
+      ],
+      "title": "ComboTile",
+      "type": "object"
+    },
+    "CompareColumn": {
+      "additionalProperties": false,
+      "properties": {
+        "column": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+          "title": "Column",
+          "type": "string"
+        }
+      },
+      "required": [
+        "column"
+      ],
+      "title": "CompareColumn",
+      "type": "object"
+    },
+    "DateControl": {
+      "additionalProperties": false,
+      "properties": {
+        "default": {
+          "default": "last_7_days",
+          "description": "The range shown on first load.",
+          "enum": [
+            "today",
+            "yesterday",
+            "last_7_days",
+            "last_30_days",
+            "last_90_days",
+            "this_month",
+            "last_month",
+            "this_quarter",
+            "this_fy"
+          ],
+          "title": "Default",
+          "type": "string"
+        },
+        "fy_start_month": {
+          "default": 4,
+          "description": "Month number the financial year starts in.",
+          "maximum": 12,
+          "minimum": 1,
+          "title": "Fy Start Month",
+          "type": "integer"
+        },
+        "horizon_days": {
+          "default": 400,
+          "description": "Days of history stored for controlled tiles.",
+          "maximum": 732,
+          "minimum": 31,
+          "title": "Horizon Days",
+          "type": "integer"
+        },
+        "presets": {
+          "anyOf": [
+            {
+              "items": {
+                "enum": [
+                  "today",
+                  "yesterday",
+                  "last_7_days",
+                  "last_30_days",
+                  "last_90_days",
+                  "this_month",
+                  "last_month",
+                  "this_quarter",
+                  "this_fy"
+                ],
+                "type": "string"
+              },
+              "maxItems": 9,
+              "minItems": 1,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Ranges the viewer may pick; null means all nine.",
+          "title": "Presets"
+        }
+      },
+      "title": "DateControl",
+      "type": "object"
+    },
+    "DonutTile": {
+      "additionalProperties": false,
+      "properties": {
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "date": {
+          "default": "fixed",
+          "description": "control follows the page date control.",
+          "enum": [
+            "fixed",
+            "control"
+          ],
+          "title": "Date",
+          "type": "string"
+        },
+        "follow_filters": {
+          "default": false,
+          "description": "Follow the page filters (needs control).",
+          "title": "Follow Filters",
+          "type": "boolean"
+        },
+        "format": {
+          "default": "number",
+          "enum": [
+            "number",
+            "integer",
+            "decimal1",
+            "decimal2",
+            "percent",
+            "percent_value",
+            "currency",
+            "compact"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "grain": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "quarter",
+                "year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grain"
+        },
+        "hidden": {
+          "default": false,
+          "description": "Hide the tile without deleting it.",
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "measure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasureBindingV2"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "measures": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasuresBinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_]{0,47}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Query"
+        },
+        "series": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Target"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "title": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "const": "donut",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "enum": [
+                "quarter",
+                "third",
+                "half",
+                "two_thirds",
+                "full"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tile width; defaults by tile type.",
+          "title": "Width"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "x_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X Label"
+        },
+        "y": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SeriesRefV2"
+          },
+          "maxItems": 1,
+          "title": "Y",
+          "type": "array"
+        },
+        "y_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y Label"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "type"
+      ],
+      "title": "DonutTile",
+      "type": "object"
+    },
+    "DueRule": {
+      "additionalProperties": false,
+      "properties": {
+        "warn_days": {
+          "description": "Days before the date at which a row is flagged.",
+          "maximum": 90,
+          "minimum": 0,
+          "title": "Warn Days",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "warn_days"
+      ],
+      "title": "DueRule",
+      "type": "object"
+    },
+    "ForecastQuery": {
+      "additionalProperties": false,
+      "properties": {
+        "forecast_id": {
+          "minimum": 1,
+          "title": "Forecast Id",
+          "type": "integer"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "refresh_minutes": {
+          "default": 15,
+          "maximum": 1440,
+          "minimum": 5,
+          "title": "Refresh Minutes",
+          "type": "integer"
+        },
+        "source": {
+          "const": "forecast",
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "source",
+        "forecast_id"
+      ],
+      "title": "ForecastQuery",
+      "type": "object"
+    },
+    "FunnelTile": {
+      "additionalProperties": false,
+      "properties": {
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "date": {
+          "default": "fixed",
+          "description": "control follows the page date control.",
+          "enum": [
+            "fixed",
+            "control"
+          ],
+          "title": "Date",
+          "type": "string"
+        },
+        "follow_filters": {
+          "default": false,
+          "description": "Follow the page filters (needs control).",
+          "title": "Follow Filters",
+          "type": "boolean"
+        },
+        "format": {
+          "default": "number",
+          "enum": [
+            "number",
+            "integer",
+            "decimal1",
+            "decimal2",
+            "percent",
+            "percent_value",
+            "currency",
+            "compact"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "grain": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "quarter",
+                "year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grain"
+        },
+        "hidden": {
+          "default": false,
+          "description": "Hide the tile without deleting it.",
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "measure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasureBindingV2"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "measures": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasuresBinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_]{0,47}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Query"
+        },
+        "series": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Target"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "title": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "const": "funnel",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "enum": [
+                "quarter",
+                "third",
+                "half",
+                "two_thirds",
+                "full"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tile width; defaults by tile type.",
+          "title": "Width"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "x_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X Label"
+        },
+        "y": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SeriesRefV2"
+          },
+          "maxItems": 1,
+          "title": "Y",
+          "type": "array"
+        },
+        "y_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y Label"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "type"
+      ],
+      "title": "FunnelTile",
+      "type": "object"
+    },
+    "KpiQuery": {
+      "additionalProperties": false,
+      "properties": {
+        "days": {
+          "default": 30,
+          "maximum": 400,
+          "minimum": 1,
+          "title": "Days",
+          "type": "integer"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "refresh_minutes": {
+          "default": 15,
+          "maximum": 1440,
+          "minimum": 5,
+          "title": "Refresh Minutes",
+          "type": "integer"
+        },
+        "source": {
+          "const": "kpi_history",
+          "title": "Source",
+          "type": "string"
+        },
+        "watch_id": {
+          "minimum": 1,
+          "title": "Watch Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "source",
+        "watch_id"
+      ],
+      "title": "KpiQuery",
+      "type": "object"
+    },
+    "LineTileV2": {
+      "additionalProperties": false,
+      "properties": {
+        "band": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Band"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "date": {
+          "default": "fixed",
+          "description": "control follows the page date control.",
+          "enum": [
+            "fixed",
+            "control"
+          ],
+          "title": "Date",
+          "type": "string"
+        },
+        "follow_filters": {
+          "default": false,
+          "description": "Follow the page filters (needs control).",
+          "title": "Follow Filters",
+          "type": "boolean"
+        },
+        "format": {
+          "default": "number",
+          "enum": [
+            "number",
+            "integer",
+            "decimal1",
+            "decimal2",
+            "percent",
+            "percent_value",
+            "currency",
+            "compact"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "ghost": {
+          "default": "none",
+          "description": "Grey copy of the previous period or last year.",
+          "enum": [
+            "none",
+            "previous_period",
+            "last_year"
+          ],
+          "title": "Ghost",
+          "type": "string"
+        },
+        "grain": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "quarter",
+                "year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grain"
+        },
+        "hidden": {
+          "default": false,
+          "description": "Hide the tile without deleting it.",
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "measure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasureBindingV2"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "measures": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasuresBinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_]{0,47}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Query"
+        },
+        "series": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Target"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "title": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "const": "line",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "enum": [
+                "quarter",
+                "third",
+                "half",
+                "two_thirds",
+                "full"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tile width; defaults by tile type.",
+          "title": "Width"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "x_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X Label"
+        },
+        "y": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SeriesRefV2"
+          },
+          "maxItems": 6,
+          "title": "Y",
+          "type": "array"
+        },
+        "y_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y Label"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "type"
+      ],
+      "title": "LineTileV2",
+      "type": "object"
+    },
+    "MeasureBindingV2": {
+      "additionalProperties": false,
+      "properties": {
+        "by": {
+          "default": [],
+          "items": {
+            "pattern": "^[^\\s.;\"\\'()]{1,63}(\\.[^\\s.;\"\\'()]{1,63}){1,2}$",
+            "type": "string"
+          },
+          "maxItems": 2,
+          "title": "By",
+          "type": "array"
+        },
+        "filters": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MeasureFilter"
+          },
+          "maxItems": 10,
+          "title": "Filters",
+          "type": "array"
+        },
+        "grain": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "quarter",
+                "year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grain"
+        },
+        "name": {
+          "pattern": "^[a-z_][a-z0-9_]{0,62}$",
+          "title": "Name",
+          "type": "string"
+        },
+        "other": {
+          "default": false,
+          "description": "Fold the rest into one Other row (needs top).",
+          "title": "Other",
+          "type": "boolean"
+        },
+        "refresh_minutes": {
+          "default": 15,
+          "maximum": 1440,
+          "minimum": 5,
+          "title": "Refresh Minutes",
+          "type": "integer"
+        },
+        "top": {
+          "anyOf": [
+            {
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Top"
+        },
+        "window": {
+          "anyOf": [
+            {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/WindowLastDays"
+                },
+                {
+                  "$ref": "#/$defs/WindowLastPeriods"
+                },
+                {
+                  "$ref": "#/$defs/WindowFixed"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Window"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "MeasureBindingV2",
+      "type": "object"
+    },
+    "MeasureFilter": {
+      "additionalProperties": false,
+      "properties": {
+        "dimension": {
+          "pattern": "^[^\\s.;\"\\'()]{1,63}(\\.[^\\s.;\"\\'()]{1,63}){1,2}$",
+          "title": "Dimension",
+          "type": "string"
+        },
+        "op": {
+          "enum": [
+            "=",
+            "!=",
+            "in",
+            "not_in",
+            ">",
+            ">=",
+            "<",
+            "<=",
+            "is_null",
+            "is_not_null"
+          ],
+          "title": "Op",
+          "type": "string"
+        },
+        "values": {
+          "default": [],
+          "items": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          },
+          "maxItems": 50,
+          "title": "Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "dimension",
+        "op"
+      ],
+      "title": "MeasureFilter",
+      "type": "object"
+    },
+    "MeasuresBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "by": {
+          "default": [],
+          "items": {
+            "pattern": "^[^\\s.;\"\\'()]{1,63}(\\.[^\\s.;\"\\'()]{1,63}){1,2}$",
+            "type": "string"
+          },
+          "maxItems": 2,
+          "title": "By",
+          "type": "array"
+        },
+        "filters": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MeasureFilter"
+          },
+          "maxItems": 10,
+          "title": "Filters",
+          "type": "array"
+        },
+        "grain": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "quarter",
+                "year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grain"
+        },
+        "names": {
+          "description": "Two to six distinct measure names read side by side.",
+          "items": {
+            "pattern": "^[a-z_][a-z0-9_]{0,62}$",
+            "type": "string"
+          },
+          "maxItems": 6,
+          "minItems": 2,
+          "title": "Names",
+          "type": "array"
+        },
+        "other": {
+          "default": false,
+          "description": "Fold the rest into one Other row (needs top and exactly one by; only for measures that add up).",
+          "title": "Other",
+          "type": "boolean"
+        },
+        "refresh_minutes": {
+          "default": 15,
+          "maximum": 1440,
+          "minimum": 5,
+          "title": "Refresh Minutes",
+          "type": "integer"
+        },
+        "top": {
+          "anyOf": [
+            {
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Top"
+        },
+        "window": {
+          "anyOf": [
+            {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/WindowLastDays"
+                },
+                {
+                  "$ref": "#/$defs/WindowLastPeriods"
+                },
+                {
+                  "$ref": "#/$defs/WindowFixed"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Window"
+        }
+      },
+      "required": [
+        "names"
+      ],
+      "title": "MeasuresBinding",
+      "type": "object"
+    },
+    "OwedWhen": {
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "enum": [
+            ">",
+            ">=",
+            "<",
+            "<=",
+            "=",
+            "!="
+          ],
+          "title": "Op",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "op",
+        "value"
+      ],
+      "title": "OwedWhen",
+      "type": "object"
+    },
+    "PageFilter": {
+      "additionalProperties": false,
+      "properties": {
+        "dimension": {
+          "pattern": "^[^\\s.;\"\\'()]{1,63}(\\.[^\\s.;\"\\'()]{1,63}){1,2}$",
+          "title": "Dimension",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,23}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 60,
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "dimension",
+        "label"
+      ],
+      "title": "PageFilter",
+      "type": "object"
+    },
+    "PairedBarTile": {
+      "additionalProperties": false,
+      "properties": {
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "date": {
+          "default": "fixed",
+          "description": "control follows the page date control.",
+          "enum": [
+            "fixed",
+            "control"
+          ],
+          "title": "Date",
+          "type": "string"
+        },
+        "follow_filters": {
+          "default": false,
+          "description": "Follow the page filters (needs control).",
+          "title": "Follow Filters",
+          "type": "boolean"
+        },
+        "format": {
+          "default": "number",
+          "enum": [
+            "number",
+            "integer",
+            "decimal1",
+            "decimal2",
+            "percent",
+            "percent_value",
+            "currency",
+            "compact"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "grain": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "quarter",
+                "year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grain"
+        },
+        "hidden": {
+          "default": false,
+          "description": "Hide the tile without deleting it.",
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "measure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasureBindingV2"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "measures": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasuresBinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "mirror": {
+          "default": false,
+          "description": "Draw the second series mirrored below zero.",
+          "title": "Mirror",
+          "type": "boolean"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_]{0,47}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Query"
+        },
+        "series": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Target"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "title": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "const": "paired_bar",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "enum": [
+                "quarter",
+                "third",
+                "half",
+                "two_thirds",
+                "full"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tile width; defaults by tile type.",
+          "title": "Width"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "x_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X Label"
+        },
+        "y": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SeriesRefV2"
+          },
+          "maxItems": 2,
+          "title": "Y",
+          "type": "array"
+        },
+        "y_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y Label"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "type"
+      ],
+      "title": "PairedBarTile",
+      "type": "object"
+    },
+    "RankedBarTile": {
+      "additionalProperties": false,
+      "properties": {
+        "cumulative": {
+          "default": false,
+          "title": "Cumulative",
+          "type": "boolean"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "date": {
+          "default": "fixed",
+          "description": "control follows the page date control.",
+          "enum": [
+            "fixed",
+            "control"
+          ],
+          "title": "Date",
+          "type": "string"
+        },
+        "follow_filters": {
+          "default": false,
+          "description": "Follow the page filters (needs control).",
+          "title": "Follow Filters",
+          "type": "boolean"
+        },
+        "format": {
+          "default": "number",
+          "enum": [
+            "number",
+            "integer",
+            "decimal1",
+            "decimal2",
+            "percent",
+            "percent_value",
+            "currency",
+            "compact"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "grain": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "quarter",
+                "year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grain"
+        },
+        "hidden": {
+          "default": false,
+          "description": "Hide the tile without deleting it.",
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "measure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasureBindingV2"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "measures": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasuresBinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "other": {
+          "default": false,
+          "title": "Other",
+          "type": "boolean"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_]{0,47}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Query"
+        },
+        "series": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Target"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "title": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "top": {
+          "anyOf": [
+            {
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Top"
+        },
+        "type": {
+          "const": "ranked_bar",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "enum": [
+                "quarter",
+                "third",
+                "half",
+                "two_thirds",
+                "full"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tile width; defaults by tile type.",
+          "title": "Width"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "x_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X Label"
+        },
+        "y": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SeriesRefV2"
+          },
+          "maxItems": 1,
+          "title": "Y",
+          "type": "array"
+        },
+        "y_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y Label"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "type"
+      ],
+      "title": "RankedBarTile",
+      "type": "object"
+    },
+    "Section": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "tiles": {
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]{0,47}$",
+            "type": "string"
+          },
+          "maxItems": 16,
+          "minItems": 1,
+          "title": "Tiles",
+          "type": "array"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        }
+      },
+      "required": [
+        "tiles"
+      ],
+      "title": "Section",
+      "type": "object"
+    },
+    "SeriesRefV2": {
+      "additionalProperties": false,
+      "properties": {
+        "as": {
+          "anyOf": [
+            {
+              "enum": [
+                "bar",
+                "line"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Draw this series as bars or a line (combo tiles only).",
+          "title": "As"
+        },
+        "column": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+          "title": "Column",
+          "type": "string"
+        },
+        "dashed": {
+          "default": false,
+          "title": "Dashed",
+          "type": "boolean"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        },
+        "tone": {
+          "anyOf": [
+            {
+              "enum": [
+                "inward",
+                "outward",
+                "neutral",
+                "accent"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Semantic colour role; the renderer owns hues.",
+          "title": "Tone"
+        }
+      },
+      "required": [
+        "column"
+      ],
+      "title": "SeriesRefV2",
+      "type": "object"
+    },
+    "SparklineTileV2": {
+      "additionalProperties": false,
+      "properties": {
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "date": {
+          "default": "fixed",
+          "description": "control follows the page date control.",
+          "enum": [
+            "fixed",
+            "control"
+          ],
+          "title": "Date",
+          "type": "string"
+        },
+        "follow_filters": {
+          "default": false,
+          "description": "Follow the page filters (needs control).",
+          "title": "Follow Filters",
+          "type": "boolean"
+        },
+        "format": {
+          "default": "number",
+          "enum": [
+            "number",
+            "integer",
+            "decimal1",
+            "decimal2",
+            "percent",
+            "percent_value",
+            "currency",
+            "compact"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "grain": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "quarter",
+                "year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grain"
+        },
+        "hidden": {
+          "default": false,
+          "description": "Hide the tile without deleting it.",
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "measure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasureBindingV2"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "measures": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasuresBinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_]{0,47}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Query"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Target"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "title": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "const": "sparkline",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "enum": [
+                "quarter",
+                "third",
+                "half",
+                "two_thirds",
+                "full"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tile width; defaults by tile type.",
+          "title": "Width"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "y": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SeriesRefV2"
+          },
+          "maxItems": 1,
+          "title": "Y",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "type"
+      ],
+      "title": "SparklineTileV2",
+      "type": "object"
+    },
+    "SqlQuery": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "refresh_minutes": {
+          "default": 15,
+          "maximum": 1440,
+          "minimum": 5,
+          "title": "Refresh Minutes",
+          "type": "integer"
+        },
+        "sql": {
+          "maxLength": 20000,
+          "minLength": 1,
+          "title": "Sql",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "sql"
+      ],
+      "title": "SqlQuery",
+      "type": "object"
+    },
+    "StackedBarTileV2": {
+      "additionalProperties": false,
+      "properties": {
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "date": {
+          "default": "fixed",
+          "description": "control follows the page date control.",
+          "enum": [
+            "fixed",
+            "control"
+          ],
+          "title": "Date",
+          "type": "string"
+        },
+        "follow_filters": {
+          "default": false,
+          "description": "Follow the page filters (needs control).",
+          "title": "Follow Filters",
+          "type": "boolean"
+        },
+        "format": {
+          "default": "number",
+          "enum": [
+            "number",
+            "integer",
+            "decimal1",
+            "decimal2",
+            "percent",
+            "percent_value",
+            "currency",
+            "compact"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "grain": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "quarter",
+                "year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grain"
+        },
+        "hidden": {
+          "default": false,
+          "description": "Hide the tile without deleting it.",
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "horizontal": {
+          "default": false,
+          "title": "Horizontal",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "measure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasureBindingV2"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "measures": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasuresBinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "percent": {
+          "default": false,
+          "description": "Draw 100 percent stacked bars.",
+          "title": "Percent",
+          "type": "boolean"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_]{0,47}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Query"
+        },
+        "series": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Target"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "title": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "const": "stacked_bar",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "enum": [
+                "quarter",
+                "third",
+                "half",
+                "two_thirds",
+                "full"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tile width; defaults by tile type.",
+          "title": "Width"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "x_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X Label"
+        },
+        "y": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SeriesRefV2"
+          },
+          "maxItems": 6,
+          "title": "Y",
+          "type": "array"
+        },
+        "y_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y Label"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "type"
+      ],
+      "title": "StackedBarTileV2",
+      "type": "object"
+    },
+    "StatTileV2": {
+      "additionalProperties": false,
+      "properties": {
+        "column": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Column"
+        },
+        "compare": {
+          "anyOf": [
+            {
+              "enum": [
+                "none",
+                "previous_row"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "#/$defs/CompareColumn"
+            }
+          ],
+          "default": "none",
+          "title": "Compare"
+        },
+        "compare_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Compare Label"
+        },
+        "comparison": {
+          "default": "previous_period",
+          "description": "Comparison under the date control.",
+          "enum": [
+            "previous_period",
+            "last_year",
+            "both",
+            "none"
+          ],
+          "title": "Comparison",
+          "type": "string"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "date": {
+          "default": "fixed",
+          "description": "control follows the page date control.",
+          "enum": [
+            "fixed",
+            "control"
+          ],
+          "title": "Date",
+          "type": "string"
+        },
+        "follow_filters": {
+          "default": false,
+          "description": "Follow the page filters (needs control).",
+          "title": "Follow Filters",
+          "type": "boolean"
+        },
+        "format": {
+          "default": "number",
+          "enum": [
+            "number",
+            "integer",
+            "decimal1",
+            "decimal2",
+            "percent",
+            "percent_value",
+            "currency",
+            "compact"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "good_direction": {
+          "default": "none",
+          "enum": [
+            "up",
+            "down",
+            "none"
+          ],
+          "title": "Good Direction",
+          "type": "string"
+        },
+        "grain": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "quarter",
+                "year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grain"
+        },
+        "hidden": {
+          "default": false,
+          "description": "Hide the tile without deleting it.",
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "measure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasureBindingV2"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "measures": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasuresBinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "owed_when": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OwedWhen"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "pick": {
+          "default": "last",
+          "enum": [
+            "last",
+            "last_complete"
+          ],
+          "title": "Pick",
+          "type": "string"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_]{0,47}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Query"
+        },
+        "sparkline": {
+          "default": false,
+          "title": "Sparkline",
+          "type": "boolean"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Target"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "title": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "const": "stat",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "enum": [
+                "quarter",
+                "third",
+                "half",
+                "two_thirds",
+                "full"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tile width; defaults by tile type.",
+          "title": "Width"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "type"
+      ],
+      "title": "StatTileV2",
+      "type": "object"
+    },
+    "TableColumnV2": {
+      "additionalProperties": false,
+      "properties": {
+        "bar": {
+          "default": false,
+          "description": "Draw an in-cell bar (at most one column).",
+          "title": "Bar",
+          "type": "boolean"
+        },
+        "column": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+          "title": "Column",
+          "type": "string"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "delta": {
+          "default": false,
+          "title": "Delta",
+          "type": "boolean"
+        },
+        "due": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DueRule"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "format": {
+          "anyOf": [
+            {
+              "enum": [
+                "number",
+                "integer",
+                "decimal1",
+                "decimal2",
+                "percent",
+                "percent_value",
+                "currency",
+                "compact"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Format"
+        },
+        "good_direction": {
+          "default": "none",
+          "enum": [
+            "up",
+            "down",
+            "none"
+          ],
+          "title": "Good Direction",
+          "type": "string"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        },
+        "owed_when": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OwedWhen"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "total": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Total"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        }
+      },
+      "required": [
+        "column"
+      ],
+      "title": "TableColumnV2",
+      "type": "object"
+    },
+    "TableSort": {
+      "additionalProperties": false,
+      "properties": {
+        "column": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+          "title": "Column",
+          "type": "string"
+        },
+        "dir": {
+          "default": "asc",
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "title": "Dir",
+          "type": "string"
+        }
+      },
+      "required": [
+        "column"
+      ],
+      "title": "TableSort",
+      "type": "object"
+    },
+    "TableTileV2": {
+      "additionalProperties": false,
+      "properties": {
+        "columns": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TableColumnV2"
+          },
+          "maxItems": 12,
+          "title": "Columns",
+          "type": "array"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "date": {
+          "default": "fixed",
+          "description": "control follows the page date control.",
+          "enum": [
+            "fixed",
+            "control"
+          ],
+          "title": "Date",
+          "type": "string"
+        },
+        "follow_filters": {
+          "default": false,
+          "description": "Follow the page filters (needs control).",
+          "title": "Follow Filters",
+          "type": "boolean"
+        },
+        "format": {
+          "default": "number",
+          "enum": [
+            "number",
+            "integer",
+            "decimal1",
+            "decimal2",
+            "percent",
+            "percent_value",
+            "currency",
+            "compact"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "grain": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "quarter",
+                "year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grain"
+        },
+        "hidden": {
+          "default": false,
+          "description": "Hide the tile without deleting it.",
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "max_rows": {
+          "default": 25,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Max Rows",
+          "type": "integer"
+        },
+        "measure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasureBindingV2"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "measures": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasuresBinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_]{0,47}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Query"
+        },
+        "sort": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TableSort"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Target"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "title": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "totals": {
+          "default": false,
+          "title": "Totals",
+          "type": "boolean"
+        },
+        "type": {
+          "const": "table",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "enum": [
+                "quarter",
+                "third",
+                "half",
+                "two_thirds",
+                "full"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tile width; defaults by tile type.",
+          "title": "Width"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "type"
+      ],
+      "title": "TableTileV2",
+      "type": "object"
+    },
+    "Target": {
+      "additionalProperties": false,
+      "properties": {
+        "column": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Query column that holds the target.",
+          "title": "Column"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "A fixed target number.",
+          "title": "Value"
+        }
+      },
+      "title": "Target",
+      "type": "object"
+    },
+    "TextTileV2": {
+      "additionalProperties": false,
+      "properties": {
+        "hidden": {
+          "default": false,
+          "description": "Hide the tile without deleting it.",
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "text": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "maxLength": 120,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "type": {
+          "const": "text",
+          "title": "Type",
+          "type": "string"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "enum": [
+                "quarter",
+                "third",
+                "half",
+                "two_thirds",
+                "full"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tile width; defaults by tile type.",
+          "title": "Width"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "text"
+      ],
+      "title": "TextTileV2",
+      "type": "object"
+    },
+    "WaterfallTile": {
+      "additionalProperties": false,
+      "properties": {
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "date": {
+          "default": "fixed",
+          "description": "control follows the page date control.",
+          "enum": [
+            "fixed",
+            "control"
+          ],
+          "title": "Date",
+          "type": "string"
+        },
+        "ends": {
+          "default": "first_last",
+          "enum": [
+            "first_last",
+            "none"
+          ],
+          "title": "Ends",
+          "type": "string"
+        },
+        "follow_filters": {
+          "default": false,
+          "description": "Follow the page filters (needs control).",
+          "title": "Follow Filters",
+          "type": "boolean"
+        },
+        "format": {
+          "default": "number",
+          "enum": [
+            "number",
+            "integer",
+            "decimal1",
+            "decimal2",
+            "percent",
+            "percent_value",
+            "currency",
+            "compact"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "grain": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "quarter",
+                "year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grain"
+        },
+        "hidden": {
+          "default": false,
+          "description": "Hide the tile without deleting it.",
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "measure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasureBindingV2"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "measures": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MeasuresBinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_]{0,47}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Query"
+        },
+        "series": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Target"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "title": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "const": "waterfall",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "enum": [
+                "quarter",
+                "third",
+                "half",
+                "two_thirds",
+                "full"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tile width; defaults by tile type.",
+          "title": "Width"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "x_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X Label"
+        },
+        "y": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SeriesRefV2"
+          },
+          "maxItems": 1,
+          "title": "Y",
+          "type": "array"
+        },
+        "y_label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y Label"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "type"
+      ],
+      "title": "WaterfallTile",
+      "type": "object"
+    },
+    "WindowFixed": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "description": "exclusive",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "title": "End",
+          "type": "string"
+        },
+        "start": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "title": "Start",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "WindowFixed",
+      "type": "object"
+    },
+    "WindowLastDays": {
+      "additionalProperties": false,
+      "properties": {
+        "last_days": {
+          "maximum": 3660,
+          "minimum": 1,
+          "title": "Last Days",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "last_days"
+      ],
+      "title": "WindowLastDays",
+      "type": "object"
+    },
+    "WindowLastPeriods": {
+      "additionalProperties": false,
+      "properties": {
+        "last_periods": {
+          "maximum": 60,
+          "minimum": 1,
+          "title": "Last Periods",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "last_periods"
+      ],
+      "title": "WindowLastPeriods",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A chart spec, version 2. Plain text only; tones are roles, never colours.",
+  "properties": {
+    "date_control": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DateControl"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "filters": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/PageFilter"
+      },
+      "maxItems": 3,
+      "title": "Filters",
+      "type": "array"
+    },
+    "number_locale": {
+      "anyOf": [
+        {
+          "enum": [
+            "en-IN",
+            "en-US",
+            "en-GB",
+            "en-AE",
+            "en-SG",
+            "en-AU",
+            "en-CA"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Number and date locale for the page.",
+      "title": "Number Locale"
+    },
+    "queries": {
+      "default": [],
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/SqlQuery"
+          },
+          {
+            "$ref": "#/$defs/KpiQuery"
+          },
+          {
+            "$ref": "#/$defs/ForecastQuery"
+          }
+        ]
+      },
+      "maxItems": 30,
+      "title": "Queries",
+      "type": "array"
+    },
+    "sections": {
+      "items": {
+        "$ref": "#/$defs/Section"
+      },
+      "maxItems": 10,
+      "minItems": 1,
+      "title": "Sections",
+      "type": "array"
+    },
+    "spec_version": {
+      "maximum": 2,
+      "minimum": 2,
+      "title": "Spec Version",
+      "type": "integer"
+    },
+    "subtitle": {
+      "anyOf": [
+        {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Subtitle"
+    },
+    "tiles": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "aging": "#/$defs/AgingTile",
+            "area": "#/$defs/AreaTileV2",
+            "bar": "#/$defs/BarTileV2",
+            "bullet": "#/$defs/BulletTile",
+            "calendar": "#/$defs/CalendarTile",
+            "combo": "#/$defs/ComboTile",
+            "donut": "#/$defs/DonutTile",
+            "funnel": "#/$defs/FunnelTile",
+            "line": "#/$defs/LineTileV2",
+            "paired_bar": "#/$defs/PairedBarTile",
+            "ranked_bar": "#/$defs/RankedBarTile",
+            "sparkline": "#/$defs/SparklineTileV2",
+            "stacked_bar": "#/$defs/StackedBarTileV2",
+            "stat": "#/$defs/StatTileV2",
+            "table": "#/$defs/TableTileV2",
+            "text": "#/$defs/TextTileV2",
+            "waterfall": "#/$defs/WaterfallTile"
+          },
+          "propertyName": "type"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/StatTileV2"
+          },
+          {
+            "$ref": "#/$defs/LineTileV2"
+          },
+          {
+            "$ref": "#/$defs/AreaTileV2"
+          },
+          {
+            "$ref": "#/$defs/BarTileV2"
+          },
+          {
+            "$ref": "#/$defs/StackedBarTileV2"
+          },
+          {
+            "$ref": "#/$defs/ComboTile"
+          },
+          {
+            "$ref": "#/$defs/PairedBarTile"
+          },
+          {
+            "$ref": "#/$defs/AgingTile"
+          },
+          {
+            "$ref": "#/$defs/BulletTile"
+          },
+          {
+            "$ref": "#/$defs/WaterfallTile"
+          },
+          {
+            "$ref": "#/$defs/CalendarTile"
+          },
+          {
+            "$ref": "#/$defs/DonutTile"
+          },
+          {
+            "$ref": "#/$defs/RankedBarTile"
+          },
+          {
+            "$ref": "#/$defs/FunnelTile"
+          },
+          {
+            "$ref": "#/$defs/SparklineTileV2"
+          },
+          {
+            "$ref": "#/$defs/TableTileV2"
+          },
+          {
+            "$ref": "#/$defs/TextTileV2"
+          }
+        ]
+      },
+      "maxItems": 40,
+      "minItems": 1,
+      "title": "Tiles",
+      "type": "array"
+    },
+    "title": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    }
+  },
+  "required": [
+    "spec_version",
+    "title",
+    "sections",
+    "tiles"
+  ],
+  "title": "SpecV2",
+  "type": "object"
+}

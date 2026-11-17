@@ -1,0 +1,1163 @@
+{
+  "pack_version": 1,
+  "meta": {
+    "app_name": "Northwind Supply (synthetic demo)",
+    "generated_at": "2026-10-25",
+    "repo_commit": "",
+    "db_engine": "postgresql 16",
+    "schema_source": "deploy/demo-business.sql",
+    "ic_connects_to": "synthetic demo database, read-only login",
+    "db_queried": true,
+    "schemas_in_scope": [
+      "public"
+    ]
+  },
+  "source": {
+    "propose": {
+      "kind": "source",
+      "ref": "business_db",
+      "text": "Northwind Supply sells grocery and household goods to businesses. Sales reps take sales_orders from customers, each order has order_lines for products, shipped orders are invoiced in invoices and settled by payments. inventory_snapshots keeps weekly stock counts. Key tables: sales_orders, order_lines, customers, products, invoices, payments, inventory_snapshots."
+    },
+    "confidence": "high",
+    "evidence": [
+      "deploy/demo-business.sql: schema header and CREATE TABLE statements"
+    ]
+  },
+  "business_profile": {
+    "summary": {
+      "text": "Northwind Supply sells groceries and household goods to retail, wholesale, hospitality and online customers across five regions. Sales reps take orders, invoices follow shipped orders, and customers pay by bank transfer, card or cheque. Revenue comes from order lines.",
+      "confidence": "medium",
+      "evidence": [
+        "deploy/demo-business.sql header and tables"
+      ]
+    },
+    "facts_told": [
+      {
+        "text": "Orders have five statuses: open, shipped, delivered, cancelled, returned.",
+        "confidence": "high",
+        "evidence": [
+          "deploy/demo-business.sql header and tables"
+        ]
+      },
+      {
+        "text": "Customers are one of four segments: Retail, Wholesale, Hospitality, Online.",
+        "confidence": "high",
+        "evidence": [
+          "deploy/demo-business.sql header and tables"
+        ]
+      },
+      {
+        "text": "Wholesale invoices are due after 45 days, all others after 30 days.",
+        "confidence": "high",
+        "evidence": [
+          "deploy/demo-business.sql header and tables"
+        ]
+      }
+    ],
+    "inferences": [
+      {
+        "text": "Cancelled orders are never revenue.",
+        "confidence": "medium",
+        "evidence": [
+          "deploy/demo-business.sql header and tables"
+        ]
+      },
+      {
+        "text": "Revenue is counted net of line discounts.",
+        "confidence": "medium",
+        "evidence": [
+          "deploy/demo-business.sql header and tables"
+        ]
+      }
+    ],
+    "people": [
+      {
+        "name": "",
+        "role": "Sales rep: covers a region and manages customer accounts",
+        "notes": "From sales_reps and customers.rep_id",
+        "confidence": "medium",
+        "evidence": [
+          "deploy/demo-business.sql: sales_reps, customers.rep_id"
+        ]
+      }
+    ],
+    "vocabulary": [
+      {
+        "text": "SKU: unique product code.",
+        "confidence": "high",
+        "evidence": [
+          "deploy/demo-business.sql header and tables"
+        ]
+      },
+      {
+        "text": "Segment: customer type (Retail, Wholesale, Hospitality, Online).",
+        "confidence": "high",
+        "evidence": [
+          "deploy/demo-business.sql header and tables"
+        ]
+      },
+      {
+        "text": "Days late: paid_at minus due_date.",
+        "confidence": "high",
+        "evidence": [
+          "deploy/demo-business.sql header and tables"
+        ]
+      }
+    ],
+    "priorities": [
+      {
+        "text": "Overdue invoices and bad debt: some invoices are never paid.",
+        "confidence": "medium",
+        "evidence": [
+          "deploy/demo-business.sql header and tables"
+        ]
+      }
+    ],
+    "recurring_work": [
+      {
+        "text": "Weekly inventory snapshot of units on hand per product.",
+        "confidence": "high",
+        "evidence": [
+          "deploy/demo-business.sql header and tables"
+        ]
+      }
+    ],
+    "open_questions": [
+      {
+        "text": "Is revenue meant to be net of line discounts?",
+        "confidence": "low",
+        "evidence": [
+          "deploy/demo-business.sql header and tables"
+        ]
+      }
+    ]
+  },
+  "tables": [
+    {
+      "propose": {
+        "kind": "table",
+        "ref": "business_db.public.regions",
+        "text": "One row per sales region of the business, five in total. Reference data that customers and sales reps point to.",
+        "columns": {
+          "id": "Region identifier. Referenced by sales_reps.region_id and customers.region_id.",
+          "name": "Region name. Values: North, South, East, West, Central. Unique. Use it to label regional breakdowns."
+        }
+      },
+      "confidence": "high",
+      "evidence": [
+        "deploy/demo-business.sql: CREATE TABLE regions and its seed insert"
+      ],
+      "column_review": {
+        "id": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE regions"
+          ]
+        },
+        "name": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE regions"
+          ]
+        }
+      },
+      "notes": ""
+    },
+    {
+      "propose": {
+        "kind": "table",
+        "ref": "business_db.public.sales_reps",
+        "text": "One row per sales representative, with the region they cover and whether they are still employed. Customers are assigned to reps through customers.rep_id.",
+        "columns": {
+          "id": "Sales rep identifier. Referenced by customers.rep_id.",
+          "full_name": "Rep display name (personal data). Use it for labels only, never to identify a person.",
+          "region_id": "Region the rep covers. Joins to regions.id.",
+          "hired_on": "Date the rep was hired. A business date with no time zone.",
+          "is_active": "True while the rep is employed and takes customers. False for reps who have left. Count active reps with is_active."
+        }
+      },
+      "confidence": "high",
+      "evidence": [
+        "deploy/demo-business.sql: CREATE TABLE sales_reps"
+      ],
+      "column_review": {
+        "id": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE sales_reps"
+          ]
+        },
+        "full_name": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE sales_reps"
+          ]
+        },
+        "region_id": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE sales_reps"
+          ]
+        },
+        "hired_on": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE sales_reps"
+          ]
+        },
+        "is_active": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE sales_reps"
+          ]
+        }
+      },
+      "notes": ""
+    },
+    {
+      "propose": {
+        "kind": "table",
+        "ref": "business_db.public.customers",
+        "text": "One row per customer account (a business that buys goods). Active customers are those with is_active true. Segment and region are the usual ways to group customers.",
+        "columns": {
+          "id": "Customer identifier. Referenced by sales_orders.customer_id and invoices.customer_id.",
+          "name": "Customer business name (personal data if a sole trader). Label only.",
+          "segment": "Customer type. Values: Retail (shops), Wholesale (bulk buyers, 45-day invoice terms), Hospitality (hotels and restaurants), Online (web retailers). Exactly one per customer.",
+          "region_id": "Region the customer belongs to. Joins to regions.id. Use it for regional order counts.",
+          "rep_id": "Sales rep who manages the customer. Joins to sales_reps.id. NULL means no rep is assigned.",
+          "city": "City of the customer. Free-text location label, not a controlled list.",
+          "credit_limit": "Maximum unpaid balance allowed for the customer, in the single business currency (units, not cents).",
+          "created_at": "Date the customer account was created. A business date with no time zone.",
+          "is_active": "True for customers who can still order. False for closed or lapsed accounts. Count active customers with is_active."
+        }
+      },
+      "confidence": "high",
+      "evidence": [
+        "deploy/demo-business.sql: CREATE TABLE customers (segment CHECK)"
+      ],
+      "column_review": {
+        "id": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE customers"
+          ]
+        },
+        "name": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE customers"
+          ]
+        },
+        "segment": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE customers"
+          ]
+        },
+        "region_id": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE customers"
+          ]
+        },
+        "rep_id": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE customers"
+          ]
+        },
+        "city": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE customers"
+          ]
+        },
+        "credit_limit": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE customers"
+          ]
+        },
+        "created_at": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE customers"
+          ]
+        },
+        "is_active": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE customers"
+          ]
+        }
+      },
+      "notes": ""
+    },
+    {
+      "propose": {
+        "kind": "table",
+        "ref": "business_db.public.products",
+        "text": "One row per product SKU sold, with list price and unit cost. Discontinued products stay in the table because old orders refer to them.",
+        "columns": {
+          "id": "Product identifier. Referenced by order_lines.product_id and inventory_snapshots.product_id.",
+          "sku": "Stock keeping unit code, unique per product, for example SKU-0001 (example).",
+          "name": "Product display name, category word plus an item number.",
+          "category": "Product family. Values: Beverages, Cleaning, Dairy, Dry Goods, Frozen, Packaging, Produce, Snacks. Use it for category revenue breakdowns.",
+          "unit_price": "Current list price per unit, in the business currency units. The price actually charged is on order_lines.unit_price.",
+          "unit_cost": "Cost per unit to the business, same currency units. Margin is price minus cost.",
+          "is_discontinued": "True when the product is no longer sold. Count discontinued products with is_discontinued."
+        }
+      },
+      "confidence": "high",
+      "evidence": [
+        "deploy/demo-business.sql: CREATE TABLE products"
+      ],
+      "column_review": {
+        "id": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE products"
+          ]
+        },
+        "sku": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE products"
+          ]
+        },
+        "name": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE products"
+          ]
+        },
+        "category": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE products"
+          ]
+        },
+        "unit_price": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE products"
+          ]
+        },
+        "unit_cost": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE products"
+          ]
+        },
+        "is_discontinued": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE products"
+          ]
+        }
+      },
+      "notes": ""
+    },
+    {
+      "propose": {
+        "kind": "table",
+        "ref": "business_db.public.sales_orders",
+        "text": "One row per sales order, the order header. order_date is the business date for reporting. Revenue and order trends exclude status cancelled, and open orders are those not yet shipped.",
+        "columns": {
+          "id": "Order identifier. Referenced by order_lines.order_id and invoices.order_id.",
+          "customer_id": "Customer who placed the order. Joins to customers.id. Use it to reach segment and region.",
+          "order_date": "Date the order was placed. A business date with no time zone. Use it to place an order in a day, week or month.",
+          "status": "Order lifecycle stage. Values: open (taken, not yet shipped), shipped (sent, not yet confirmed delivered), delivered (received), cancelled (never revenue), returned (sent back).",
+          "channel": "How the order arrived. Values: field_sales (rep visit), phone, web, marketplace (third-party site)."
+        }
+      },
+      "confidence": "high",
+      "evidence": [
+        "deploy/demo-business.sql: CREATE TABLE sales_orders (status and channel CHECK)"
+      ],
+      "column_review": {
+        "id": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE sales_orders"
+          ]
+        },
+        "customer_id": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE sales_orders"
+          ]
+        },
+        "order_date": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE sales_orders"
+          ]
+        },
+        "status": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE sales_orders"
+          ]
+        },
+        "channel": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE sales_orders"
+          ]
+        }
+      },
+      "notes": ""
+    },
+    {
+      "propose": {
+        "kind": "table",
+        "ref": "business_db.public.order_lines",
+        "text": "One row per product line on a sales order. Line amount is qty * unit_price * (1 - discount_pct / 100). Sum line amounts to get order value and revenue.",
+        "columns": {
+          "id": "Order line identifier.",
+          "order_id": "Order this line belongs to. Joins to sales_orders.id.",
+          "product_id": "Product sold on the line. Joins to products.id.",
+          "qty": "Units sold on the line. Always above zero. A few bulk orders have hundreds of units.",
+          "unit_price": "Price per unit actually charged, in business currency units, before discount. Can differ from products.unit_price when prices changed.",
+          "discount_pct": "Percentage discount on the line, 0 to 100. 0 means no discount. Only some wholesale lines carry a discount."
+        }
+      },
+      "confidence": "high",
+      "evidence": [
+        "deploy/demo-business.sql: CREATE TABLE order_lines"
+      ],
+      "column_review": {
+        "id": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE order_lines"
+          ]
+        },
+        "order_id": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE order_lines"
+          ]
+        },
+        "product_id": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE order_lines"
+          ]
+        },
+        "qty": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE order_lines"
+          ]
+        },
+        "unit_price": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE order_lines"
+          ]
+        },
+        "discount_pct": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE order_lines"
+          ]
+        }
+      },
+      "notes": ""
+    },
+    {
+      "propose": {
+        "kind": "table",
+        "ref": "business_db.public.invoices",
+        "text": "One row per invoice, issued for a non-cancelled sales order. Amount is the total of that order's lines. Unpaid balance is invoice amount minus the payments recorded against it.",
+        "columns": {
+          "id": "Invoice identifier. Referenced by payments.invoice_id.",
+          "order_id": "The sales order this invoice bills. Joins to sales_orders.id. Unique, so one invoice per order.",
+          "customer_id": "Customer being billed. Joins to customers.id.",
+          "invoice_date": "Date the invoice was issued, the day after the order date. A business date with no time zone.",
+          "due_date": "Date payment is due. 45 days after invoice_date for Wholesale customers, otherwise 30 days.",
+          "amount": "Invoice total in business currency units, tax not modelled. Compare with the sum of payments.amount to find unpaid balance."
+        }
+      },
+      "confidence": "high",
+      "evidence": [
+        "deploy/demo-business.sql: CREATE TABLE invoices"
+      ],
+      "column_review": {
+        "id": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE invoices"
+          ]
+        },
+        "order_id": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE invoices"
+          ]
+        },
+        "customer_id": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE invoices"
+          ]
+        },
+        "invoice_date": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE invoices"
+          ]
+        },
+        "due_date": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE invoices"
+          ]
+        },
+        "amount": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE invoices"
+          ]
+        }
+      },
+      "notes": ""
+    },
+    {
+      "propose": {
+        "kind": "table",
+        "ref": "business_db.public.payments",
+        "text": "One row per payment received against an invoice. paid_at is the business date of receipt. Invoices with no payment rows are unpaid.",
+        "columns": {
+          "id": "Payment identifier.",
+          "invoice_id": "Invoice this payment settles. Joins to invoices.id.",
+          "paid_at": "Date the money was received. A business date with no time zone. paid_at minus invoices.due_date is days paid late, negative when early.",
+          "amount": "Amount received in business currency units. Usually equals the invoice amount, one payment per invoice.",
+          "method": "How the customer paid. Values: bank_transfer, card, cheque."
+        }
+      },
+      "confidence": "high",
+      "evidence": [
+        "deploy/demo-business.sql: CREATE TABLE payments (method CHECK)"
+      ],
+      "column_review": {
+        "id": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE payments"
+          ]
+        },
+        "invoice_id": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE payments"
+          ]
+        },
+        "paid_at": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE payments"
+          ]
+        },
+        "amount": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE payments"
+          ]
+        },
+        "method": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE payments"
+          ]
+        }
+      },
+      "notes": ""
+    },
+    {
+      "propose": {
+        "kind": "table",
+        "ref": "business_db.public.inventory_snapshots",
+        "text": "One row per product per weekly stock count date. Use the latest snapshot_date for current stock. on_hand of zero means a stock-out on that date.",
+        "columns": {
+          "product_id": "Product counted. Joins to products.id. Together with snapshot_date it is the primary key.",
+          "snapshot_date": "Date of the stock count, taken weekly. A business date with no time zone. The newest date is the current stock position.",
+          "on_hand": "Units in stock on the snapshot date. Never negative. Zero means out of stock."
+        }
+      },
+      "confidence": "high",
+      "evidence": [
+        "deploy/demo-business.sql: CREATE TABLE inventory_snapshots"
+      ],
+      "column_review": {
+        "product_id": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE inventory_snapshots"
+          ]
+        },
+        "snapshot_date": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE inventory_snapshots"
+          ]
+        },
+        "on_hand": {
+          "confidence": "high",
+          "evidence": [
+            "deploy/demo-business.sql: CREATE TABLE inventory_snapshots"
+          ]
+        }
+      },
+      "notes": ""
+    }
+  ],
+  "rules": [
+    {
+      "propose": {
+        "kind": "rule",
+        "ref": "rule:naming-lowercase",
+        "title": "Identifier naming",
+        "text": "All table and column names are lowercase snake_case and unquoted. Write public.sales_orders or just sales_orders, never a double-quoted PascalCase name. Correct example: SELECT count(*) FROM customers WHERE is_active.",
+        "tables": [
+          "business_db.public.regions",
+          "business_db.public.sales_reps",
+          "business_db.public.customers",
+          "business_db.public.products",
+          "business_db.public.sales_orders",
+          "business_db.public.order_lines",
+          "business_db.public.invoices",
+          "business_db.public.payments",
+          "business_db.public.inventory_snapshots"
+        ]
+      },
+      "category": "naming",
+      "confidence": "high",
+      "evidence": [
+        "deploy/demo-business.sql: all CREATE TABLE statements"
+      ]
+    },
+    {
+      "propose": {
+        "kind": "rule",
+        "ref": "rule:order-status",
+        "title": "Order status values",
+        "text": "sales_orders.status is open, shipped, delivered, cancelled or returned. Revenue and order trends exclude cancelled. Open means taken but not yet shipped. Counts of cancelled orders use status cancelled.",
+        "tables": [
+          "business_db.public.sales_orders"
+        ]
+      },
+      "category": "status",
+      "confidence": "high",
+      "evidence": [
+        "deploy/demo-business.sql: sales_orders status CHECK",
+        "deploy/demo-business.sql: invoices are created only for status <> cancelled"
+      ]
+    },
+    {
+      "propose": {
+        "kind": "rule",
+        "ref": "rule:money-units",
+        "title": "Money and line amounts",
+        "text": "All money columns are numeric amounts in one business currency, in whole currency units and not cents. A line amount is qty * unit_price * (1 - discount_pct / 100). Revenue is the sum of line amounts for orders that are not cancelled. Whether revenue should net out discounts is an open question.",
+        "tables": [
+          "business_db.public.order_lines",
+          "business_db.public.invoices",
+          "business_db.public.payments"
+        ]
+      },
+      "category": "money",
+      "confidence": "medium",
+      "evidence": [
+        "deploy/demo-business.sql: order_lines numeric columns",
+        "deploy/demo-business.sql: invoices amount derived from order lines"
+      ]
+    },
+    {
+      "propose": {
+        "kind": "rule",
+        "ref": "rule:business-dates",
+        "title": "Dates have no time zone",
+        "text": "Every date column is of type date, with no time and no time zone. order_date is the business date of an order, invoice_date and due_date place an invoice, paid_at is the day payment arrived, snapshot_date is the weekly stock count date.",
+        "tables": [
+          "business_db.public.sales_orders",
+          "business_db.public.invoices",
+          "business_db.public.payments",
+          "business_db.public.inventory_snapshots"
+        ]
+      },
+      "category": "time",
+      "confidence": "high",
+      "evidence": [
+        "deploy/demo-business.sql: date typed columns"
+      ]
+    },
+    {
+      "propose": {
+        "kind": "rule",
+        "ref": "rule:unpaid-balance",
+        "title": "Unpaid invoice balance",
+        "text": "An invoice is unpaid when the sum of its payments.amount is below invoices.amount. Total unpaid balance is the sum of invoices.amount minus the sum of payments.amount. A small share of invoices is never paid and counts as bad debt.",
+        "tables": [
+          "business_db.public.invoices",
+          "business_db.public.payments"
+        ]
+      },
+      "category": "join",
+      "confidence": "high",
+      "evidence": [
+        "deploy/demo-business.sql: payments reference invoices",
+        "db: aggregate sums of invoices and payments"
+      ]
+    },
+    {
+      "propose": {
+        "kind": "rule",
+        "ref": "rule:latest-stock",
+        "title": "Current stock is the latest snapshot",
+        "text": "inventory_snapshots holds weekly history. Current stock for a product is its row with the newest snapshot_date. Summing on_hand across all dates is meaningless.",
+        "tables": [
+          "business_db.public.inventory_snapshots",
+          "business_db.public.products"
+        ]
+      },
+      "category": "derived_column",
+      "confidence": "high",
+      "evidence": [
+        "deploy/demo-business.sql: inventory_snapshots primary key (product_id, snapshot_date)"
+      ]
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Segment",
+      "propose": {
+        "kind": "rule",
+        "ref": "rule:term-segment",
+        "title": "Term: Segment",
+        "text": "Customer type, stored in customers.segment: Retail, Wholesale, Hospitality or Online. Used to compare buying and payment behaviour. Wholesale has longer invoice terms.",
+        "tables": [
+          "business_db.public.customers"
+        ]
+      },
+      "confidence": "high",
+      "evidence": [
+        "deploy/demo-business.sql: customers segment CHECK"
+      ]
+    },
+    {
+      "term": "Open balance",
+      "propose": {
+        "kind": "rule",
+        "ref": "rule:term-open-balance",
+        "title": "Term: Open balance",
+        "text": "Invoice amount not yet covered by payments: invoices.amount minus the sum of payments.amount for that invoice. Summed over invoices it is the unpaid balance owed to the business.",
+        "tables": [
+          "business_db.public.invoices",
+          "business_db.public.payments"
+        ]
+      },
+      "confidence": "high",
+      "evidence": [
+        "deploy/demo-business.sql: invoices and payments tables"
+      ]
+    },
+    {
+      "term": "Days late",
+      "propose": {
+        "kind": "rule",
+        "ref": "rule:term-days-late",
+        "title": "Term: Days late",
+        "text": "paid_at minus due_date for a payment, in days. Positive means paid after the due date, negative means paid early. Averages by segment show which customers pay slowly.",
+        "tables": [
+          "business_db.public.payments",
+          "business_db.public.invoices"
+        ]
+      },
+      "confidence": "high",
+      "evidence": [
+        "deploy/demo-business.sql: payments.paid_at, invoices.due_date"
+      ]
+    }
+  ],
+  "kpis": [
+    {
+      "propose": {
+        "kind": "kpi",
+        "ref": "kpi:monthly-revenue",
+        "title": "Monthly revenue",
+        "text": "Sum of qty * unit_price * (1 - discount_pct / 100) over order lines of orders that are not cancelled, per calendar month of order_date. One business currency, whole units. Grain: one value per month. Reference SQL: SELECT to_char(date_trunc('month', o.order_date), 'YYYY-MM') AS month, round(sum(l.qty * l.unit_price * (1 - l.discount_pct / 100)), 2) AS revenue FROM sales_orders o JOIN order_lines l ON l.order_id = o.id WHERE o.status <> 'cancelled' GROUP BY 1 ORDER BY 1",
+        "tables": [
+          "business_db.public.sales_orders",
+          "business_db.public.order_lines"
+        ]
+      },
+      "reference_sql": "SELECT to_char(date_trunc('month', o.order_date), 'YYYY-MM') AS month, round(sum(l.qty * l.unit_price * (1 - l.discount_pct / 100)), 2) AS revenue FROM sales_orders o JOIN order_lines l ON l.order_id = o.id WHERE o.status <> 'cancelled' GROUP BY 1 ORDER BY 1",
+      "origin": "suggested",
+      "sql_tested": true,
+      "confidence": "medium",
+      "evidence": [
+        "db: monthly revenue aggregate",
+        "deploy/demo-business.sql: order_lines columns"
+      ]
+    },
+    {
+      "propose": {
+        "kind": "kpi",
+        "ref": "kpi:unpaid-balance",
+        "title": "Unpaid invoice balance",
+        "text": "Sum of invoices.amount minus sum of payments.amount, across all invoices. One business currency, whole units. Grain: a single number as of today, with no date filter. Reference SQL: SELECT round(sum(amount) - (SELECT coalesce(sum(amount), 0) FROM payments), 2) AS unpaid_balance FROM invoices",
+        "tables": [
+          "business_db.public.invoices",
+          "business_db.public.payments"
+        ]
+      },
+      "reference_sql": "SELECT round(sum(amount) - (SELECT coalesce(sum(amount), 0) FROM payments), 2) AS unpaid_balance FROM invoices",
+      "origin": "suggested",
+      "sql_tested": true,
+      "confidence": "medium",
+      "evidence": [
+        "db: unpaid balance aggregate",
+        "deploy/demo-business.sql: invoices, payments"
+      ]
+    },
+    {
+      "propose": {
+        "kind": "kpi",
+        "ref": "kpi:avg-days-paid-late",
+        "title": "Average days paid late by segment",
+        "text": "Average of payments.paid_at minus invoices.due_date, grouped by customers.segment. Grain: one value per segment. Positive means late. Reference SQL: SELECT c.segment, round(avg(p.paid_at - i.due_date), 1) AS avg_days_late FROM payments p JOIN invoices i ON i.id = p.invoice_id JOIN customers c ON c.id = i.customer_id GROUP BY 1 ORDER BY 2 DESC",
+        "tables": [
+          "business_db.public.payments",
+          "business_db.public.invoices",
+          "business_db.public.customers"
+        ]
+      },
+      "reference_sql": "SELECT c.segment, round(avg(p.paid_at - i.due_date), 1) AS avg_days_late FROM payments p JOIN invoices i ON i.id = p.invoice_id JOIN customers c ON c.id = i.customer_id GROUP BY 1 ORDER BY 2 DESC",
+      "origin": "suggested",
+      "sql_tested": true,
+      "confidence": "medium",
+      "evidence": [
+        "db: average days late by segment aggregate"
+      ]
+    },
+    {
+      "propose": {
+        "kind": "kpi",
+        "ref": "kpi:units-on-hand",
+        "title": "Units on hand",
+        "text": "Sum of on_hand across all products on the latest snapshot_date. Grain: a single number for the newest weekly stock count. Reference SQL: SELECT sum(on_hand) AS units_on_hand FROM inventory_snapshots WHERE snapshot_date = (SELECT max(snapshot_date) FROM inventory_snapshots)",
+        "tables": [
+          "business_db.public.inventory_snapshots"
+        ]
+      },
+      "reference_sql": "SELECT sum(on_hand) AS units_on_hand FROM inventory_snapshots WHERE snapshot_date = (SELECT max(snapshot_date) FROM inventory_snapshots)",
+      "origin": "suggested",
+      "sql_tested": true,
+      "confidence": "medium",
+      "evidence": [
+        "db: sum of on_hand on max(snapshot_date)"
+      ]
+    }
+  ],
+  "hide_tables": [],
+  "watch_candidates": [
+    {
+      "title": "Overdue invoice balance above 900000",
+      "condition": "Total balance of invoices whose due_date is before today and whose payments are below the invoice amount (invoices.amount minus sum of payments.amount) rises above 900000.",
+      "cadence_minutes": 1440,
+      "one_shot": false,
+      "draft_sql": "SELECT round(coalesce(sum(i.amount - coalesce(p.paid, 0)), 0), 2) AS overdue_balance FROM invoices i LEFT JOIN (SELECT invoice_id, sum(amount) AS paid FROM payments GROUP BY invoice_id) p ON p.invoice_id = i.id WHERE i.due_date < current_date AND i.amount > coalesce(p.paid, 0)",
+      "trigger_hint": {
+        "type": "threshold",
+        "column": "overdue_balance",
+        "op": ">",
+        "value": 900000
+      },
+      "kpi_ref": "kpi:unpaid-balance",
+      "rationale": "Overdue money is cash the business is waiting for. When it fires, review slow-paying segments and chase the largest balances.",
+      "sql_tested": true,
+      "confidence": "medium",
+      "evidence": [
+        "db: aggregate run read-only returned one row"
+      ]
+    },
+    {
+      "title": "Weekly revenue drop of more than 20 percent",
+      "condition": "Revenue of the latest 7 days of order_date (qty * unit_price * (1 - discount_pct / 100) on orders that are not cancelled) divided by revenue of the 7 days before falls below 0.8.",
+      "cadence_minutes": 1440,
+      "one_shot": false,
+      "draft_sql": "WITH m AS (SELECT max(order_date) AS d FROM sales_orders), r AS (SELECT o.order_date, sum(l.qty * l.unit_price * (1 - l.discount_pct / 100)) AS rev FROM sales_orders o JOIN order_lines l ON l.order_id = o.id WHERE o.status <> 'cancelled' GROUP BY o.order_date) SELECT round((SELECT sum(rev) FROM r, m WHERE r.order_date > m.d - 7) / nullif((SELECT sum(rev) FROM r, m WHERE r.order_date > m.d - 14 AND r.order_date <= m.d - 7), 0), 3) AS revenue_ratio",
+      "trigger_hint": {
+        "type": "threshold",
+        "column": "revenue_ratio",
+        "op": "<",
+        "value": 0.8
+      },
+      "kpi_ref": "kpi:monthly-revenue",
+      "rationale": "A sharp week-on-week fall can mean a lost customer or channel problem. When it fires, break revenue down by region and segment.",
+      "sql_tested": true,
+      "confidence": "medium",
+      "evidence": [
+        "db: aggregate run read-only returned one row"
+      ]
+    },
+    {
+      "title": "Products at zero stock in the latest count",
+      "condition": "Number of products with on_hand = 0 on the newest snapshot_date of inventory_snapshots rises above 0.",
+      "cadence_minutes": 1440,
+      "one_shot": false,
+      "draft_sql": "SELECT count(*) AS zero_stock_products FROM inventory_snapshots WHERE snapshot_date = (SELECT max(snapshot_date) FROM inventory_snapshots) AND on_hand = 0",
+      "trigger_hint": {
+        "type": "threshold",
+        "column": "zero_stock_products",
+        "op": ">",
+        "value": 0
+      },
+      "kpi_ref": "kpi:units-on-hand",
+      "rationale": "A stock-out means lost sales. When it fires, ask purchasing to reorder those products.",
+      "sql_tested": true,
+      "confidence": "medium",
+      "evidence": [
+        "db: aggregate run read-only returned one row"
+      ]
+    }
+  ],
+  "dashboard_ideas": [
+    {
+      "title": "Sales and revenue overview",
+      "question": "How is revenue trending, and where does it come from?",
+      "audience": "owner",
+      "layout": [
+        "tiles: revenue_30d vs revenue_prev_30d (currency, last 30 days, change vs previous 30 days)",
+        "line chart: weekly revenue, last 26 weeks",
+        "bar chart: revenue by product category, last 90 days",
+        "bar chart: orders by region, last 90 days",
+        "table: top 10 products by revenue, last 90 days"
+      ],
+      "queries": [
+        {
+          "id": "tiles",
+          "sql": "SELECT round(sum(CASE WHEN o.order_date > m.d - 30 THEN l.qty * l.unit_price * (1 - l.discount_pct / 100) END), 2) AS revenue_30d, round(sum(CASE WHEN o.order_date > m.d - 60 AND o.order_date <= m.d - 30 THEN l.qty * l.unit_price * (1 - l.discount_pct / 100) END), 2) AS revenue_prev_30d FROM sales_orders o JOIN order_lines l ON l.order_id = o.id CROSS JOIN (SELECT max(order_date) AS d FROM sales_orders) m WHERE o.status <> 'cancelled'",
+          "refresh_minutes": 60
+        },
+        {
+          "id": "trend",
+          "sql": "SELECT to_char(date_trunc('week', o.order_date), 'YYYY-MM-DD') AS week, round(sum(l.qty * l.unit_price * (1 - l.discount_pct / 100)), 2) AS revenue FROM sales_orders o JOIN order_lines l ON l.order_id = o.id WHERE o.status <> 'cancelled' AND o.order_date >= date_trunc('week', (SELECT max(order_date) FROM sales_orders) - 180) GROUP BY 1 ORDER BY 1",
+          "refresh_minutes": 60
+        },
+        {
+          "id": "by_category",
+          "sql": "SELECT p.category, round(sum(l.qty * l.unit_price * (1 - l.discount_pct / 100)), 2) AS revenue FROM sales_orders o JOIN order_lines l ON l.order_id = o.id JOIN products p ON p.id = l.product_id WHERE o.status <> 'cancelled' AND o.order_date >= (SELECT max(order_date) FROM sales_orders) - 90 GROUP BY 1 ORDER BY 2 DESC",
+          "refresh_minutes": 60
+        },
+        {
+          "id": "by_region",
+          "sql": "SELECT r.name AS region, count(*) AS orders FROM sales_orders o JOIN customers c ON c.id = o.customer_id JOIN regions r ON r.id = c.region_id WHERE o.status <> 'cancelled' AND o.order_date >= (SELECT max(order_date) FROM sales_orders) - 90 GROUP BY 1 ORDER BY 2 DESC",
+          "refresh_minutes": 60
+        },
+        {
+          "id": "top_products",
+          "sql": "SELECT p.name AS product, p.category, round(sum(l.qty * l.unit_price * (1 - l.discount_pct / 100)), 2) AS revenue FROM sales_orders o JOIN order_lines l ON l.order_id = o.id JOIN products p ON p.id = l.product_id WHERE o.status <> 'cancelled' AND o.order_date >= (SELECT max(order_date) FROM sales_orders) - 90 GROUP BY 1, 2 ORDER BY 3 DESC LIMIT 10",
+          "refresh_minutes": 60
+        }
+      ],
+      "confidence": "medium",
+      "evidence": [
+        "db: every query run read-only in this session",
+        "deploy/demo-business.sql: tables used"
+      ]
+    },
+    {
+      "title": "Receivables and late payments",
+      "question": "How much are we owed, and which customers pay late?",
+      "audience": "owner",
+      "layout": [
+        "tiles: invoiced_total and unpaid_balance (currency, all time)",
+        "bar chart: average days late by segment",
+        "line chart: average days late by payment month",
+        "table: unpaid balance by segment"
+      ],
+      "queries": [
+        {
+          "id": "tiles",
+          "sql": "SELECT round(sum(i.amount), 2) AS invoiced_total, round(sum(i.amount) - (SELECT coalesce(sum(amount), 0) FROM payments), 2) AS unpaid_balance FROM invoices i",
+          "refresh_minutes": 60
+        },
+        {
+          "id": "late_by_segment",
+          "sql": "SELECT c.segment, round(avg(p.paid_at - i.due_date), 1) AS avg_days_late FROM payments p JOIN invoices i ON i.id = p.invoice_id JOIN customers c ON c.id = i.customer_id GROUP BY 1 ORDER BY 2 DESC",
+          "refresh_minutes": 60
+        },
+        {
+          "id": "late_by_month",
+          "sql": "SELECT to_char(date_trunc('month', p.paid_at), 'YYYY-MM') AS month, round(avg(p.paid_at - i.due_date), 1) AS avg_days_late FROM payments p JOIN invoices i ON i.id = p.invoice_id GROUP BY 1 ORDER BY 1",
+          "refresh_minutes": 60
+        },
+        {
+          "id": "unpaid_by_segment",
+          "sql": "SELECT c.segment, count(*) AS unpaid_invoices, round(sum(i.amount - coalesce(p.paid, 0)), 2) AS balance FROM invoices i JOIN customers c ON c.id = i.customer_id LEFT JOIN (SELECT invoice_id, sum(amount) AS paid FROM payments GROUP BY invoice_id) p ON p.invoice_id = i.id WHERE i.amount > coalesce(p.paid, 0) GROUP BY 1 ORDER BY 3 DESC",
+          "refresh_minutes": 60
+        }
+      ],
+      "confidence": "medium",
+      "evidence": [
+        "db: every query run read-only in this session",
+        "deploy/demo-business.sql: tables used"
+      ]
+    }
+  ],
+  "open_questions": [
+    {
+      "id": "q1",
+      "question": "Should revenue be net of line discounts, or list value before discount?",
+      "why_it_matters": "Wholesale lines carry discounts, so the two definitions differ and KPIs and dashboards depend on the choice.",
+      "affects": [
+        "rule:money-units",
+        "kpi:monthly-revenue"
+      ],
+      "seen_in_code": "deploy/demo-business.sql: invoices.amount is computed with discount_pct applied, so this pack nets discounts out."
+    }
+  ],
+  "coverage": {
+    "tables": [
+      {
+        "name": "public.regions",
+        "where": "tables",
+        "reason": "Described with every column."
+      },
+      {
+        "name": "public.sales_reps",
+        "where": "tables",
+        "reason": "Described with every column."
+      },
+      {
+        "name": "public.customers",
+        "where": "tables",
+        "reason": "Described with every column."
+      },
+      {
+        "name": "public.products",
+        "where": "tables",
+        "reason": "Described with every column."
+      },
+      {
+        "name": "public.sales_orders",
+        "where": "tables",
+        "reason": "Described with every column."
+      },
+      {
+        "name": "public.order_lines",
+        "where": "tables",
+        "reason": "Described with every column."
+      },
+      {
+        "name": "public.invoices",
+        "where": "tables",
+        "reason": "Described with every column."
+      },
+      {
+        "name": "public.payments",
+        "where": "tables",
+        "reason": "Described with every column."
+      },
+      {
+        "name": "public.inventory_snapshots",
+        "where": "tables",
+        "reason": "Described with every column."
+      }
+    ],
+    "conventions": {
+      "soft_delete": "not found: no deleted_at or is_deleted column in any table",
+      "test_data": "not found: no test or demo flag; all rows are synthetic",
+      "status": "rule:order-status",
+      "money": "rule:money-units",
+      "time": "rule:business-dates",
+      "tenancy": "not found: single business, no tenant column",
+      "derived_column": "rule:latest-stock covers snapshots; invoices.amount is derived from order lines (rule:money-units)",
+      "audit": "not found: no history or created_by tables",
+      "archive": "not found: no archive tables or partitions",
+      "naming": "rule:naming-lowercase"
+    },
+    "db_queries_run": [
+      {
+        "purpose": "Count of rows per status of sales_orders",
+        "sql": "SELECT status, count(*) FROM sales_orders GROUP BY 1"
+      },
+      {
+        "purpose": "Product categories",
+        "sql": "SELECT category, count(*) FROM products GROUP BY 1"
+      },
+      {
+        "purpose": "Date range of orders",
+        "sql": "SELECT min(order_date), max(order_date) FROM sales_orders"
+      },
+      {
+        "purpose": "Test KPI or watch query rev_month",
+        "sql": "SELECT to_char(date_trunc('month', o.order_date), 'YYYY-MM') AS month, round(sum(l.qty * l.unit_price * (1 - l.discount_pct / 100)), 2) AS revenue FROM sales_orders o JOIN order_lines l ON l.order_id = o.id WHERE o.status <> 'cancelled' GROUP BY 1 ORDER BY 1"
+      },
+      {
+        "purpose": "Test KPI or watch query unpaid",
+        "sql": "SELECT round(sum(amount) - (SELECT coalesce(sum(amount), 0) FROM payments), 2) AS unpaid_balance FROM invoices"
+      },
+      {
+        "purpose": "Test KPI or watch query late_seg",
+        "sql": "SELECT c.segment, round(avg(p.paid_at - i.due_date), 1) AS avg_days_late FROM payments p JOIN invoices i ON i.id = p.invoice_id JOIN customers c ON c.id = i.customer_id GROUP BY 1 ORDER BY 2 DESC"
+      },
+      {
+        "purpose": "Test KPI or watch query stock",
+        "sql": "SELECT sum(on_hand) AS units_on_hand FROM inventory_snapshots WHERE snapshot_date = (SELECT max(snapshot_date) FROM inventory_snapshots)"
+      },
+      {
+        "purpose": "Test KPI or watch query overdue",
+        "sql": "SELECT round(coalesce(sum(i.amount - coalesce(p.paid, 0)), 0), 2) AS overdue_balance FROM invoices i LEFT JOIN (SELECT invoice_id, sum(amount) AS paid FROM payments GROUP BY invoice_id) p ON p.invoice_id = i.id WHERE i.due_date < current_date AND i.amount > coalesce(p.paid, 0)"
+      },
+      {
+        "purpose": "Test KPI or watch query ratio",
+        "sql": "WITH m AS (SELECT max(order_date) AS d FROM sales_orders), r AS (SELECT o.order_date, sum(l.qty * l.unit_price * (1 - l.discount_pct / 100)) AS rev FROM sales_orders o JOIN order_lines l ON l.order_id = o.id WHERE o.status <> 'cancelled' GROUP BY o.order_date) SELECT round((SELECT sum(rev) FROM r, m WHERE r.order_date > m.d - 7) / nullif((SELECT sum(rev) FROM r, m WHERE r.order_date > m.d - 14 AND r.order_date <= m.d - 7), 0), 3) AS revenue_ratio"
+      },
+      {
+        "purpose": "Test KPI or watch query zero",
+        "sql": "SELECT count(*) AS zero_stock_products FROM inventory_snapshots WHERE snapshot_date = (SELECT max(snapshot_date) FROM inventory_snapshots) AND on_hand = 0"
+      },
+      {
+        "purpose": "Test dashboard query dash_tiles",
+        "sql": "SELECT round(sum(CASE WHEN o.order_date > m.d - 30 THEN l.qty * l.unit_price * (1 - l.discount_pct / 100) END), 2) AS revenue_30d, round(sum(CASE WHEN o.order_date > m.d - 60 AND o.order_date <= m.d - 30 THEN l.qty * l.unit_price * (1 - l.discount_pct / 100) END), 2) AS revenue_prev_30d FROM sales_orders o JOIN order_lines l ON l.order_id = o.id CROSS JOIN (SELECT max(order_date) AS d FROM sales_orders) m WHERE o.status <> 'cancelled'"
+      },
+      {
+        "purpose": "Test dashboard query dash_trend",
+        "sql": "SELECT to_char(date_trunc('week', o.order_date), 'YYYY-MM-DD') AS week, round(sum(l.qty * l.unit_price * (1 - l.discount_pct / 100)), 2) AS revenue FROM sales_orders o JOIN order_lines l ON l.order_id = o.id WHERE o.status <> 'cancelled' AND o.order_date >= date_trunc('week', (SELECT max(order_date) FROM sales_orders) - 180) GROUP BY 1 ORDER BY 1"
+      },
+      {
+        "purpose": "Test dashboard query dash_cat",
+        "sql": "SELECT p.category, round(sum(l.qty * l.unit_price * (1 - l.discount_pct / 100)), 2) AS revenue FROM sales_orders o JOIN order_lines l ON l.order_id = o.id JOIN products p ON p.id = l.product_id WHERE o.status <> 'cancelled' AND o.order_date >= (SELECT max(order_date) FROM sales_orders) - 90 GROUP BY 1 ORDER BY 2 DESC"
+      },
+      {
+        "purpose": "Test dashboard query dash_region",
+        "sql": "SELECT r.name AS region, count(*) AS orders FROM sales_orders o JOIN customers c ON c.id = o.customer_id JOIN regions r ON r.id = c.region_id WHERE o.status <> 'cancelled' AND o.order_date >= (SELECT max(order_date) FROM sales_orders) - 90 GROUP BY 1 ORDER BY 2 DESC"
+      },
+      {
+        "purpose": "Test dashboard query dash_top",
+        "sql": "SELECT p.name AS product, p.category, round(sum(l.qty * l.unit_price * (1 - l.discount_pct / 100)), 2) AS revenue FROM sales_orders o JOIN order_lines l ON l.order_id = o.id JOIN products p ON p.id = l.product_id WHERE o.status <> 'cancelled' AND o.order_date >= (SELECT max(order_date) FROM sales_orders) - 90 GROUP BY 1, 2 ORDER BY 3 DESC LIMIT 10"
+      },
+      {
+        "purpose": "Test dashboard query ar_tiles",
+        "sql": "SELECT round(sum(i.amount), 2) AS invoiced_total, round(sum(i.amount) - (SELECT coalesce(sum(amount), 0) FROM payments), 2) AS unpaid_balance FROM invoices i"
+      },
+      {
+        "purpose": "Test dashboard query ar_late",
+        "sql": "SELECT c.segment, round(avg(p.paid_at - i.due_date), 1) AS avg_days_late FROM payments p JOIN invoices i ON i.id = p.invoice_id JOIN customers c ON c.id = i.customer_id GROUP BY 1 ORDER BY 2 DESC"
+      },
+      {
+        "purpose": "Test dashboard query ar_month",
+        "sql": "SELECT to_char(date_trunc('month', p.paid_at), 'YYYY-MM') AS month, round(avg(p.paid_at - i.due_date), 1) AS avg_days_late FROM payments p JOIN invoices i ON i.id = p.invoice_id GROUP BY 1 ORDER BY 1"
+      },
+      {
+        "purpose": "Test dashboard query ar_top",
+        "sql": "SELECT c.segment, count(*) AS unpaid_invoices, round(sum(i.amount - coalesce(p.paid, 0)), 2) AS balance FROM invoices i JOIN customers c ON c.id = i.customer_id LEFT JOIN (SELECT invoice_id, sum(amount) AS paid FROM payments GROUP BY invoice_id) p ON p.invoice_id = i.id WHERE i.amount > coalesce(p.paid, 0) GROUP BY 1 ORDER BY 3 DESC"
+      }
+    ]
+  }
+}

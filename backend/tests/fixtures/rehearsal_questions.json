@@ -1,0 +1,77 @@
+[
+  {
+    "id": "q1",
+    "ask": "How many active customers do we have?",
+    "sql": "SELECT count(*) FROM customers WHERE is_active",
+    "match": "int",
+    "sanity": 224
+  },
+  {
+    "id": "q2",
+    "ask": "How many products are discontinued?",
+    "sql": "SELECT count(*) FROM products WHERE is_discontinued",
+    "match": "int",
+    "sanity": 8
+  },
+  {
+    "id": "q3",
+    "ask": "How many sales reps are active?",
+    "sql": "SELECT count(*) FROM sales_reps WHERE is_active",
+    "match": "int",
+    "sanity": 11
+  },
+  {
+    "id": "q4",
+    "ask": "How many sales orders were placed in September 2026?",
+    "sql": "SELECT count(*) FROM sales_orders WHERE order_date >= '2026-09-01' AND order_date < '2026-10-01'",
+    "match": "int",
+    "sanity": 691
+  },
+  {
+    "id": "q5",
+    "ask": "How many orders have been cancelled in total?",
+    "sql": "SELECT count(*) FROM sales_orders WHERE status = 'cancelled'",
+    "match": "int",
+    "sanity": 447
+  },
+  {
+    "id": "q6",
+    "ask": "How many sales orders are open right now?",
+    "sql": "SELECT count(*) FROM sales_orders WHERE status = 'open'",
+    "match": "int",
+    "sanity": 84,
+    "track_this": true
+  },
+  {
+    "id": "q7",
+    "ask": "Which product category had the highest sales revenue in 2025?",
+    "sql": "SELECT p.category FROM order_lines l JOIN sales_orders o ON o.id = l.order_id JOIN products p ON p.id = l.product_id WHERE o.order_date >= '2025-01-01' AND o.order_date < '2026-01-01' AND o.status <> 'cancelled' GROUP BY 1 ORDER BY sum(l.qty * l.unit_price * (1 - l.discount_pct / 100)) DESC LIMIT 1",
+    "match": "text",
+    "candidates_sql": "SELECT DISTINCT category FROM products",
+    "sanity": "Frozen"
+  },
+  {
+    "id": "q8",
+    "ask": "Which customer segment pays its invoices latest on average?",
+    "sql": "SELECT c.segment FROM payments p JOIN invoices i ON i.id = p.invoice_id JOIN customers c ON c.id = i.customer_id GROUP BY 1 ORDER BY avg(p.paid_at - i.due_date) DESC LIMIT 1",
+    "match": "text",
+    "candidates_sql": "SELECT DISTINCT segment FROM customers",
+    "sanity": "Hospitality"
+  },
+  {
+    "id": "q9",
+    "ask": "Which region's order count fell between July 2026 and September 2026?",
+    "sql": "SELECT r.name FROM sales_orders o JOIN customers c ON c.id = o.customer_id JOIN regions r ON r.id = c.region_id GROUP BY r.name HAVING count(*) FILTER (WHERE o.order_date >= '2026-09-01' AND o.order_date < '2026-10-01') < count(*) FILTER (WHERE o.order_date >= '2026-07-01' AND o.order_date < '2026-08-01')",
+    "match": "text",
+    "candidates_sql": "SELECT name FROM regions",
+    "sanity": "South"
+  },
+  {
+    "id": "q10",
+    "ask": "What is the total unpaid invoice balance right now?",
+    "sql": "SELECT round(sum(amount) - (SELECT coalesce(sum(amount), 0) FROM payments), 2) FROM invoices",
+    "match": "money",
+    "tolerance": 0.005,
+    "sanity": 2005218.07
+  }
+]

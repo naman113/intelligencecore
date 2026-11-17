@@ -1,0 +1,77 @@
+/* The onboarding interview. The only place in the product where a person and
+   the system talk in prose, so it is allowed to look like a conversation and
+   nothing else does. */
+
+.iv {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.iv-thread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+  padding: var(--s5);
+  overflow-y: auto;
+}
+
+.iv-turn { display: flex; }
+.iv-turn.is-user { justify-content: flex-end; }
+
+.iv-bubble {
+  max-width: 62ch;
+  padding: var(--s3) var(--s4);
+  border-radius: var(--radius);
+  font-size: var(--fs-base);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.iv-turn.is-assistant .iv-bubble {
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-top-left-radius: 3px;
+  color: var(--t1);
+}
+.iv-turn.is-user .iv-bubble {
+  background: var(--signal-lo);
+  border: 1px solid var(--signal);
+  border-top-right-radius: 3px;
+  color: #EAF2FB;
+}
+
+.iv-who {
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t4);
+  margin-bottom: var(--s1);
+}
+
+.iv-compose {
+  display: flex;
+  gap: var(--s2);
+  align-items: flex-end;
+  padding: var(--s4) var(--s5);
+  border-top: 1px solid var(--line);
+}
+.iv-compose .textarea {
+  min-height: 44px;
+  max-height: 180px;
+  font-family: var(--body);
+  font-size: var(--fs-base);
+}
+
+.iv-hint {
+  font-size: var(--fs-micro);
+  color: var(--t4);
+  padding: 0 var(--s5) var(--s3);
+}
+
+@media (max-width: 640px) {
+  .iv-thread { padding: var(--s4); }
+  .iv-compose { padding: var(--s3) var(--s4); }
+  .iv-bubble { max-width: 100%; }
+}

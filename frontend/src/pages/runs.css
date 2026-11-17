@@ -1,0 +1,127 @@
+/* Quick 008: Runs control center. Blue is work in flight, red is broken, green
+   is done. Nothing on this page is owed, so there is no gold here. */
+
+.runs-now {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s4);
+  margin-bottom: var(--s4);
+}
+.runs-now-col { min-width: 0; }
+.runs-now-error { margin-bottom: var(--s4); }
+
+.runs-now-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s3) var(--s4);
+  border-bottom: 1px solid var(--line);
+  color: inherit;
+  text-decoration: none;
+  transition: background var(--t-fast) var(--ease);
+}
+.runs-now-row:last-child { border-bottom: none; }
+a.runs-now-row:hover { background: var(--raised); }
+.runs-now-row.is-selected { background: var(--signal-wash); }
+
+.runs-now-title { font-size: var(--fs-small); font-weight: 500; color: var(--t1); }
+.runs-now-meta { font-size: var(--fs-tiny); color: var(--t3); margin-top: 2px; }
+.runs-now-time { font-size: var(--fs-micro); white-space: nowrap; }
+.runs-now-empty { padding: var(--s4); font-size: var(--fs-small); color: var(--t3); }
+
+/* A calm pulse on work in flight; none under reduced motion. */
+.runs-pulse { animation: runs-pulse 1.6s var(--ease) infinite; }
+@keyframes runs-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .runs-pulse { animation: none; }
+}
+
+.runs-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3);
+  margin-bottom: var(--s4);
+}
+.runs-chips { display: flex; flex-wrap: wrap; gap: var(--s2); flex: 1 1 auto; min-width: 0; }
+.runs-selects { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; }
+.runs-selects .select { width: auto; min-width: 9rem; }
+
+.runs-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line-lit);
+  background: transparent;
+  color: var(--t2);
+  font: inherit;
+  font-size: var(--fs-tiny);
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.runs-chip:hover { background: var(--raised); color: var(--t1); }
+.runs-chip.is-active { background: var(--signal-wash); border-color: var(--signal-lo); color: var(--signal-hi); }
+
+.runs-row { text-decoration: none; }
+.runs-row.is-failed { box-shadow: inset 2px 0 0 var(--broken); }
+.runs-line {
+  margin-top: 3px;
+  font-size: var(--fs-tiny);
+  color: var(--t2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.runs-line.is-error, .runs-error-text { color: var(--broken-hi); }
+.runs-repeats { color: var(--t2); }
+
+.runs-skills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.runs-skill { font-family: var(--mono); font-size: var(--fs-micro); text-transform: none; letter-spacing: 0; }
+
+.runs-more {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s3) var(--s4);
+}
+.runs-more-error { font-size: var(--fs-tiny); color: var(--broken-hi); }
+
+.runs-counts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--s3);
+}
+.runs-count { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.runs-count .mono { color: var(--t1); overflow-wrap: anywhere; }
+
+/* Quick 019: the memory a run used. Same row shape as Memory's search results. */
+.runs-mem-group { padding-top: var(--s3); border-bottom: 1px solid var(--line); }
+.runs-mem-group:last-child { border-bottom: none; }
+.runs-mem-label { display: block; padding: 0 var(--s4) var(--s2); }
+.runs-mem-row { padding: var(--s2) var(--s4); }
+.runs-mem-kind { min-width: 84px; justify-content: center; }
+.runs-mem-text { font-size: var(--fs-small); color: var(--t1); overflow-wrap: anywhere; white-space: pre-wrap; }
+.runs-mem-text.dim { color: var(--t3); }
+.runs-mem-meta { margin-top: 2px; font-size: var(--fs-micro); color: var(--t3); }
+.runs-mem-chips { display: flex; flex-wrap: wrap; gap: var(--s2); padding: 0 var(--s4) var(--s3); }
+.runs-mem-note { padding: var(--s2) var(--s4) var(--s3); font-size: var(--fs-tiny); color: var(--t3); }
+
+@media (max-width: 900px) {
+  .runs-now { grid-template-columns: 1fr; }
+}
+/* One column (split.css): with nothing picked, the "Pick a run" panel is noise. */
+@media (max-width: 1024px) {
+  .runs-split:not(.has-detail) .split-detail { display: none; }
+}
+@media (max-width: 560px) {
+  .runs-mem-kind { min-width: 0; }
+  .runs-selects { width: 100%; }
+  .runs-selects .select { flex: 1 1 8rem; min-width: 0; }
+  .runs-now-row, .runs-row { padding-left: var(--s3); padding-right: var(--s3); }
+}

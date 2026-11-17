@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp API Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #075e54;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #128c7e;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #075e54;
+        }
+        .response {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .curl-example {
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        .json-example {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .hint {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>WhatsApp API Tester</h1>
+    
+    <div class="container">
+        <h2>Send Text Message</h2>
+        
+        <h3>Example CURL Command</h3>
+        <div class="curl-example">
+            curl -X POST http://localhost:3000/api/message \
+            -H "Content-Type: application/json" \
+            -d '{"phone": "1234567890", "message": "Hello from WhatsApp API!"}'
+        </div>
+        
+        <h3>Test Form</h3>
+        <form id="sendMessageForm">
+            <label for="phoneNumber">Phone Number (with country code):</label>
+            <input type="text" id="phoneNumber" placeholder="e.g., 1234567890" required>
+            
+            <label for="message">Message:</label>
+            <textarea id="message" rows="4" placeholder="Type your message here..." required></textarea>
+            
+            <button type="submit">Send Message</button>
+        </form>
+        
+        <div id="messageResponse" class="response" style="display: none;"></div>
+    </div>
+    
+    <div class="container">
+        <h2>Send Bulk Messages</h2>
+        
+        <h3>Example CURL Command</h3>
+        <div class="curl-example">
+            curl -X POST http://localhost:3000/api/bulk-message \
+            -H "Content-Type: application/json" \
+            -d '{"messages": [{"phone": "1234567890", "message": "Bulk message 1"}, {"phone": "2345678901", "message": "Bulk message 2"}]}'
+        </div>
+        
+        <h3>Sample JSON</h3>
+        <div class="json-example" id="bulkSampleJson">
+{
+  "messages": [
+    {
+      "phone": "1234567890",
+      "message": "This is bulk test message 1"
+    },
+    {
+      "phone": "2345678901",
+      "message": "This is bulk test message 2"
+    }
+  ]
+}
+        </div>
+        <p class="hint">Edit the phone numbers and messages above as needed</p>
+        
+        <button id="sendBulkMessages">Send Bulk Messages</button>
+        
+        <div id="bulkResponse" class="response" style="display: none;"></div>
+    </div>
+    
+    <div class="container">
+        <h2>Check Connection Status</h2>
+        
+        <h3>Example CURL Command</h3>
+        <div class="curl-example">
+            curl -X GET http://localhost:3000/api/status
+        </div>
+        
+        <button id="checkStatus">Check Status</button>
+        
+        <div id="statusResponse" class="response" style="display: none;"></div>
+    </div>
+    
+    <script>
+        document.getElementById('sendMessageForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const message = document.getElementById('message').value;
+            const responseDiv = document.getElementById('messageResponse');
+            
+            responseDiv.style.display = 'block';
+            responseDiv.innerHTML = 'Sending message...';
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phone: phoneNumber,
+                        message: message
+                    })
+                });
+                
+                const data = await response.json();
+                responseDiv.innerHTML = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseDiv.innerHTML = `Error: ${error.message}`;
+            }
+        });
+        
+        document.getElementById('sendBulkMessages').addEventListener('click', async function() {
+            const bulkJsonText = document.getElementById('bulkSampleJson').textContent;
+            const responseDiv = document.getElementById('bulkResponse');
+            
+            responseDiv.style.display = 'block';
+            responseDiv.innerHTML = 'Sending bulk messages...';
+            
+            try {
+                // Parse the JSON input
+                const bulkData = JSON.parse(bulkJsonText);
+                
+                const response = await fetch('http://localhost:3000/api/bulk-message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(bulkData)
+                });
+                
+                const data = await response.json();
+                responseDiv.innerHTML = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseDiv.innerHTML = `Error: ${error.message}`;
+            }
+        });
+        
+        document.getElementById('checkStatus').addEventListener('click', async function() {
+            const responseDiv = document.getElementById('statusResponse');
+            
+            responseDiv.style.display = 'block';
+            responseDiv.innerHTML = 'Checking status...';
+            
+            try {
+                const response = await fetch(`${window.location.origin}/api/status`);
+                const data = await response.json();
+                responseDiv.innerHTML = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseDiv.innerHTML = `Error: ${error.message}`;
+            }
+        });
+        
+        // Make the JSON example editable
+        const jsonExample = document.getElementById('bulkSampleJson');
+        jsonExample.contentEditable = 'true';
+        jsonExample.addEventListener('blur', function() {
+            try {
+                // Validate JSON when user finishes editing
+                const json = JSON.parse(jsonExample.textContent);
+                // Format it nicely
+                jsonExample.textContent = JSON.stringify(json, null, 2);
+            } catch (error) {
+                alert('Invalid JSON format: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

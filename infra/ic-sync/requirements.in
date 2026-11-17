@@ -1,0 +1,5 @@
+dlt[postgres,sql-database,parquet]==1.31.0
+pymysql[rsa]==1.2.3
+pyodbc==5.3.0
+sqlalchemy>=2.0,<2.2
+pyarrow==26.0.0

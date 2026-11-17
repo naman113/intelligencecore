@@ -1,0 +1,24 @@
+.env
+__pycache__/
+.venv/
+# uv.lock is COMMITTED on purpose: install.sh and agentctl run `uv sync --frozen`,
+# so the lock is what pins every client VM to identical dependency versions.
+*.pyc
+artifacts/
+documents/
+.DS_Store
+.claude/
+backend/snapshot.json
+_to_delete/
+backend/backups/
+
+# Phase 11: agentctl backup output (never commit dumps)
+backups/
+
+# Never commit secrets or client data
+*.env
+!.env.example
+*SECRETS*
+*.pem
+*.key
+secrets/

@@ -1,0 +1,43 @@
+# Quick 042: sandbox-runner service. An always-on HTTP service that runs the
+# model's Python for a gateway that has no Docker socket (Railway). The gateway
+# sends script + files, the service runs it as the unprivileged `runner` user and
+# returns stdout/stderr and the new or changed files.
+#
+# Build with this folder as the context:
+#   docker build -f Dockerfile.service -t ic-sandbox-service app/sandbox
+# Run (the service refuses to start without SANDBOX_TOKEN):
+#   docker run -e SANDBOX_TOKEN=... -p 8080:8080 ic-sandbox-service
+FROM python:3.12-slim
+
+# tini is PID 1: scripts can orphan children, and only an init reaps them (a
+# Python server as PID 1 would leave zombies that still count against the
+# runner's process limit).
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends tini \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt \
+ && rm -f /tmp/requirements.txt \
+ && find /usr/local/lib/python3.12/site-packages -depth -type d -name tests -exec rm -rf {} +
+
+ENV OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 MPLBACKEND=Agg
+
+# Fixed uid: the server drops each script to it, and sweeps its processes.
+RUN useradd -m -u 1000 runner \
+ && mkdir -p /work \
+ && chown runner:runner /work
+# Build matplotlib's font cache once; the server restores a pristine copy of the
+# runner's home after every run.
+RUN runuser -u runner -- python -c "import matplotlib.pyplot" \
+ && cp -a /home/runner /opt/runner-home-pristine \
+ && chown -R root:root /opt/runner-home-pristine
+
+COPY server.py /opt/ic/server.py
+
+# The server itself stays root (it must switch users and kill leftovers); the
+# scripts never run as root. Set RAILWAY_RUN_UID=0 on Railway so it is not
+# started as another user.
+EXPOSE 8080
+ENTRYPOINT ["tini", "--"]
+CMD ["python", "-I", "/opt/ic/server.py"]

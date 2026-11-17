@@ -1,0 +1,181 @@
+{
+ "mill": {
+  "rolls_in": {
+   "kind": "sum",
+   "sql": "SELECT COALESCE(COUNT(*), 0) FROM rolls_inward r LEFT JOIN suppliers s ON s.supplier_id = r.supplier_id LEFT JOIN qualities q ON q.quality_id = r.quality_id WHERE (r.weigh_time AT TIME ZONE 'Asia/Kolkata')::date BETWEEN {from} AND {to} {extra}",
+   "dims": {
+    "suppliers.name": "s.name",
+    "qualities.name": "q.name"
+   }
+  },
+  "kg_in": {
+   "kind": "sum",
+   "sql": "SELECT COALESCE(SUM(r.kg), 0) FROM rolls_inward r LEFT JOIN suppliers s ON s.supplier_id = r.supplier_id LEFT JOIN qualities q ON q.quality_id = r.quality_id WHERE (r.weigh_time AT TIME ZONE 'Asia/Kolkata')::date BETWEEN {from} AND {to} {extra}",
+   "dims": {
+    "suppliers.name": "s.name",
+    "qualities.name": "q.name"
+   }
+  },
+  "avg_roll_kg": {
+   "kind": "avg",
+   "sql": "SELECT AVG(r.kg) FROM rolls_inward r LEFT JOIN suppliers s ON s.supplier_id = r.supplier_id LEFT JOIN qualities q ON q.quality_id = r.quality_id WHERE (r.weigh_time AT TIME ZONE 'Asia/Kolkata')::date BETWEEN {from} AND {to} {extra}",
+   "dims": {
+    "suppliers.name": "s.name",
+    "qualities.name": "q.name"
+   }
+  },
+  "grns": {
+   "kind": "sum",
+   "sql": "SELECT COALESCE(COUNT(*), 0) FROM grns g LEFT JOIN suppliers s ON s.supplier_id = g.supplier_id WHERE g.grn_date BETWEEN {from} AND {to} {extra}",
+   "dims": {
+    "suppliers.name": "s.name"
+   }
+  },
+  "grn_value": {
+   "kind": "sum",
+   "sql": "SELECT COALESCE(SUM(g.value), 0) FROM grns g LEFT JOIN suppliers s ON s.supplier_id = g.supplier_id WHERE g.grn_date BETWEEN {from} AND {to} {extra}",
+   "dims": {
+    "suppliers.name": "s.name"
+   }
+  },
+  "rolls_out": {
+   "kind": "sum",
+   "sql": "SELECT COALESCE(SUM(d.rolls), 0) FROM dispatches d LEFT JOIN customers c ON c.customer_id = d.customer_id WHERE (d.dispatch_time AT TIME ZONE 'Asia/Kolkata')::date BETWEEN {from} AND {to} {extra}",
+   "dims": {
+    "customers.name": "c.name"
+   }
+  },
+  "kg_out": {
+   "kind": "sum",
+   "sql": "SELECT COALESCE(SUM(d.kg), 0) FROM dispatches d LEFT JOIN customers c ON c.customer_id = d.customer_id WHERE (d.dispatch_time AT TIME ZONE 'Asia/Kolkata')::date BETWEEN {from} AND {to} {extra}",
+   "dims": {
+    "customers.name": "c.name"
+   }
+  },
+  "dispatches": {
+   "kind": "sum",
+   "sql": "SELECT COALESCE(COUNT(*), 0) FROM dispatches d LEFT JOIN customers c ON c.customer_id = d.customer_id WHERE (d.dispatch_time AT TIME ZONE 'Asia/Kolkata')::date BETWEEN {from} AND {to} {extra}",
+   "dims": {
+    "customers.name": "c.name"
+   }
+  },
+  "stock_kg": {
+   "kind": "closing",
+   "sql": "SELECT COALESCE(SUM(s.kg_on_hand), 0) FROM stock_daily s LEFT JOIN qualities q ON q.quality_id = s.quality_id WHERE s.day = (SELECT MAX(s.day) FROM stock_daily s LEFT JOIN qualities q ON q.quality_id = s.quality_id WHERE s.day BETWEEN {from} AND {to} {extra}) {extra}",
+   "dims": {
+    "qualities.name": "q.name"
+   }
+  },
+  "receivables_open": {
+   "kind": "now",
+   "sql": "SELECT COALESCE(SUM(i.amount - i.paid_amount), 0) FROM invoices i LEFT JOIN customers c ON c.customer_id = i.customer_id WHERE TRUE {extra}",
+   "dims": {
+    "customers.name": "c.name",
+    "invoices.age_bucket": "i.age_bucket",
+    "invoices.is_overdue": "i.is_overdue",
+    "invoices.due_date": "i.due_date"
+   }
+  },
+  "receivables_overdue": {
+   "kind": "now",
+   "sql": "SELECT COALESCE(SUM(i.amount - i.paid_amount), 0) FROM invoices i LEFT JOIN customers c ON c.customer_id = i.customer_id WHERE i.is_overdue = TRUE {extra}",
+   "dims": {
+    "customers.name": "c.name",
+    "invoices.age_bucket": "i.age_bucket",
+    "invoices.is_overdue": "i.is_overdue",
+    "invoices.due_date": "i.due_date"
+   }
+  },
+  "gst_payable": {
+   "kind": "sum",
+   "sql": "SELECT COALESCE(SUM(g.gst_payable), 0) FROM gst_monthly g WHERE g.month BETWEEN {from} AND {to} {extra}",
+   "dims": {}
+  }
+ },
+ "fleet": {
+  "fuel_litres": {
+   "kind": "sum",
+   "sql": "SELECT COALESCE(SUM(f.litres), 0) FROM fuel_fills f LEFT JOIN vehicles v ON v.vehicle_id = f.vehicle_id WHERE (f.fill_time AT TIME ZONE 'Asia/Kolkata')::date BETWEEN {from} AND {to} {extra}",
+   "dims": {
+    "vehicles.reg_no": "v.reg_no"
+   }
+  },
+  "fuel_spend": {
+   "kind": "sum",
+   "sql": "SELECT COALESCE(SUM(f.amount), 0) FROM fuel_fills f LEFT JOIN vehicles v ON v.vehicle_id = f.vehicle_id WHERE (f.fill_time AT TIME ZONE 'Asia/Kolkata')::date BETWEEN {from} AND {to} {extra}",
+   "dims": {
+    "vehicles.reg_no": "v.reg_no"
+   }
+  },
+  "km": {
+   "kind": "sum",
+   "sql": "SELECT COALESCE(SUM(t.km), 0) FROM trips t LEFT JOIN vehicles v ON v.vehicle_id = t.vehicle_id WHERE t.trip_date BETWEEN {from} AND {to} {extra}",
+   "dims": {
+    "vehicles.reg_no": "v.reg_no"
+   }
+  },
+  "fuel_per_km": {
+   "kind": "ratio",
+   "sql": "SELECT (SELECT COALESCE(SUM(f.litres), 0) FROM fuel_fills f LEFT JOIN vehicles v ON v.vehicle_id = f.vehicle_id WHERE (f.fill_time AT TIME ZONE 'Asia/Kolkata')::date BETWEEN {from} AND {to} {extra}) / NULLIF((SELECT SUM(t.km) FROM trips t LEFT JOIN vehicles v ON v.vehicle_id = t.vehicle_id WHERE t.trip_date BETWEEN {from} AND {to} {extra}), 0)",
+   "dims": {
+    "vehicles.reg_no": "v.reg_no"
+   }
+  },
+  "distinct_vehicles": {
+   "kind": "distinct",
+   "sql": "SELECT COALESCE(COUNT(DISTINCT f.vehicle_id), 0) FROM fuel_fills f LEFT JOIN vehicles v ON v.vehicle_id = f.vehicle_id WHERE (f.fill_time AT TIME ZONE 'Asia/Kolkata')::date BETWEEN {from} AND {to} {extra}",
+   "dims": {
+    "vehicles.reg_no": "v.reg_no"
+   }
+  },
+  "fuel_budget": {
+   "kind": "sum",
+   "sql": "SELECT COALESCE(SUM(b.fuel_budget), 0) FROM budgets b WHERE b.month BETWEEN {from} AND {to} {extra}",
+   "dims": {}
+  }
+ },
+ "distributor": {
+  "orders": {
+   "kind": "sum",
+   "sql": "SELECT COALESCE(COUNT(*), 0) FROM orders o LEFT JOIN customers c ON c.customer_id = o.customer_id LEFT JOIN channels h ON h.channel_id = o.channel_id WHERE o.order_date BETWEEN {from} AND {to} {extra}",
+   "dims": {
+    "customers.name": "c.name",
+    "channels.name": "h.name"
+   }
+  },
+  "order_value": {
+   "kind": "sum",
+   "sql": "SELECT COALESCE(SUM(o.order_value), 0) FROM orders o LEFT JOIN customers c ON c.customer_id = o.customer_id LEFT JOIN channels h ON h.channel_id = o.channel_id WHERE o.order_date BETWEEN {from} AND {to} {extra}",
+   "dims": {
+    "customers.name": "c.name",
+    "channels.name": "h.name"
+   }
+  },
+  "distinct_customers": {
+   "kind": "distinct",
+   "sql": "SELECT COALESCE(COUNT(DISTINCT o.customer_id), 0) FROM orders o LEFT JOIN customers c ON c.customer_id = o.customer_id LEFT JOIN channels h ON h.channel_id = o.channel_id WHERE o.order_date BETWEEN {from} AND {to} {extra}",
+   "dims": {
+    "customers.name": "c.name",
+    "channels.name": "h.name"
+   }
+  },
+  "value_per_order": {
+   "kind": "formula",
+   "sql": "SELECT (SELECT COALESCE(SUM(o.order_value), 0) FROM orders o LEFT JOIN customers c ON c.customer_id = o.customer_id LEFT JOIN channels h ON h.channel_id = o.channel_id WHERE o.order_date BETWEEN {from} AND {to} {extra}) / NULLIF((SELECT COUNT(*) FROM orders o LEFT JOIN customers c ON c.customer_id = o.customer_id LEFT JOIN channels h ON h.channel_id = o.channel_id WHERE o.order_date BETWEEN {from} AND {to} {extra}), 0)",
+   "dims": {
+    "customers.name": "c.name",
+    "channels.name": "h.name"
+   }
+  },
+  "receivables_open": {
+   "kind": "now",
+   "sql": "SELECT COALESCE(SUM(i.amount - i.paid_amount), 0) FROM invoices i LEFT JOIN customers c ON c.customer_id = i.customer_id WHERE TRUE {extra}",
+   "dims": {
+    "customers.name": "c.name",
+    "invoices.age_bucket": "i.age_bucket",
+    "invoices.is_overdue": "i.is_overdue",
+    "invoices.due_date": "i.due_date"
+   }
+  }
+ }
+}

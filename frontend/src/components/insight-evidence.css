@@ -1,0 +1,10 @@
+/* Quick 006: the folded evidence behind a finding (Insights page and Cases timeline). */
+.ins-evidence { border-top: 1px solid var(--line); padding-top: var(--s2); }
+.ins-evidence > summary { cursor: pointer; color: var(--t2); font-size: var(--fs-small); width: max-content; padding: 4px 0; }
+.ins-evidence > summary:hover { color: var(--t1); }
+.ins-evidence-body { display: flex; flex-direction: column; gap: var(--s3); padding-top: var(--s2); min-width: 0; }
+.ins-sql { min-width: 0; }
+.ins-sql-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); margin-bottom: var(--s1); }
+.ins-sql pre { margin: 0; padding: var(--s2) var(--s3); background: var(--ground); border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 12px; line-height: 1.5; white-space: pre; overflow-x: auto; overflow-wrap: normal; max-width: 100%; }
+.ins-table-wrap { overflow-x: auto; max-width: 100%; border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.ins-table { width: max-content; min-width: 100%; font-size: var(--fs-tiny); font-variant-numeric: tabular-nums; }

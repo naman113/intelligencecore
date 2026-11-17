@@ -1,0 +1,50 @@
+/* Layout preview grid (UI-SPEC sections 3 and 15): 12 columns from 1024 px, 6 from 640 px,
+   2 below. Operator tokens only; no gold token is used here. */
+
+.lt-editor { margin-bottom: var(--s4); }
+.lt-section { margin: var(--s4) 0; }
+.lt-section-title { max-width: 320px; margin-bottom: var(--s2); font-weight: 600; }
+.lt-range { display: block; max-width: 240px; margin-bottom: var(--s3); }
+
+.lt-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.lt-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--s3);
+  min-width: 0;
+}
+.lt-card.lt-hidden { opacity: 0.4; }
+.lt-card-head { display: flex; align-items: center; gap: var(--s2); margin-bottom: var(--s2); }
+.lt-type { font-size: 12px; color: var(--t3); }
+.lt-flag { font-size: 12px; color: var(--t2); }
+.lt-moves { margin-left: auto; display: inline-flex; gap: 4px; }
+.lt-title { width: 100%; }
+.lt-row { display: flex; flex-wrap: wrap; gap: var(--s3); align-items: flex-end; margin-top: var(--s2); }
+.lt-field { display: block; min-width: 0; }
+.lt-show { font-size: 13px; color: var(--t2); display: inline-flex; align-items: center; gap: 4px; }
+
+/* below 640 px: quarter spans 1, everything else 2 */
+.lt-w-quarter { grid-column: span 1; }
+.lt-w-third, .lt-w-half, .lt-w-two_thirds, .lt-w-full { grid-column: span 2; }
+
+@media (min-width: 640px) {
+  .lt-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .lt-w-quarter, .lt-w-third, .lt-w-half { grid-column: span 3; }
+  .lt-w-two_thirds, .lt-w-full { grid-column: span 6; }
+}
+@media (min-width: 768px) {
+  .lt-grid { gap: 16px; }
+}
+@media (min-width: 1024px) {
+  .lt-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .lt-w-quarter { grid-column: span 3; }
+  .lt-w-third { grid-column: span 4; }
+  .lt-w-half { grid-column: span 6; }
+  .lt-w-two_thirds { grid-column: span 8; }
+  .lt-w-full { grid-column: span 12; }
+}

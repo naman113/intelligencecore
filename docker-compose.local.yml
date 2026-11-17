@@ -1,0 +1,238 @@
+# Full local stack — gateway AND WhatsApp connector in Docker, for one machine.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
+#
+# Deliberately a SEPARATE file rather than services added to docker-compose.yml:
+# on a client VM the gateway runs under systemd and `agentctl update` issues a
+# bare `docker compose up -d`. An `app` service in the base file would silently
+# start a SECOND gateway there, competing for the same task_runs queue and
+# double-sending every autonomous message.
+#
+# With the connector in this stack there is no tunnel: it reaches the gateway at
+# http://app:8080 over the compose network, and the gateway reaches it at
+# http://whatsapp:3000. Nothing is published beyond loopback.
+
+# ── Resource ceilings ────────────────────────────────────────────────────
+#
+# Every container is bounded so no single one can starve the host. The numbers
+# are ceilings, not budgets: the whole stack idles around 530MB, so these exist
+# to contain a runaway — a pathological PDF, a memory leak, a graph that grows
+# unattended — not to ration normal work.
+#
+# `reservations` is the other half and matters as much: it keeps a floor under
+# each container so capping one does not let another crowd it out. Limits alone
+# would let a busy neighbour take everything up to its own ceiling.
+#
+# Deliberately set in this overlay, not the base file: client VMs are sized for
+# this workload alone, and a ceiling tuned to a shared dev machine would be the
+# wrong shape there — and silently so, since the symptom would be an OOM-killed
+# gateway rather than an error anyone can read.
+#
+# BUDGET: this machine runs other work, so the whole stack is capped at
+# 4 CPU / 8GB / 30GB disk. Two mechanisms, and only the first is a guarantee:
+#
+#   1. `.wslconfig` caps the entire Docker/WSL2 VM at 4 processors and 8GB.
+#      Everything below lives inside that, so the budget holds no matter what
+#      any container asks for. This is the load-bearing control.
+#   2. The per-container limits below divide that budget so one container
+#      cannot starve the others inside it. Their ceilings deliberately SUM to
+#      slightly more than the VM has: ceilings are not reservations, and sizing
+#      each for its own worst case while relying on (1) for the total beats
+#      under-provisioning every container against a simultaneous peak that
+#      never happens.
+#
+# Memory ceilings total ~7GB, leaving ~2.5GB inside the VM for up to three
+# concurrent sandbox containers (worker_concurrency) plus VM overhead.
+
+services:
+  # This machine already runs native PostgreSQL services (postgresql-x64-16 and
+  # -18), one of which owns 5433 — the port the base file publishes. Republish
+  # ours out of the way.
+  #
+  # `!override` matters: compose APPENDS to a `ports` list by default, so a plain
+  # `ports:` here would keep 5433 alongside the new one and fail identically.
+  #
+  # Nothing in the stack depends on this. The gateway reaches the DB at
+  # postgres:5432 over the compose network; the host publish exists only so you
+  # can point psql or a GUI at it from Windows.
+  postgres:
+    ports: !override
+      - "127.0.0.1:15433:5432"
+    # pgvector similarity search over learnings is the memory-hungry path.
+    deploy:
+      resources:
+        limits: {cpus: "1.0", memory: 1280M}
+        reservations: {memory: 192M}
+
+  # Phase 14 (WH-01): analytics warehouse; same host-port dodge as postgres.
+  warehouse:
+    ports: !override
+      - "127.0.0.1:15434:5432"
+    deploy:
+      resources:
+        limits: {cpus: "1.0", memory: 1536M}
+        reservations: {memory: 128M}
+
+  falkordb:
+    # A graph store grows with the graph; this is the container most likely to
+    # creep over weeks, which is exactly why it gets a hard ceiling.
+    deploy:
+      resources:
+        limits: {cpus: "0.5", memory: 768M}
+        reservations: {memory: 128M}
+
+  langfuse:
+    # Optional — tracing only. Nothing depends on it, so it gets the least, and
+    # it is the first thing to drop if the budget ever gets tight.
+    deploy:
+      resources:
+        limits: {cpus: "0.5", memory: 512M}
+        reservations: {memory: 64M}
+
+  app:
+    build:
+      context: ./backend
+    container_name: agentic-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      falkordb:
+        condition: service_started
+    env_file:
+      - .env
+    environment:
+      # Service-name addressing wins over whatever .env holds for the host
+      # layout (localhost:5433 etc.) — env_file is applied first, then this.
+      MEMORY_DATABASE_URL: postgresql://agent:agent@postgres:5432/agent_memory
+      WAREHOUSE_URL: postgresql://warehouse:5432/warehouse  # Phase 14 (WH-03): warehouse mode for the local stack
+      # Phase 15 (SRC-05): SYNC_NETWORK / SYNC_CSV_NETWORK stay unset; syncrunner discovers them
+      # from the warehouse container.
+      SYNC_IMAGE: agentic-sync:latest
+      # Quick 031: the warehouse's container_name (docker-compose.yml), not its service name.
+      # syncrunner runs `docker inspect` on it to find the sync networks, and sync containers use it
+      # as the warehouse hostname. An overlay that renames the container must set the new name here.
+      SYNC_WAREHOUSE_HOST: agentic-warehouse
+      FALKORDB_HOST: falkordb
+      FALKORDB_PORT: "6379"
+      LANGFUSE_HOST: http://langfuse:3000
+      WA_API_BASE: http://whatsapp:3000
+      # Tells sandbox.py to mount the artifacts VOLUME by name instead of a bind
+      # path the host daemon cannot resolve. Must match the volume name below.
+      SANDBOX_ARTIFACTS_VOLUME: agentic_artifacts
+    volumes:
+      - artifacts:/app/artifacts
+      - ./inbox:/app/inbox
+      - ./documents:/app/documents
+      # Vendored skills library: repo-root, OUTSIDE the ./backend build context,
+      # so without this mount the containerized gateway silently has no library
+      # while bare-metal does. Read-only — runtime never writes it.
+      - ./skills_library:/app/skills_library:ro
+      # Docker-out-of-docker. The Analysis/Document agents run `docker run` for
+      # every sandboxed script; this socket is how they reach the host daemon,
+      # and why the image ships the docker CLI. Note this is host-root-equivalent
+      # access — acceptable on your own machine, not on a client VM.
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "127.0.0.1:8080:8080"
+    # The largest ceiling, because this is the container that does real work:
+    # three concurrent task runs, and CAD-PDF rendering (pikepdf/PyMuPDF at
+    # 110 DPI) which is the genuine memory spike in this system.
+    deploy:
+      resources:
+        limits: {cpus: "2.0", memory: 2560M}
+        reservations: {memory: 256M}
+
+  whatsapp:
+    build:
+      context: ./wa-connector
+    container_name: agentic-whatsapp
+    restart: unless-stopped
+    environment:
+      PORT: "3000"
+      NODE_ENV: production
+      # The connector authenticates the gateway's sends with this; the gateway
+      # sends it as x-api-key (whatsapp.py). Same value both sides.
+      API_KEY: ${WA_API_KEY:?WA_API_KEY missing — run deploy/local.ps1 init}
+      QR_TOKEN: ${WA_QR_TOKEN:-whatsapp-qr-secret}
+      # Inbound direction. This is the connector's ONLY credential: it holds the
+      # webhook secret and never the admin key (OPS_KEY).
+      AGENT_WEBHOOK_URL: http://app:8080/webhook/whatsapp
+      AGENT_WEBHOOK_SECRET: ${WEBHOOK_SECRET:?WEBHOOK_SECRET missing — run deploy/local.ps1 init}
+    volumes:
+      # THIS is what makes the pairing permanent. Baileys writes its multi-file
+      # auth state here (whatsapp.js::sessionDir); on an anonymous volume the
+      # creds die with the container and every restart demands a fresh QR.
+      - wa_sessions:/app/wa-sessions
+      - wa_logs:/app/logs
+    ports:
+      # 3000 on the host is already taken by falkordb's browser UI in the base
+      # compose file, hence 3010.
+      - "127.0.0.1:3010:3000"
+    # Baileys holds session state and syncs group metadata; steady state is
+    # ~70MB, so 512M is a wide ceiling rather than a constraint.
+    deploy:
+      resources:
+        limits: {cpus: "0.5", memory: 512M}
+        reservations: {memory: 128M}
+
+  # The operator UI. Static files behind nginx, which also proxies /api and
+  # /health to the gateway — so the browser sees one origin, the ops key rides
+  # as a plain header, and the backend needs no CORS middleware to support it.
+  #
+  # Deliberately a SECOND surface rather than a replacement: the gateway keeps
+  # serving the original dashboard on 8080, which stays the fallback if
+  # anything here misbehaves.
+  ui:
+    build:
+      context: ./frontend
+    container_name: agentic-ui
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      # Bound to every interface so phones and laptops on the same wifi can
+      # reach it. That is a deliberate loosening: this port speaks plain HTTP
+      # and the ops key is an admin credential, so anyone on the network can
+      # read it off the wire. Fine on a trusted network, wrong on a shared one
+      # — put it back to "127.0.0.1:8090:80" and use `local.ps1 mobile`
+      # (Tailscale, HTTPS, nothing exposed) when off a network you control.
+      - "0.0.0.0:8090:80"
+    # nginx serving a few hundred kB of static files. This is the smallest
+    # thing in the stack by an order of magnitude.
+    deploy:
+      resources:
+        limits: {cpus: "0.25", memory: 128M}
+        reservations: {memory: 16M}
+
+  # Phase 4: the dashboards origin. Agent-authored dashboard HTML renders only
+  # here, never on 8080 (gateway) or 8090 (ui), because both keep the ops key in
+  # localStorage. It serves /d/_lib/ and proxies only /d/ to app:8080, which stays
+  # loopback-only. Bound to loopback by default; to open dashboards from a phone,
+  # widen it like ui or use Tailscale.
+  dashboards:
+    build:
+      context: ./dashboards
+    container_name: agentic-dashboards
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "127.0.0.1:8091:80"
+    deploy:
+      resources:
+        limits: {cpus: "0.25", memory: 128M}
+        reservations: {memory: 16M}
+
+volumes:
+  # Explicitly named, unlike the base file's project-scoped volumes: sandbox.py
+  # has to pass this name to `docker run --mount source=...`, so it cannot be a
+  # value that changes with the directory name. (The base file's warning about
+  # not renaming volumes applies to client VMs with existing data — these two
+  # are new and local.)
+  artifacts:
+    name: agentic_artifacts
+  wa_sessions:
+    name: agentic_wa_sessions
+  wa_logs:
+    name: agentic_wa_logs

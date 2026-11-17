@@ -1,0 +1,15 @@
+/* Phase 8: Overview layout. */
+.ov-grid { display: grid; grid-template-columns: minmax(0, 1fr) 1px minmax(300px, 400px); gap: var(--s5); align-items: start; }
+.ov-rule { align-self: stretch; background: var(--line); width: 1px; }
+.ov-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: var(--s3); }
+.ov-tile { display: flex; flex-direction: column; gap: var(--s1); padding: var(--s3); border: 1px solid var(--line); border-radius: 6px; min-width: 0; color: inherit; }
+.ov-tile-title { font-weight: 500; overflow-wrap: anywhere; }
+.ov-tile-value { font-size: var(--fs-head); line-height: 1.1; }
+.ov-main { display: flex; flex-direction: column; gap: var(--s5); min-width: 0; }
+.ov-owed { min-width: 0; }
+@media (max-width: 980px) {
+  .ov-grid { grid-template-columns: 1fr; }
+  .ov-rule { display: none; }
+  .ov-owed { order: -1; }
+  .ov-main { margin-top: var(--s6); padding-top: var(--s5); border-top: 1px solid var(--line); }
+}

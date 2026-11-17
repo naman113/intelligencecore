@@ -1,0 +1,184 @@
+/* Quick 014: the knowledge graph view on Memory. A dark canvas in the spirit
+   of FalkorDB Browser's graph view; colours come from lib/memgraph.ts (fixed
+   categorical order, validated on #0B111B). Text keeps the app's ink tokens. */
+
+.mg { margin-bottom: var(--s5); overflow: hidden; }
+
+.mg-scope { width: auto; min-width: 180px; max-width: 280px; }
+.mg-toggle { font-size: var(--fs-tiny); color: var(--t2); white-space: nowrap; }
+
+.mg-body {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) auto;
+  min-height: 300px;
+}
+
+.mg-side {
+  border-right: 1px solid var(--line);
+  padding: var(--s3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+  max-height: 640px;
+  overflow-y: auto;
+  background: var(--surface);
+}
+.mg-search { width: 100%; font-size: var(--fs-small); }
+
+.mg-found { display: flex; flex-direction: column; gap: 2px; font-size: var(--fs-tiny); margin-top: calc(var(--s3) * -1); }
+.mg-found-row,
+.mg-legend-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  width: 100%;
+  padding: 3px var(--s2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--t1);
+  font: inherit;
+  font-size: var(--fs-tiny);
+  text-align: left;
+  cursor: pointer;
+}
+.mg-found-row:hover,
+.mg-legend-row:hover { background: var(--raised); }
+.mg-legend-row.is-off { color: var(--t4); }
+.mg-legend-row.is-off .mg-dot { opacity: 0.25; }
+.mg-legend-row.is-off .mg-legend-label { text-decoration: line-through; }
+
+.mg-legend-title {
+  font-size: var(--fs-micro);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: var(--s1);
+}
+.mg-legend-empty { font-size: var(--fs-tiny); padding-left: var(--s2); }
+.mg-legend-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mg-legend-count { font-family: var(--mono); font-size: var(--fs-micro); color: var(--t3); }
+
+.mg-dot {
+  display: inline-block;
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.mg-dot-rel { width: 12px; height: 3px; border-radius: 2px; }
+
+.mg-main { position: relative; min-width: 0; background: #0b111b; }
+.mg-stage { position: relative; width: 100%; overflow: hidden; }
+.mg-svg { display: block; touch-action: none; cursor: grab; user-select: none; }
+.mg-svg:active { cursor: grabbing; }
+.mg-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s5);
+  color: var(--t3);
+  text-align: center;
+}
+
+.mg-zoom {
+  position: absolute;
+  right: var(--s3);
+  bottom: var(--s3);
+  display: flex;
+  gap: var(--s1);
+}
+.mg-zoom .btn { background: rgba(14, 20, 32, 0.85); }
+
+.mg-node { cursor: pointer; transition: opacity var(--t-fast) var(--ease); }
+.mg-node .mg-shape { stroke: #0b111b; stroke-width: 2; }
+.mg-node.is-selected .mg-shape { stroke: #f0f4f8; stroke-width: 2.5; }
+.mg-node.is-dim,
+.mg-edge.is-dim { opacity: 0.16; }
+.mg-edge { transition: opacity var(--t-fast) var(--ease); }
+.mg-hit { cursor: help; }
+.mg-ring { fill: none; stroke: var(--signal-hi); stroke-width: 2; stroke-dasharray: 3 2; }
+
+.mg-inner {
+  fill: #ffffff;
+  font-family: var(--body);
+  font-size: 7.5px;
+  font-weight: 600;
+  pointer-events: none;
+}
+.mg-name,
+.mg-edge-label {
+  fill: var(--t1);
+  font-family: var(--body);
+  font-size: 10px;
+  paint-order: stroke;
+  stroke: #0b111b;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.mg-edge-label { fill: var(--t2); font-family: var(--mono); font-size: 8px; letter-spacing: 0.02em; }
+.mg-edge-label.is-superseded { text-decoration: line-through; }
+
+.mg-panel {
+  width: 340px;
+  border-left: 1px solid var(--line);
+  background: var(--surface);
+  max-height: 640px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.mg-panel-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: var(--s3) var(--s4);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+}
+.mg-panel-body { padding: var(--s3) var(--s4); display: flex; flex-direction: column; gap: var(--s3); }
+.mg-meta { font-size: var(--fs-tiny); }
+.mg-summary { margin: 0; color: var(--t2); font-size: var(--fs-small); }
+.mg-panel-sub {
+  font-size: var(--fs-micro);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-top: var(--s2);
+}
+.mg-facts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s2); }
+.mg-fact {
+  padding: var(--s2) var(--s3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--raised);
+  font-size: var(--fs-small);
+}
+.mg-fact-head { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s2); margin-bottom: 3px; }
+.mg-rel { font-size: var(--fs-micro); color: var(--t3); }
+.mg-other {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--signal-hi);
+  font: inherit;
+  font-size: var(--fs-tiny);
+  cursor: pointer;
+}
+.mg-other:hover { text-decoration: underline; }
+.mg-when { font-size: var(--fs-micro); margin-top: 3px; }
+.mg-fact.is-superseded { opacity: 0.75; }
+.mg-struck { text-decoration: line-through; color: var(--t3); }
+.mg-episode-text { white-space: pre-wrap; margin: 0; font-size: var(--fs-small); }
+
+@media (max-width: 1100px) {
+  .mg-body { grid-template-columns: 1fr; }
+  .mg-side { border-right: 0; border-bottom: 1px solid var(--line); max-height: none; }
+  .mg-panel { width: auto; border-left: 0; border-top: 1px solid var(--line); max-height: none; }
+}

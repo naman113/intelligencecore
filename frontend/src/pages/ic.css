@@ -1,0 +1,71 @@
+/* Phase 8: shared Intelligence Corner page styles. Neutral and blue; gold lives only in the owed column. */
+.ic-page { min-width: 0; }
+.ic-page .ic-list { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+.ic-page .ic-row { padding: var(--s3) 0; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: var(--s1); min-width: 0; }
+.ic-page .ic-row-title { font-weight: 500; }
+.ic-page .ic-meta { color: var(--t3); font-size: var(--fs-small); }
+.ic-page .ic-owed-line { color: var(--owed-hi); font-size: var(--fs-small); }
+.ic-page .ic-body { white-space: pre-wrap; overflow-wrap: anywhere; }
+.ic-page .ic-sql { margin: var(--s2) 0 0; padding: var(--s2) var(--s3); background: var(--ground); overflow-x: auto; font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.ic-page .ic-timeline { display: flex; flex-direction: column; gap: var(--s2); }
+.ic-page .ic-timeline > * { border-left: 2px solid var(--line); padding-left: var(--s3); }
+.ic-page .ic-ref, .ic-page code, .ic-page .mono { overflow-wrap: anywhere; }
+.ic-page .ic-trend { margin: var(--s3) 0; }
+.ic-page .ic-split { display: grid; grid-template-columns: minmax(180px, 260px) minmax(0, 1fr); gap: var(--s5); }
+@media (max-width: 760px) { .ic-page .ic-split { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .ic-page .btn-sm { min-height: 40px; } }
+
+/* Phase 8 plan 09: context rows */
+.ic-page .ic-gold { border-left: 3px solid var(--owed); padding-left: var(--s3); background: var(--owed-wash); }
+.ic-page .ic-pending { display: flex; flex-direction: column; gap: var(--s2); min-width: 0; }
+.ic-page .ic-pending .textarea { width: 100%; min-height: 96px; }
+.ic-page .ic-cols { margin-left: var(--s4); display: flex; flex-direction: column; }
+.ic-page .ic-chips { display: flex; flex-wrap: wrap; gap: var(--s1); }
+
+/* Quick 006: the Insights page. Severity is a left stripe plus a printed pill (critical
+   red, warning amber, info neutral); gold is never used here, it means "you owe this". */
+.ic-page .ins-strip { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s2) var(--s4); padding: var(--s3) var(--s4); margin-bottom: var(--s4); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.ic-page .ins-stat { color: var(--t2); font-size: var(--fs-small); white-space: nowrap; }
+.ic-page .ins-stat b { font-family: var(--display); font-stretch: var(--display-wide); font-size: var(--fs-lead); font-weight: 600; color: var(--t1); font-variant-numeric: tabular-nums; margin-right: 2px; }
+.ic-page .ins-stat-critical b { color: var(--broken-hi); }
+.ic-page .ins-stat-warning b { color: var(--warn-hi); }
+.ic-page .ins-strip-note { color: var(--t3); font-size: var(--fs-small); margin-left: auto; }
+.ic-page .ins-filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--s3) var(--s4); margin-bottom: var(--s4); }
+.ic-page .ins-filter { display: flex; flex-direction: column; min-width: 150px; }
+.ic-page .ins-list { display: flex; flex-direction: column; gap: var(--s3); }
+.ic-page .ins-card { position: relative; display: flex; flex-direction: column; gap: var(--s3); min-width: 0; padding: var(--s4) var(--s5); background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--line-lit); border-radius: var(--radius); }
+.ic-page .ins-sev-critical { border-left-color: var(--broken); }
+.ic-page .ins-sev-warning { border-left-color: var(--warn); }
+.ic-page .ins-top { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); }
+.ic-page .ins-title { margin: 0; font-family: var(--display); font-stretch: var(--display-wide); font-size: var(--fs-lead); font-weight: 600; line-height: 1.3; color: var(--t1); overflow-wrap: anywhere; }
+.ic-page .ins-words { margin: 0; display: grid; gap: var(--s2); }
+.ic-page .ins-words > div { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: var(--s3); }
+.ic-page .ins-words dt { color: var(--t3); font-size: var(--fs-tiny); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 3px; }
+.ic-page .ins-words dd { margin: 0; color: var(--t1); line-height: 1.5; overflow-wrap: anywhere; }
+.ic-page .ins-figures { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--s2); }
+.ic-page .ins-figures li { display: inline-flex; align-items: baseline; gap: var(--s2); padding: 4px 10px; background: var(--raised); border: 1px solid var(--line); border-radius: var(--radius-sm); max-width: 100%; }
+.ic-page .ins-fig-label { color: var(--t3); font-size: var(--fs-tiny); overflow-wrap: anywhere; }
+.ic-page .ins-fig-value { font-family: var(--mono); font-size: var(--fs-small); color: var(--t1); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ic-page .ins-caveat { margin: 0; color: var(--t3); font-size: var(--fs-small); font-style: italic; overflow-wrap: anywhere; }
+.ic-page .ins-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); padding-top: var(--s1); }
+.ic-page .ins-case { font-size: var(--fs-small); }
+@media (max-width: 600px) {
+  .ic-page .ins-card { padding: var(--s3) var(--s4); }
+  .ic-page .ins-words > div { grid-template-columns: 1fr; gap: 2px; }
+  .ic-page .ins-strip-note { margin-left: 0; flex-basis: 100%; }
+  .ic-page .ins-filter { flex: 1 1 100%; }
+  .ic-page .ins-actions .grow { display: none; }
+}
+
+/* Quick 041: the KPI page stays easy to follow when zoomed or narrow. The open row is blue (the system's "you are here"), never gold. */
+.ic-page .kpi-split { align-items: start; }
+.ic-page .kpi-detail-pane { min-width: 0; }
+.ic-page .kpi-list .ic-row { padding-left: var(--s3); padding-right: var(--s3); }
+.ic-page .kpi-list .ic-row.is-current { background: var(--signal-wash); box-shadow: inset 3px 0 0 var(--signal); }
+.ic-page .kpi-list .ic-row-title[aria-current="true"] { color: var(--t1); }
+.ic-page .kpi-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s2) var(--s4); }
+.ic-page .kpi-step { display: flex; align-items: center; gap: var(--s2); }
+.ic-page .kpi-step .is-off { opacity: 0.45; pointer-events: none; }
+@media (min-width: 901px) {
+  .ic-page .kpi-list-pane { position: sticky; top: var(--s5); max-height: calc(100vh - 2 * var(--s5)); overflow-y: auto; overscroll-behavior: contain; }
+}

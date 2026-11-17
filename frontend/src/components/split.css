@@ -1,0 +1,65 @@
+/* List on the left, detail on the right — shared by Cases, Documents and Runs.
+   Below 1024px the two become one column and the list steps aside when
+   something is selected, so a phone shows one thing at a time. */
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+  gap: var(--s5);
+  align-items: start;
+}
+
+.split-list {
+  position: sticky;
+  top: var(--s5);
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.split-detail { min-width: 0; }
+
+.list-row {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--s3) var(--s4);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  color: inherit;
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease);
+}
+.list-row:last-child { border-bottom: none; }
+.list-row:hover { background: var(--raised); }
+.list-row.is-selected { background: var(--signal-wash); }
+/* A row that needs a person carries the same left edge as an owed card. */
+.list-row.is-owed { box-shadow: inset 2px 0 0 var(--owed); }
+
+.list-title {
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--t1);
+}
+.list-meta {
+  margin-top: 3px;
+  font-size: var(--fs-tiny);
+  color: var(--t3);
+  display: flex;
+  gap: var(--s2);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.back-link {
+  display: none;
+  margin-bottom: var(--s3);
+}
+
+@media (max-width: 1024px) {
+  .split { grid-template-columns: 1fr; }
+  .split-list { position: static; max-height: none; }
+  .split.has-detail .split-list { display: none; }
+  .split.has-detail .back-link { display: inline-flex; }
+}

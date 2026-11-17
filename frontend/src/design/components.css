@@ -1,0 +1,419 @@
+/* Shared components. Single-class selectors only; modifiers are compound
+   classes on the same element (.btn.btn-primary), never descendant overrides.
+   Spacing belongs to the component that owns it — no page file reaches in to
+   adjust another component's margins. */
+
+/* ── Buttons ───────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s2);
+  padding: 7px 14px;
+  min-height: 34px;
+  background: var(--raised);
+  color: var(--t1);
+  border: 1px solid var(--line-lit);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-small);
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--t-fast) var(--ease),
+              border-color var(--t-fast) var(--ease),
+              color var(--t-fast) var(--ease);
+}
+.btn:hover:not(:disabled) { background: var(--raised-2); border-color: var(--t4); }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--signal);
+  border-color: var(--signal);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) { background: var(--signal-hi); border-color: var(--signal-hi); }
+
+/* The affirmative half of a human gate. Gold because pressing it is how a
+   person discharges what they owe. */
+.btn-owed {
+  background: var(--owed);
+  border-color: var(--owed);
+  color: #1A1206;
+  font-weight: 600;
+}
+.btn-owed:hover:not(:disabled) { background: var(--owed-hi); border-color: var(--owed-hi); }
+
+.btn-quiet {
+  background: transparent;
+  border-color: transparent;
+  color: var(--t2);
+}
+.btn-quiet:hover:not(:disabled) { background: var(--raised); color: var(--t1); border-color: transparent; }
+
+.btn-danger { color: var(--broken-hi); border-color: rgba(229, 83, 75, 0.35); background: transparent; }
+.btn-danger:hover:not(:disabled) { background: var(--broken-wash); border-color: var(--broken); }
+
+.btn-sm { min-height: 28px; padding: 3px 10px; font-size: var(--fs-tiny); }
+.btn-icon { padding: 6px; min-height: 30px; min-width: 30px; }
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  align-items: center;
+}
+
+/* ── Pills ─────────────────────────────────────────────────────────────── */
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: 99px;
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  background: rgba(160, 174, 192, 0.12);
+  color: var(--t2);
+}
+.pill-signal  { background: var(--signal-wash);  color: var(--signal-hi); }
+.pill-owed    { background: var(--owed-wash);    color: var(--owed-hi); }
+.pill-settled { background: var(--settled-wash); color: var(--settled-hi); }
+.pill-broken  { background: var(--broken-wash);  color: var(--broken-hi); }
+.pill-warn    { background: var(--warn-wash);    color: var(--warn-hi); } /* Quick 006: warning findings */
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--t4);
+}
+.dot-signal  { background: var(--signal); }
+.dot-owed    { background: var(--owed); }
+.dot-settled { background: var(--settled); }
+.dot-broken  { background: var(--broken); }
+
+/* ── Panels and cards ──────────────────────────────────────────────────── */
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.panel-pad { padding: var(--s5); }
+
+/* Wraps, because several headers carry a title plus a filter strip plus
+   controls, and on a narrow screen that has to stack rather than push the panel
+   wider than the page. */
+.panel-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s3);
+  padding: var(--s4) var(--s5);
+  border-bottom: 1px solid var(--line);
+}
+.panel-title {
+  font-family: var(--display);
+  font-stretch: var(--display-wide);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  margin: 0;
+}
+.panel-body { padding: var(--s5); }
+.panel-spacer { flex: 1; }
+
+.card {
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--s4);
+}
+
+/* The one card shape that means a person has to do something. The left edge is
+   the tell — it matches the rail dot and the pill, so the same signal appears
+   at three scales. */
+.card-owed {
+  border-color: rgba(212, 149, 43, 0.32);
+  border-left: 2px solid var(--owed);
+  padding-left: calc(var(--s4) - 1px);
+}
+
+/* ── Section labels ────────────────────────────────────────────────────── */
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--t3);
+}
+
+.field-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: var(--s1);
+}
+
+/* ── Forms ─────────────────────────────────────────────────────────────── */
+
+.input,
+.textarea,
+.select {
+  width: 100%;
+  padding: 7px 10px;
+  min-height: 34px;
+  background: var(--ground);
+  color: var(--t1);
+  border: 1px solid var(--line-lit);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-small);
+  transition: border-color var(--t-fast) var(--ease);
+}
+.input:hover, .textarea:hover, .select:hover { border-color: var(--t4); }
+.input:focus, .textarea:focus, .select:focus { border-color: var(--signal); outline-offset: 1px; }
+.input::placeholder, .textarea::placeholder { color: var(--t4); }
+
+.textarea {
+  min-height: 96px;
+  font-family: var(--mono);
+  font-size: var(--fs-tiny);
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.select {
+  appearance: none;
+  padding-right: 28px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--t3) 50%),
+                    linear-gradient(135deg, var(--t3) 50%, transparent 50%);
+  background-position: calc(100% - 15px) 15px, calc(100% - 10px) 15px;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
+.field { margin-bottom: var(--s3); }
+
+/* Aligned from the top, because a field with a hint under it is taller than one
+   without and bottom-alignment would stagger the inputs across the row. Bare
+   controls in a grid use <FormAction>, which supplies the matching label-height
+   spacer. */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--s3);
+  align-items: start;
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  font-size: var(--fs-tiny);
+  color: var(--t2);
+  cursor: pointer;
+  user-select: none;
+}
+.check input { accent-color: var(--signal); width: 14px; height: 14px; }
+
+/* ── Tables ────────────────────────────────────────────────────────────── */
+
+/* Every table lives inside this so a wide one scrolls itself rather than the
+   page. Without it, the tool-trace and config tables push the body sideways on
+   a phone. */
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-small);
+}
+.table th {
+  text-align: left;
+  padding: 8px 12px;
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--t3);
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.table tbody tr:last-child td { border-bottom: none; }
+.table-rows tbody tr { cursor: pointer; transition: background var(--t-fast) var(--ease); }
+.table-rows tbody tr:hover { background: var(--raised); }
+.table-rows tbody tr.is-selected { background: var(--signal-wash); }
+
+/* ── Empty states — an invitation, not an apology ──────────────────────── */
+
+.empty {
+  padding: var(--s7) var(--s5);
+  text-align: center;
+  color: var(--t3);
+}
+.empty-title {
+  font-family: var(--display);
+  font-stretch: var(--display-wide);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--t2);
+  margin-bottom: var(--s2);
+}
+.empty-body { font-size: var(--fs-small); max-width: 46ch; margin: 0 auto; }
+.empty-action { margin-top: var(--s4); }
+
+/* ── Code and traces ───────────────────────────────────────────────────── */
+
+.code {
+  background: var(--ground);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: var(--s3);
+  font-family: var(--mono);
+  font-size: var(--fs-tiny);
+  line-height: 1.6;
+  color: var(--t2);
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: auto;
+  margin: 0;
+}
+
+/* ── Banners ───────────────────────────────────────────────────────────── */
+
+.banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s3);
+  padding: var(--s3) var(--s4);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-lit);
+  background: var(--raised);
+  font-size: var(--fs-small);
+  color: var(--t2);
+}
+.banner-owed   { border-color: rgba(212, 149, 43, 0.35); background: var(--owed-wash); color: var(--owed-hi); }
+.banner-broken { border-color: rgba(229, 83, 75, 0.35); background: var(--broken-wash); color: var(--broken-hi); }
+
+/* ── Progress meter (expectations met, memory usage) ───────────────────── */
+
+.meter {
+  height: 5px;
+  background: var(--ground);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.meter-fill {
+  height: 100%;
+  background: var(--signal);
+  border-radius: 99px;
+  transition: width var(--t-mid) var(--ease);
+}
+.meter-fill.is-owed { background: var(--owed); }
+.meter-fill.is-settled { background: var(--settled); }
+.meter-fill.is-broken { background: var(--broken); }
+
+/* ── Tabs (filter strips) ──────────────────────────────────────────────── */
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--ground);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+}
+.tab {
+  padding: 5px 12px;
+  border: none;
+  background: transparent;
+  color: var(--t3);
+  border-radius: 4px;
+  font-size: var(--fs-tiny);
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.tab:hover { color: var(--t1); }
+.tab.is-active { background: var(--raised-2); color: var(--t1); }
+.tab-count { font-family: var(--mono); font-size: var(--fs-micro); opacity: 0.7; margin-left: 5px; }
+
+/* ── Key/value rows ────────────────────────────────────────────────────── */
+
+.kv {
+  display: grid;
+  grid-template-columns: minmax(90px, max-content) 1fr;
+  gap: var(--s2) var(--s4);
+  font-size: var(--fs-small);
+}
+.kv-key {
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--t3);
+  padding-top: 2px;
+}
+.kv-val { color: var(--t1); min-width: 0; word-break: break-word; }
+
+/* ── Load-in ───────────────────────────────────────────────────────────── */
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+.rise {
+  animation: rise var(--t-slow) var(--ease) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rise { animation: none; }
+}
+
+.spin {
+  width: 14px; height: 14px;
+  border: 2px solid var(--line-lit);
+  border-top-color: var(--signal);
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+  flex: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .spin { animation-duration: 2s; }
+}
+
+/* ── Layout helpers ────────────────────────────────────────────────────── */
+
+.stack   { display: flex; flex-direction: column; gap: var(--s4); }
+.stack-2 { display: flex; flex-direction: column; gap: var(--s2); }
+.stack-3 { display: flex; flex-direction: column; gap: var(--s3); }
+.row     { display: flex; align-items: center; gap: var(--s3); }
+.row-top { display: flex; align-items: flex-start; gap: var(--s3); }
+.wrap    { flex-wrap: wrap; }
+.grow    { flex: 1; min-width: 0; }
+
+/* Quick 023: Run now. */
+.runnow { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: var(--s2) var(--s3); }
+.runnow-link { font-size: var(--fs-small); }
+.runnow-err { color: var(--broken-hi); font-size: var(--fs-small); }

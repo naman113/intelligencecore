@@ -1,0 +1,177 @@
+[
+ {
+  "object": "table",
+  "op": "create",
+  "definition": {
+   "name": "customers",
+   "relation": "public.customers",
+   "role": "dimension",
+   "grain": "one row per customer",
+   "primary_key": [
+    "customer_id"
+   ]
+  }
+ },
+ {
+  "object": "table",
+  "op": "create",
+  "definition": {
+   "name": "channels",
+   "relation": "public.channels",
+   "role": "dimension",
+   "grain": "one row per sales channel",
+   "primary_key": [
+    "channel_id"
+   ]
+  }
+ },
+ {
+  "object": "table",
+  "op": "create",
+  "definition": {
+   "name": "orders",
+   "relation": "public.orders",
+   "role": "fact",
+   "grain": "one row per order",
+   "primary_key": [
+    "order_id"
+   ],
+   "agg_time_dimension": "public.orders.order_date"
+  }
+ },
+ {
+  "object": "table",
+  "op": "create",
+  "definition": {
+   "name": "invoices",
+   "relation": "public.invoices",
+   "role": "fact",
+   "grain": "one row per invoice",
+   "primary_key": [
+    "invoice_id"
+   ]
+  }
+ },
+ {
+  "object": "relationship",
+  "op": "create",
+  "definition": {
+   "name": "orders_customer_id_to_customers",
+   "from_relation": "public.orders",
+   "from_columns": [
+    "customer_id"
+   ],
+   "to_relation": "public.customers",
+   "to_columns": [
+    "customer_id"
+   ],
+   "cardinality": "many_to_one",
+   "origin": "foreign_key"
+  }
+ },
+ {
+  "object": "relationship",
+  "op": "create",
+  "definition": {
+   "name": "orders_channel_id_to_channels",
+   "from_relation": "public.orders",
+   "from_columns": [
+    "channel_id"
+   ],
+   "to_relation": "public.channels",
+   "to_columns": [
+    "channel_id"
+   ],
+   "cardinality": "many_to_one",
+   "origin": "foreign_key"
+  }
+ },
+ {
+  "object": "relationship",
+  "op": "create",
+  "definition": {
+   "name": "invoices_customer_id_to_customers",
+   "from_relation": "public.invoices",
+   "from_columns": [
+    "customer_id"
+   ],
+   "to_relation": "public.customers",
+   "to_columns": [
+    "customer_id"
+   ],
+   "cardinality": "many_to_one",
+   "origin": "foreign_key"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "orders",
+   "type": "simple",
+   "base_relation": "public.orders",
+   "agg": "count",
+   "expr": "order_id",
+   "label": "Orders",
+   "description": "Orders placed"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "order_value",
+   "type": "simple",
+   "base_relation": "public.orders",
+   "agg": "sum",
+   "expr": "order_value",
+   "label": "Order value",
+   "description": "Value of orders placed"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "distinct_customers",
+   "type": "simple",
+   "base_relation": "public.orders",
+   "agg": "count_distinct",
+   "expr": "customer_id",
+   "label": "Distinct customers",
+   "description": "Customers who ordered"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "receivables_open",
+   "type": "simple",
+   "base_relation": "public.invoices",
+   "agg": "sum",
+   "expr": "amount - paid_amount",
+   "label": "Receivables open",
+   "description": "Unpaid invoice amounts right now"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "value_per_order",
+   "type": "derived",
+   "expr": "order_value / orders",
+   "input_metrics": [
+    {
+     "name": "order_value"
+    },
+    {
+     "name": "orders"
+    }
+   ],
+   "label": "Value per order",
+   "description": "Order value divided by orders"
+  }
+ }
+]

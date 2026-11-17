@@ -1,0 +1,1004 @@
+[
+ {
+  "n": 1,
+  "client": "mill",
+  "text": "Daily operations: rolls and kg in and out, GRNs and dispatches, last 7 days, click a day for detail",
+  "checks": {
+   "1": [
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "rolls_in"
+     ]
+    },
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "kg_in"
+     ]
+    },
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "rolls_out"
+     ]
+    },
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "kg_out"
+     ]
+    },
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "grns"
+     ]
+    },
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "dispatches"
+     ]
+    }
+   ],
+   "2": [
+    {
+     "check": "governed_share_min",
+     "min": 1.0
+    },
+    {
+     "check": "raw_sql_needs_word",
+     "word": "unverified"
+    }
+   ],
+   "3": [
+    {
+     "check": "tile_type_any",
+     "types": [
+      "paired_bar",
+      "combo"
+     ]
+    },
+    {
+     "check": "tile_type_any",
+     "types": [
+      "table"
+     ]
+    },
+    {
+     "check": "tile_type_none",
+     "types": [
+      "donut"
+     ]
+    }
+   ],
+   "4": [
+    {
+     "check": "control_default",
+     "preset": "last_7_days"
+    },
+    {
+     "check": "follows_control",
+     "min_tiles": 3
+    }
+   ],
+   "5": [
+    {
+     "check": "tones_on",
+     "type": [
+      "paired_bar",
+      "combo"
+     ],
+     "tones": [
+      "inward",
+      "outward"
+     ]
+    },
+    {
+     "check": "good_direction_set"
+    }
+   ],
+   "6": [
+    {
+     "check": "sections_min",
+     "min": 2
+    },
+    {
+     "check": "first_section_stats_max",
+     "max": 4
+    },
+    {
+     "check": "titles_have_period"
+    }
+   ],
+   "7": [
+    {
+     "check": "recipe_loaded",
+     "name": "daily-operations"
+    },
+    {
+     "check": "preview_rounds_max",
+     "max": 3
+    },
+    {
+     "check": "no_errors"
+    },
+    {
+     "check": "warnings_explained"
+    }
+   ]
+  },
+  "reply_checks": [],
+  "gate": true
+ },
+ {
+  "n": 2,
+  "client": "mill",
+  "text": "Who owes me money and how old is it?",
+  "checks": {
+   "1": [
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "receivables_open",
+      "receivables_overdue"
+     ]
+    }
+   ],
+   "2": [
+    {
+     "check": "governed_share_min",
+     "min": 1.0
+    },
+    {
+     "check": "raw_sql_needs_word",
+     "word": "unverified"
+    }
+   ],
+   "3": [
+    {
+     "check": "tile_type_any",
+     "types": [
+      "aging"
+     ]
+    },
+    {
+     "check": "tile_type_any",
+     "types": [
+      "ranked_bar",
+      "table",
+      "bar"
+     ]
+    },
+    {
+     "check": "tile_type_none",
+     "types": [
+      "donut"
+     ]
+    }
+   ],
+   "4": [],
+   "5": [
+    {
+     "check": "owed_only_on",
+     "allowed": [
+      "receivables_overdue"
+     ],
+     "required": true
+    }
+   ],
+   "6": [
+    {
+     "check": "sections_min",
+     "min": 2
+    },
+    {
+     "check": "titles_have_period"
+    }
+   ],
+   "7": [
+    {
+     "check": "recipe_loaded",
+     "name": "receivables"
+    },
+    {
+     "check": "preview_rounds_max",
+     "max": 3
+    },
+    {
+     "check": "no_errors"
+    },
+    {
+     "check": "warnings_explained"
+    }
+   ]
+  },
+  "reply_checks": [],
+  "gate": true
+ },
+ {
+  "n": 3,
+  "client": "mill",
+  "text": "GST payable this month vs last month",
+  "checks": {
+   "1": [
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "gst_payable"
+     ]
+    }
+   ],
+   "2": [
+    {
+     "check": "governed_share_min",
+     "min": 1.0
+    },
+    {
+     "check": "raw_sql_needs_word",
+     "word": "unverified"
+    }
+   ],
+   "3": [
+    {
+     "check": "tile_type_any",
+     "types": [
+      "stat"
+     ]
+    },
+    {
+     "check": "tile_type_none",
+     "types": [
+      "donut"
+     ]
+    }
+   ],
+   "4": [
+    {
+     "check": "control_default",
+     "preset": "this_month"
+    },
+    {
+     "check": "follows_control",
+     "min_tiles": 1
+    }
+   ],
+   "5": [
+    {
+     "check": "good_direction_set",
+     "allowed": [
+      "none",
+      "down"
+     ]
+    },
+    {
+     "check": "owed_only_on",
+     "allowed": []
+    }
+   ],
+   "6": [
+    {
+     "check": "titles_have_period"
+    }
+   ],
+   "7": [
+    {
+     "check": "recipe_loaded",
+     "name": "payables-gst"
+    },
+    {
+     "check": "preview_rounds_max",
+     "max": 3
+    },
+    {
+     "check": "no_errors"
+    },
+    {
+     "check": "warnings_explained"
+    }
+   ]
+  },
+  "reply_checks": [],
+  "gate": true
+ },
+ {
+  "n": 4,
+  "client": "mill",
+  "text": "Stock movement by quality this month",
+  "checks": {
+   "1": [
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "stock_kg"
+     ]
+    },
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "kg_in"
+     ]
+    },
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "kg_out"
+     ]
+    }
+   ],
+   "2": [
+    {
+     "check": "governed_share_min",
+     "min": 1.0
+    },
+    {
+     "check": "raw_sql_needs_word",
+     "word": "unverified"
+    }
+   ],
+   "3": [
+    {
+     "check": "tile_type_any",
+     "types": [
+      "waterfall",
+      "table"
+     ]
+    },
+    {
+     "check": "tile_type_none",
+     "types": [
+      "donut"
+     ]
+    }
+   ],
+   "4": [
+    {
+     "check": "control_default",
+     "preset": "this_month"
+    },
+    {
+     "check": "follows_control",
+     "min_tiles": 1
+    }
+   ],
+   "5": [],
+   "6": [
+    {
+     "check": "titles_have_period"
+    }
+   ],
+   "7": [
+    {
+     "check": "preview_rounds_max",
+     "max": 3
+    },
+    {
+     "check": "no_errors"
+    },
+    {
+     "check": "warnings_explained"
+    }
+   ]
+  },
+  "reply_checks": [],
+  "gate": true
+ },
+ {
+  "n": 5,
+  "client": "fleet",
+  "text": "Diesel per vehicle this month and the trend",
+  "checks": {
+   "1": [
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "fuel_litres",
+      "fuel_spend"
+     ]
+    },
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "fuel_per_km"
+     ]
+    }
+   ],
+   "2": [
+    {
+     "check": "governed_share_min",
+     "min": 1.0
+    },
+    {
+     "check": "raw_sql_needs_word",
+     "word": "unverified"
+    }
+   ],
+   "3": [
+    {
+     "check": "tile_type_any",
+     "types": [
+      "ranked_bar",
+      "bar"
+     ]
+    },
+    {
+     "check": "tile_type_any",
+     "types": [
+      "line",
+      "area",
+      "combo"
+     ]
+    },
+    {
+     "check": "tile_type_none",
+     "types": [
+      "donut"
+     ]
+    }
+   ],
+   "4": [
+    {
+     "check": "control_default",
+     "preset": "this_month"
+    },
+    {
+     "check": "follows_control",
+     "min_tiles": 1
+    }
+   ],
+   "5": [
+    {
+     "check": "good_direction_set"
+    }
+   ],
+   "6": [
+    {
+     "check": "sections_min",
+     "min": 2
+    },
+    {
+     "check": "titles_have_period"
+    }
+   ],
+   "7": [
+    {
+     "check": "preview_rounds_max",
+     "max": 3
+    },
+    {
+     "check": "no_errors"
+    },
+    {
+     "check": "warnings_explained"
+    }
+   ]
+  },
+  "reply_checks": [],
+  "gate": true
+ },
+ {
+  "n": 6,
+  "client": "fleet",
+  "text": "Certificates due for renewal",
+  "checks": {
+   "1": [
+    {
+     "check": "tile_type_any",
+     "types": [
+      "table"
+     ]
+    }
+   ],
+   "2": [
+    {
+     "check": "raw_sql_needs_word",
+     "word": "unverified"
+    }
+   ],
+   "3": [
+    {
+     "check": "tile_type_any",
+     "types": [
+      "table"
+     ]
+    },
+    {
+     "check": "tile_type_none",
+     "types": [
+      "donut"
+     ]
+    }
+   ],
+   "4": [],
+   "5": [
+    {
+     "check": "owed_only_on",
+     "required": true
+    }
+   ],
+   "6": [
+    {
+     "check": "sections_min",
+     "min": 1
+    }
+   ],
+   "7": [
+    {
+     "check": "preview_rounds_max",
+     "max": 3
+    },
+    {
+     "check": "no_errors"
+    },
+    {
+     "check": "warnings_explained"
+    }
+   ]
+  },
+  "reply_checks": [],
+  "gate": false
+ },
+ {
+  "n": 7,
+  "client": "fleet",
+  "text": "Fuel spend vs budget",
+  "checks": {
+   "1": [
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "fuel_spend"
+     ]
+    },
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "fuel_budget"
+     ]
+    }
+   ],
+   "2": [
+    {
+     "check": "governed_share_min",
+     "min": 1.0
+    },
+    {
+     "check": "raw_sql_needs_word",
+     "word": "unverified"
+    }
+   ],
+   "3": [
+    {
+     "check": "tile_type_any",
+     "types": [
+      "bullet",
+      "stat"
+     ]
+    },
+    {
+     "check": "tile_type_none",
+     "types": [
+      "donut"
+     ]
+    }
+   ],
+   "4": [],
+   "5": [
+    {
+     "check": "good_direction_set"
+    }
+   ],
+   "6": [
+    {
+     "check": "titles_have_period"
+    }
+   ],
+   "7": [
+    {
+     "check": "preview_rounds_max",
+     "max": 3
+    },
+    {
+     "check": "no_errors"
+    },
+    {
+     "check": "warnings_explained"
+    }
+   ]
+  },
+  "reply_checks": [
+   {
+    "check": "reply_contains_any",
+    "words": [
+     "budget"
+    ]
+   }
+  ],
+  "gate": true
+ },
+ {
+  "n": 8,
+  "client": "fleet",
+  "text": "A fleet overview I can check every morning",
+  "checks": {
+   "1": [
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "fuel_litres",
+      "fuel_spend"
+     ]
+    },
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "km",
+      "fuel_per_km",
+      "distinct_vehicles"
+     ]
+    }
+   ],
+   "2": [
+    {
+     "check": "governed_share_min",
+     "min": 0.8
+    },
+    {
+     "check": "raw_sql_needs_word",
+     "word": "unverified"
+    }
+   ],
+   "3": [
+    {
+     "check": "tile_type_any",
+     "types": [
+      "stat"
+     ]
+    },
+    {
+     "check": "tile_type_none",
+     "types": [
+      "donut"
+     ]
+    }
+   ],
+   "4": [
+    {
+     "check": "control_default",
+     "presets": [
+      "yesterday",
+      "last_7_days"
+     ]
+    }
+   ],
+   "5": [
+    {
+     "check": "good_direction_set"
+    }
+   ],
+   "6": [
+    {
+     "check": "first_section_stats_max",
+     "max": 4
+    },
+    {
+     "check": "sections_min",
+     "min": 2
+    },
+    {
+     "check": "titles_have_period"
+    }
+   ],
+   "7": [
+    {
+     "check": "recipe_loaded",
+     "name": "fleet-compliance"
+    },
+    {
+     "check": "preview_rounds_max",
+     "max": 3
+    },
+    {
+     "check": "no_errors"
+    },
+    {
+     "check": "warnings_explained"
+    }
+   ]
+  },
+  "reply_checks": [],
+  "gate": true
+ },
+ {
+  "n": 9,
+  "client": "distributor",
+  "text": "Orders and value by week, compared with last year",
+  "checks": {
+   "1": [
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "orders"
+     ]
+    },
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "order_value"
+     ]
+    }
+   ],
+   "2": [
+    {
+     "check": "governed_share_min",
+     "min": 1.0
+    },
+    {
+     "check": "raw_sql_needs_word",
+     "word": "unverified"
+    }
+   ],
+   "3": [
+    {
+     "check": "tile_type_any",
+     "types": [
+      "line",
+      "combo",
+      "area",
+      "bar"
+     ]
+    },
+    {
+     "check": "tile_type_none",
+     "types": [
+      "donut"
+     ]
+    }
+   ],
+   "4": [
+    {
+     "check": "ghost_on",
+     "types": [
+      "line",
+      "area",
+      "bar"
+     ],
+     "ghost": "last_year"
+    },
+    {
+     "check": "follows_control",
+     "min_tiles": 1
+    }
+   ],
+   "5": [
+    {
+     "check": "good_direction_set"
+    }
+   ],
+   "6": [
+    {
+     "check": "titles_have_period"
+    }
+   ],
+   "7": [
+    {
+     "check": "preview_rounds_max",
+     "max": 3
+    },
+    {
+     "check": "no_errors"
+    },
+    {
+     "check": "warnings_explained"
+    }
+   ]
+  },
+  "reply_checks": [
+   {
+    "check": "reply_contains_any",
+    "words": [
+     "last year",
+     "horizon"
+    ]
+   }
+  ],
+  "gate": true
+ },
+ {
+  "n": 10,
+  "client": "distributor",
+  "text": "Receivables by customer, who is late",
+  "checks": {
+   "1": [
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "receivables_open"
+     ]
+    }
+   ],
+   "2": [
+    {
+     "check": "governed_share_min",
+     "min": 1.0
+    },
+    {
+     "check": "raw_sql_needs_word",
+     "word": "unverified"
+    }
+   ],
+   "3": [
+    {
+     "check": "tile_type_any",
+     "types": [
+      "table"
+     ]
+    },
+    {
+     "check": "tile_type_none",
+     "types": [
+      "donut"
+     ]
+    }
+   ],
+   "4": [],
+   "5": [
+    {
+     "check": "owed_only_on",
+     "required": true
+    }
+   ],
+   "6": [
+    {
+     "check": "sections_min",
+     "min": 1
+    },
+    {
+     "check": "titles_have_period"
+    }
+   ],
+   "7": [
+    {
+     "check": "recipe_loaded",
+     "name": "receivables"
+    },
+    {
+     "check": "preview_rounds_max",
+     "max": 3
+    },
+    {
+     "check": "no_errors"
+    },
+    {
+     "check": "warnings_explained"
+    }
+   ]
+  },
+  "reply_checks": [],
+  "gate": true
+ },
+ {
+  "n": 11,
+  "client": "distributor",
+  "text": "How many distinct customers ordered this month",
+  "checks": {
+   "1": [
+    {
+     "check": "bound_measures_any",
+     "any": [
+      "distinct_customers"
+     ]
+    }
+   ],
+   "2": [
+    {
+     "check": "governed_share_min",
+     "min": 1.0
+    },
+    {
+     "check": "raw_sql_needs_word",
+     "word": "unverified"
+    }
+   ],
+   "3": [
+    {
+     "check": "tile_type_any",
+     "types": [
+      "stat"
+     ]
+    }
+   ],
+   "4": [
+    {
+     "check": "control_default",
+     "preset": "this_month"
+    },
+    {
+     "check": "presets_for_distinct"
+    }
+   ],
+   "5": [
+    {
+     "check": "good_direction_set"
+    }
+   ],
+   "6": [
+    {
+     "check": "titles_have_period"
+    }
+   ],
+   "7": [
+    {
+     "check": "preview_rounds_max",
+     "max": 3
+    },
+    {
+     "check": "no_errors"
+    },
+    {
+     "check": "warnings_explained"
+    }
+   ]
+  },
+  "reply_checks": [],
+  "gate": true
+ },
+ {
+  "n": 12,
+  "client": "mill",
+  "text": "Make the outward bars red",
+  "after": 1,
+  "checks": {
+   "1": [],
+   "2": [],
+   "3": [],
+   "4": [],
+   "5": [],
+   "6": [],
+   "7": [
+    {
+     "check": "preview_rounds_max",
+     "max": 3
+    }
+   ]
+  },
+  "reply_checks": [
+   {
+    "check": "reply_contains_all",
+    "words": [
+     "red",
+     "outward"
+    ]
+   },
+   {
+    "check": "reply_contains_any",
+    "words": [
+     "bad",
+     "problem",
+     "warning",
+     "negative"
+    ]
+   }
+  ],
+  "required": [
+   {
+    "check": "reply_contains_all",
+    "words": [
+     "red",
+     "outward"
+    ]
+   },
+   {
+    "check": "reply_contains_any",
+    "words": [
+     "bad",
+     "problem",
+     "warning",
+     "negative"
+    ]
+   }
+  ],
+  "gate": false
+ }
+]

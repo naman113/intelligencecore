@@ -1,0 +1,1652 @@
+[
+  {
+    "id": "anthropics/algorithmic-art",
+    "name": "algorithmic-art",
+    "description": "Creating algorithmic art using p5.js with seeded randomness and interactive parameter exploration. Use this when users request creating art using code, generative art, algorithmic art, flow fields, or",
+    "source": "anthropics",
+    "license": "Apache-2.0",
+    "compat": "coding-agent",
+    "path": "anthropics/algorithmic-art",
+    "relevant": false
+  },
+  {
+    "id": "anthropics/brand-guidelines",
+    "name": "brand-guidelines",
+    "description": "Applies Anthropic's official brand colors and typography to any sort of artifact that may benefit from having Anthropic's look-and-feel. Use it when brand colors or style guidelines, visual formatting",
+    "source": "anthropics",
+    "license": "Apache-2.0",
+    "compat": "general",
+    "path": "anthropics/brand-guidelines",
+    "relevant": false
+  },
+  {
+    "id": "anthropics/frontend-design",
+    "name": "frontend-design",
+    "description": "Guidance for distinctive, intentional visual design when building new UI or reshaping an existing one. Helps with aesthetic direction, typography, and making choices that don't read as templated defau",
+    "source": "anthropics",
+    "license": "Apache-2.0",
+    "compat": "coding-agent",
+    "path": "anthropics/frontend-design",
+    "relevant": false
+  },
+  {
+    "id": "anthropics/internal-comms",
+    "name": "internal-comms",
+    "description": "A set of resources to help me write all kinds of internal communications, using the formats that my company likes to use. Claude should use this skill whenever asked to write some sort of internal com",
+    "source": "anthropics",
+    "license": "Apache-2.0",
+    "compat": "coding-agent",
+    "path": "anthropics/internal-comms",
+    "relevant": true
+  },
+  {
+    "id": "anthropics/mcp-builder",
+    "name": "mcp-builder",
+    "description": "Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when building MCP servers to integrate externa",
+    "source": "anthropics",
+    "license": "Apache-2.0",
+    "compat": "coding-agent",
+    "path": "anthropics/mcp-builder",
+    "relevant": false
+  },
+  {
+    "id": "anthropics/skill-creator",
+    "name": "skill-creator",
+    "description": "Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill",
+    "source": "anthropics",
+    "license": "Apache-2.0",
+    "compat": "coding-agent",
+    "path": "anthropics/skill-creator",
+    "relevant": true
+  },
+  {
+    "id": "anthropics/slack-gif-creator",
+    "name": "slack-gif-creator",
+    "description": "Knowledge and utilities for creating animated GIFs optimized for Slack. Provides constraints, validation tools, and animation concepts. Use when users request animated GIFs for Slack like \"make me a G",
+    "source": "anthropics",
+    "license": "Apache-2.0",
+    "compat": "coding-agent",
+    "path": "anthropics/slack-gif-creator",
+    "relevant": false
+  },
+  {
+    "id": "anthropics/theme-factory",
+    "name": "theme-factory",
+    "description": "Toolkit for styling artifacts with a theme. These artifacts can be slides, docs, reportings, HTML landing pages, etc. There are 10 pre-set themes with colors/fonts that you can apply to any artifact t",
+    "source": "anthropics",
+    "license": "Apache-2.0",
+    "compat": "coding-agent",
+    "path": "anthropics/theme-factory",
+    "relevant": false
+  },
+  {
+    "id": "anthropics/web-artifacts-builder",
+    "name": "web-artifacts-builder",
+    "description": "Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind CSS, shadcn/ui). Use for complex artifacts requiring state manag",
+    "source": "anthropics",
+    "license": "Apache-2.0",
+    "compat": "coding-agent",
+    "path": "anthropics/web-artifacts-builder",
+    "relevant": false
+  },
+  {
+    "id": "anthropics/webapp-testing",
+    "name": "webapp-testing",
+    "description": "Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser l",
+    "source": "anthropics",
+    "license": "Apache-2.0",
+    "compat": "coding-agent",
+    "path": "anthropics/webapp-testing",
+    "relevant": false
+  },
+  {
+    "id": "hermes/airtable",
+    "name": "airtable",
+    "description": "Airtable REST API via curl. Records CRUD, filters, upserts.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/airtable",
+    "relevant": false
+  },
+  {
+    "id": "hermes/apple-notes",
+    "name": "apple-notes",
+    "description": "Manage Apple Notes via memo CLI: create, search, edit.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/apple-notes",
+    "relevant": false
+  },
+  {
+    "id": "hermes/apple-reminders",
+    "name": "apple-reminders",
+    "description": "Apple Reminders via remindctl: add, list, complete.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/apple-reminders",
+    "relevant": false
+  },
+  {
+    "id": "hermes/architecture-diagram",
+    "name": "architecture-diagram",
+    "description": "Dark-themed SVG architecture/cloud/infra diagrams as HTML.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/architecture-diagram",
+    "relevant": false
+  },
+  {
+    "id": "hermes/arxiv",
+    "name": "arxiv",
+    "description": "Search arXiv papers by keyword, author, category, or ID.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/arxiv",
+    "relevant": false
+  },
+  {
+    "id": "hermes/ascii-art",
+    "name": "ascii-art",
+    "description": "ASCII art: pyfiglet, cowsay, boxes, image-to-ascii.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/ascii-art",
+    "relevant": false
+  },
+  {
+    "id": "hermes/ascii-video",
+    "name": "ascii-video",
+    "description": "ASCII video: convert video/audio to colored ASCII MP4/GIF.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/ascii-video",
+    "relevant": false
+  },
+  {
+    "id": "hermes/baoyu-infographic",
+    "name": "baoyu-infographic",
+    "description": "Infographics: 21 layouts x 21 styles (信息图, 可视化).",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/baoyu-infographic",
+    "relevant": false
+  },
+  {
+    "id": "hermes/blogwatcher",
+    "name": "blogwatcher",
+    "description": "Monitor blogs and RSS/Atom feeds via blogwatcher-cli tool.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/blogwatcher",
+    "relevant": false
+  },
+  {
+    "id": "hermes/claude-code",
+    "name": "claude-code",
+    "description": "Delegate coding to Claude Code CLI (features, PRs).",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/claude-code",
+    "relevant": false
+  },
+  {
+    "id": "hermes/claude-design",
+    "name": "claude-design",
+    "description": "Design one-off HTML artifacts (landing, deck, prototype).",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/claude-design",
+    "relevant": false
+  },
+  {
+    "id": "hermes/codebase-inspection",
+    "name": "codebase-inspection",
+    "description": "Inspect codebases w/ pygount: LOC, languages, ratios.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/codebase-inspection",
+    "relevant": false
+  },
+  {
+    "id": "hermes/codex",
+    "name": "codex",
+    "description": "Delegate coding to OpenAI Codex CLI (features, PRs).",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/codex",
+    "relevant": false
+  },
+  {
+    "id": "hermes/comfyui",
+    "name": "comfyui",
+    "description": "Generate images, video, and audio via diffusion workflows.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/comfyui",
+    "relevant": false
+  },
+  {
+    "id": "hermes/competitor-news-monitor",
+    "name": "competitor-news-monitor",
+    "description": "Watch named companies for material news; cited digests.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "general",
+    "path": "hermes/competitor-news-monitor",
+    "relevant": true
+  },
+  {
+    "id": "hermes/computer-use",
+    "name": "computer-use",
+    "description": "Drive the desktop in the background without stealing focus.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/computer-use",
+    "relevant": false
+  },
+  {
+    "id": "hermes/design-md",
+    "name": "design-md",
+    "description": "Author/validate/export Google's DESIGN.md token spec files.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/design-md",
+    "relevant": false
+  },
+  {
+    "id": "hermes/document-to-action-items",
+    "name": "document-to-action-items",
+    "description": "Extract cited obligations, deadlines, tasks from documents.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "general",
+    "path": "hermes/document-to-action-items",
+    "relevant": true
+  },
+  {
+    "id": "hermes/docx",
+    "name": "docx",
+    "description": "Create, read, edit, template, and review Word .docx files.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/docx",
+    "relevant": false
+  },
+  {
+    "id": "hermes/dogfood",
+    "name": "dogfood",
+    "description": "Exploratory QA of web apps: find bugs, evidence, reports.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/dogfood",
+    "relevant": false
+  },
+  {
+    "id": "hermes/email-inbox-triage",
+    "name": "email-inbox-triage",
+    "description": "Triage an inbox: prioritize threads, draft replies safely.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/email-inbox-triage",
+    "relevant": true
+  },
+  {
+    "id": "hermes/evaluating-llms-harness",
+    "name": "evaluating-llms-harness",
+    "description": "lm-eval-harness: benchmark LLMs (MMLU, GSM8K, etc.).",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/evaluating-llms-harness",
+    "relevant": false
+  },
+  {
+    "id": "hermes/excalidraw",
+    "name": "excalidraw",
+    "description": "Hand-drawn Excalidraw JSON diagrams (arch, flow, seq).",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/excalidraw",
+    "relevant": false
+  },
+  {
+    "id": "hermes/findmy",
+    "name": "findmy",
+    "description": "Track Apple devices/AirTags via FindMy.app on macOS.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/findmy",
+    "relevant": false
+  },
+  {
+    "id": "hermes/gif-search",
+    "name": "gif-search",
+    "description": "Search/download GIFs from Tenor via curl + jq.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/gif-search",
+    "relevant": false
+  },
+  {
+    "id": "hermes/github-auth",
+    "name": "github-auth",
+    "description": "GitHub auth setup: HTTPS tokens, SSH keys, gh CLI login.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/github-auth",
+    "relevant": false
+  },
+  {
+    "id": "hermes/github-code-review",
+    "name": "github-code-review",
+    "description": "Review PRs: diffs, inline comments via gh or REST.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/github-code-review",
+    "relevant": false
+  },
+  {
+    "id": "hermes/github-issue-to-pr",
+    "name": "github-issue-to-pr",
+    "description": "Carry a GitHub issue to a verified PR with honest CI state.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/github-issue-to-pr",
+    "relevant": false
+  },
+  {
+    "id": "hermes/github-issues",
+    "name": "github-issues",
+    "description": "Create, triage, label, assign GitHub issues via gh or REST.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/github-issues",
+    "relevant": false
+  },
+  {
+    "id": "hermes/github-pr-workflow",
+    "name": "github-pr-workflow",
+    "description": "GitHub PR lifecycle: branch, commit, open, CI, merge.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/github-pr-workflow",
+    "relevant": false
+  },
+  {
+    "id": "hermes/github-repo-management",
+    "name": "github-repo-management",
+    "description": "Clone/create/fork repos; manage remotes, releases.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/github-repo-management",
+    "relevant": false
+  },
+  {
+    "id": "hermes/google-workspace",
+    "name": "google-workspace",
+    "description": "Gmail, Calendar, Drive, Docs, Sheets via gws CLI or Python.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/google-workspace",
+    "relevant": false
+  },
+  {
+    "id": "hermes/grounded-citations",
+    "name": "grounded-citations",
+    "description": "Ground answers and documents in cited, verifiable sources.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/grounded-citations",
+    "relevant": true
+  },
+  {
+    "id": "hermes/hermes-agent",
+    "name": "hermes-agent",
+    "description": "Use, configure, theme, extend, and orchestrate Hermes Agent.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/hermes-agent",
+    "relevant": false
+  },
+  {
+    "id": "hermes/hermes-agent-skill-authoring",
+    "name": "hermes-agent-skill-authoring",
+    "description": "Author in-repo SKILL.md files: frontmatter and structure.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/hermes-agent-skill-authoring",
+    "relevant": false
+  },
+  {
+    "id": "hermes/himalaya",
+    "name": "himalaya",
+    "description": "Himalaya CLI: IMAP/SMTP email from terminal.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/himalaya",
+    "relevant": false
+  },
+  {
+    "id": "hermes/huggingface-hub",
+    "name": "huggingface-hub",
+    "description": "HuggingFace hf CLI: search/download/upload models, datasets.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/huggingface-hub",
+    "relevant": false
+  },
+  {
+    "id": "hermes/humanizer",
+    "name": "humanizer",
+    "description": "Humanize text: strip AI-isms and add real voice.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/humanizer",
+    "relevant": true
+  },
+  {
+    "id": "hermes/imessage",
+    "name": "imessage",
+    "description": "Send and receive iMessages/SMS via the imsg CLI on macOS.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/imessage",
+    "relevant": false
+  },
+  {
+    "id": "hermes/inspecting-hermes-desktop-dom",
+    "name": "inspecting-hermes-desktop-dom",
+    "description": "Read the live Hermes desktop DOM/CSS over CDP.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/inspecting-hermes-desktop-dom",
+    "relevant": false
+  },
+  {
+    "id": "hermes/llama-cpp",
+    "name": "llama-cpp",
+    "description": "llama.cpp local GGUF inference + HF Hub model discovery.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/llama-cpp",
+    "relevant": false
+  },
+  {
+    "id": "hermes/llm-wiki",
+    "name": "llm-wiki",
+    "description": "Karpathy's LLM Wiki: build/query interlinked markdown KB.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/llm-wiki",
+    "relevant": false
+  },
+  {
+    "id": "hermes/manim-video",
+    "name": "manim-video",
+    "description": "Manim CE animations: 3Blue1Brown math/algo videos.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/manim-video",
+    "relevant": false
+  },
+  {
+    "id": "hermes/maps",
+    "name": "maps",
+    "description": "Geocode, POIs, routes, timezones via OpenStreetMap/OSRM.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/maps",
+    "relevant": false
+  },
+  {
+    "id": "hermes/meeting-action-items",
+    "name": "meeting-action-items",
+    "description": "Turn meeting notes into cited decisions, owners, tickets.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/meeting-action-items",
+    "relevant": true
+  },
+  {
+    "id": "hermes/merge-reconciler",
+    "name": "merge-reconciler",
+    "description": "Neutral third-party resolution of agent merge conflicts.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/merge-reconciler",
+    "relevant": false
+  },
+  {
+    "id": "hermes/nano-pdf",
+    "name": "nano-pdf",
+    "description": "Edit text in existing PDFs via natural-language prompts.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/nano-pdf",
+    "relevant": false
+  },
+  {
+    "id": "hermes/node-inspect-debugger",
+    "name": "node-inspect-debugger",
+    "description": "Debug Node.js via --inspect + Chrome DevTools Protocol CLI.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/node-inspect-debugger",
+    "relevant": false
+  },
+  {
+    "id": "hermes/notion",
+    "name": "notion",
+    "description": "Notion API + ntn CLI: pages, databases, markdown, Workers.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/notion",
+    "relevant": false
+  },
+  {
+    "id": "hermes/obsidian",
+    "name": "obsidian",
+    "description": "Read, search, create, and edit notes in the Obsidian vault.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/obsidian",
+    "relevant": false
+  },
+  {
+    "id": "hermes/ocr-and-documents",
+    "name": "ocr-and-documents",
+    "description": "Extract text from PDFs/scans (pymupdf, marker-pdf).",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/ocr-and-documents",
+    "relevant": true
+  },
+  {
+    "id": "hermes/opencode",
+    "name": "opencode",
+    "description": "Delegate coding to OpenCode CLI (features, PR review).",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/opencode",
+    "relevant": false
+  },
+  {
+    "id": "hermes/openhue",
+    "name": "openhue",
+    "description": "Control Philips Hue lights, scenes, rooms via OpenHue CLI.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/openhue",
+    "relevant": false
+  },
+  {
+    "id": "hermes/p5js",
+    "name": "p5js",
+    "description": "p5.js sketches: gen art, shaders, interactive, 3D.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/p5js",
+    "relevant": false
+  },
+  {
+    "id": "hermes/pdf",
+    "name": "pdf",
+    "description": "Create, read, merge, fill, and secure PDF files.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/pdf",
+    "relevant": false
+  },
+  {
+    "id": "hermes/plan",
+    "name": "plan",
+    "description": "Write a markdown plan to .hermes/plans/; no execution.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/plan",
+    "relevant": false
+  },
+  {
+    "id": "hermes/powerpoint",
+    "name": "powerpoint",
+    "description": "Create, read, edit .pptx decks with python-pptx.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/powerpoint",
+    "relevant": false
+  },
+  {
+    "id": "hermes/pretext",
+    "name": "pretext",
+    "description": "Build creative browser demos with DOM-free text layout.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/pretext",
+    "relevant": false
+  },
+  {
+    "id": "hermes/product-price-monitor",
+    "name": "product-price-monitor",
+    "description": "Watch product, flight, or listing prices; alert on target.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "general",
+    "path": "hermes/product-price-monitor",
+    "relevant": true
+  },
+  {
+    "id": "hermes/python-debugpy",
+    "name": "python-debugpy",
+    "description": "Debug Python: pdb REPL + debugpy remote (DAP).",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/python-debugpy",
+    "relevant": false
+  },
+  {
+    "id": "hermes/requesting-code-review",
+    "name": "requesting-code-review",
+    "description": "Pre-commit review: security scan, quality gates, auto-fix.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/requesting-code-review",
+    "relevant": false
+  },
+  {
+    "id": "hermes/sdlc-review",
+    "name": "sdlc-review",
+    "description": "Review Kanban handoffs and route verified outcomes.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/sdlc-review",
+    "relevant": false
+  },
+  {
+    "id": "hermes/serving-llms-vllm",
+    "name": "serving-llms-vllm",
+    "description": "vLLM: high-throughput LLM serving, OpenAI API, quantization.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/serving-llms-vllm",
+    "relevant": false
+  },
+  {
+    "id": "hermes/simplify-code",
+    "name": "simplify-code",
+    "description": "Parallel 4-agent cleanup of recent code changes.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/simplify-code",
+    "relevant": false
+  },
+  {
+    "id": "hermes/sketch",
+    "name": "sketch",
+    "description": "Throwaway HTML mockups: 2-3 design variants to compare.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/sketch",
+    "relevant": false
+  },
+  {
+    "id": "hermes/songsee",
+    "name": "songsee",
+    "description": "Audio spectrograms/features (mel, chroma, MFCC) via CLI.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/songsee",
+    "relevant": false
+  },
+  {
+    "id": "hermes/songwriting-and-ai-music",
+    "name": "songwriting-and-ai-music",
+    "description": "Songwriting craft and Suno AI music prompts.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/songwriting-and-ai-music",
+    "relevant": false
+  },
+  {
+    "id": "hermes/spike",
+    "name": "spike",
+    "description": "Throwaway experiments to validate an idea before build.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/spike",
+    "relevant": false
+  },
+  {
+    "id": "hermes/systematic-debugging",
+    "name": "systematic-debugging",
+    "description": "4-phase root cause debugging: understand bugs before fixing.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/systematic-debugging",
+    "relevant": false
+  },
+  {
+    "id": "hermes/teams-meeting-pipeline",
+    "name": "teams-meeting-pipeline",
+    "description": "Teams meeting summaries, job replay, Graph subscriptions.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/teams-meeting-pipeline",
+    "relevant": false
+  },
+  {
+    "id": "hermes/test-driven-development",
+    "name": "test-driven-development",
+    "description": "TDD: enforce RED-GREEN-REFACTOR, tests before code.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/test-driven-development",
+    "relevant": false
+  },
+  {
+    "id": "hermes/touchdesigner-mcp",
+    "name": "touchdesigner-mcp",
+    "description": "Control TouchDesigner via twozero MCP.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/touchdesigner-mcp",
+    "relevant": false
+  },
+  {
+    "id": "hermes/weekly-review-planning",
+    "name": "weekly-review-planning",
+    "description": "Weekly reset: commitments, stalled work, next-week plan.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "general",
+    "path": "hermes/weekly-review-planning",
+    "relevant": true
+  },
+  {
+    "id": "hermes/weights-and-biases",
+    "name": "weights-and-biases",
+    "description": "W&B: log ML experiments, sweeps, model registry, dashboards.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/weights-and-biases",
+    "relevant": false
+  },
+  {
+    "id": "hermes/xlsx",
+    "name": "xlsx",
+    "description": "Create, read, edit Excel .xlsx workbooks and CSVs.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/xlsx",
+    "relevant": false
+  },
+  {
+    "id": "hermes/xurl",
+    "name": "xurl",
+    "description": "X/Twitter via xurl CLI: raw post search, posting, DM, media.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/xurl",
+    "relevant": false
+  },
+  {
+    "id": "hermes/youtube-content",
+    "name": "youtube-content",
+    "description": "YouTube transcripts to summaries, threads, blogs.",
+    "source": "hermes",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "hermes/youtube-content",
+    "relevant": false
+  },
+  {
+    "id": "intelligence-corner/anomaly-detection",
+    "name": "anomaly-detection",
+    "description": "Find unusual days, orders, customers, vehicles or readings and explain why each is unusual, with few false alarms. Use for unusual, odd, outlier, spike, sudden drop, anything strange.",
+    "source": "intelligence-corner",
+    "license": "Proprietary",
+    "compat": "general",
+    "relevant": true,
+    "path": "intelligence-corner/anomaly-detection"
+  },
+  {
+    "id": "intelligence-corner/connect-data-source",
+    "name": "connect-data-source",
+    "description": "Use when the owner wants to connect a client database (Postgres, MySQL, SQL Server) or a CSV file as a data source. Walks through credentials form, probe, test, proposal, owner approval, status and discovery; sample data is untrusted.",
+    "source": "intelligence-corner",
+    "license": "Proprietary",
+    "compat": "general",
+    "relevant": true,
+    "path": "intelligence-corner/connect-data-source"
+  },
+  {
+    "id": "intelligence-corner/context-pack-import",
+    "name": "context-pack-import",
+    "description": "Use when the owner uploads a context pack or business document (data dictionary, README, ic-context-pack.json). Reads it as untrusted data and turns each fact into an individual proposal for owner approval; proposals only, the template pack comes in one call.",
+    "source": "intelligence-corner",
+    "license": "Proprietary",
+    "compat": "general",
+    "relevant": true,
+    "path": "intelligence-corner/context-pack-import"
+  },
+  {
+    "id": "intelligence-corner/dashboard-authoring",
+    "name": "dashboard-authoring",
+    "description": "House style for live business dashboards as chart specs: governed measures first, phone-first layout, gold means owed. Use before writing, revising or converting any dashboard.",
+    "source": "intelligence-corner",
+    "license": "Proprietary",
+    "compat": "general",
+    "relevant": true,
+    "path": "intelligence-corner/dashboard-authoring"
+  },
+  {
+    "id": "intelligence-corner/data-modeling",
+    "name": "data-modeling",
+    "description": "Use when asked to model the business data, define a governed measure, or answer a number the owner relies on. Proposes table roles, relationships and measures for approval; answers via query_measure.",
+    "source": "intelligence-corner",
+    "license": "Proprietary",
+    "compat": "general",
+    "relevant": true,
+    "path": "intelligence-corner/data-modeling"
+  },
+  {
+    "id": "intelligence-corner/driver-analysis",
+    "name": "driver-analysis",
+    "description": "Find what explains a change or a number: which segments drove it and which factors move with it, as association not cause. Use for what drives, why did it drop, what explains, contributors.",
+    "source": "intelligence-corner",
+    "license": "Proprietary",
+    "compat": "general",
+    "relevant": true,
+    "path": "intelligence-corner/driver-analysis"
+  },
+  {
+    "id": "intelligence-corner/exploratory-data-analysis",
+    "name": "exploratory-data-analysis",
+    "description": "Method for studying approved business tables like a data scientist and recording only reproducible, notable findings with record_insight. Use in exploration playbooks.",
+    "source": "intelligence-corner",
+    "license": "Proprietary",
+    "compat": "general",
+    "relevant": true,
+    "path": "intelligence-corner/exploratory-data-analysis"
+  },
+  {
+    "id": "intelligence-corner/forecasting",
+    "name": "forecasting",
+    "description": "Forecast sales, revenue, orders, fuel or any business number for the coming days, weeks or months, with a likely range and tested accuracy. Use for forecast, predict, project, next month, expected.",
+    "source": "intelligence-corner",
+    "license": "Proprietary",
+    "compat": "general",
+    "relevant": true,
+    "path": "intelligence-corner/forecasting"
+  },
+  {
+    "id": "intelligence-corner/kpi-selection",
+    "name": "kpi-selection",
+    "description": "How to pick one KPI worth watching that nobody asked for and propose it with propose_kpi for owner approval. Use after exploration finds a recurring risk or driver.",
+    "source": "intelligence-corner",
+    "license": "Proprietary",
+    "compat": "general",
+    "relevant": true,
+    "path": "intelligence-corner/kpi-selection"
+  },
+  {
+    "id": "intelligence-corner/schema-documentation",
+    "name": "schema-documentation",
+    "description": "Use when asked to discover, document or describe a database schema, its tables and columns, or to record a business rule or KPI definition. Proposes text-to-SQL descriptions for owner approval.",
+    "source": "intelligence-corner",
+    "license": "Proprietary",
+    "compat": "general",
+    "path": "intelligence-corner/schema-documentation",
+    "relevant": true
+  },
+  {
+    "id": "intelligence-corner/statistical-tests",
+    "name": "statistical-tests",
+    "description": "Check whether a difference between groups or periods is real or chance, with a range for its size. Use for is this significant, did it really change, compare A and B, before and after.",
+    "source": "intelligence-corner",
+    "license": "Proprietary",
+    "compat": "general",
+    "relevant": true,
+    "path": "intelligence-corner/statistical-tests"
+  },
+  {
+    "id": "intelligence-corner/trend-and-seasonality",
+    "name": "trend-and-seasonality",
+    "description": "Separate trend from weekly or yearly patterns, find when a level shifted, and compare periods with the season removed. Use for trend, seasonal, is it growing, when did it change, vs last year.",
+    "source": "intelligence-corner",
+    "license": "Proprietary",
+    "compat": "general",
+    "relevant": true,
+    "path": "intelligence-corner/trend-and-seasonality"
+  },
+  {
+    "id": "opencode/angular-architect",
+    "name": "angular-architect",
+    "description": "Generates Angular 17+ standalone components, configures advanced routing with lazy loading and guards, implements NgRx state management, applies RxJS patterns, and optimizes bundle performance. Use wh",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/angular-architect",
+    "relevant": false
+  },
+  {
+    "id": "opencode/api-designer",
+    "name": "api-designer",
+    "description": "Use when designing REST or GraphQL APIs, creating OpenAPI specifications, or planning API architecture. Invoke for resource modeling, versioning strategies, pagination patterns, error handling standar",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/api-designer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/architecture-designer",
+    "name": "architecture-designer",
+    "description": "Use when designing new high-level system architecture, reviewing existing designs, or making architectural decisions. Invoke to create architecture diagrams, write Architecture Decision Records (ADRs)",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/architecture-designer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/atlassian-mcp",
+    "name": "atlassian-mcp",
+    "description": "Integrates with Atlassian products to manage project tracking and documentation via MCP protocol. Use when querying Jira issues with JQL filters, creating and updating tickets with custom fields, sear",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/atlassian-mcp",
+    "relevant": false
+  },
+  {
+    "id": "opencode/chaos-engineer",
+    "name": "chaos-engineer",
+    "description": "Designs chaos experiments, creates failure injection frameworks, and facilitates game day exercises for distributed systems — producing runbooks, experiment manifests, rollback procedures, and post-mo",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/chaos-engineer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/cli-developer",
+    "name": "cli-developer",
+    "description": "Use when building CLI tools, implementing argument parsing, or adding interactive prompts. Invoke for parsing flags and subcommands, displaying progress bars and spinners, generating bash/zsh/fish com",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/cli-developer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/cloud-architect",
+    "name": "cloud-architect",
+    "description": "Designs cloud architectures, creates migration plans, generates cost optimization recommendations, and produces disaster recovery strategies across AWS, Azure, and GCP. Use when designing cloud archit",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/cloud-architect",
+    "relevant": false
+  },
+  {
+    "id": "opencode/code-documenter",
+    "name": "code-documenter",
+    "description": "Generates, formats, and validates technical documentation — including docstrings, OpenAPI/Swagger specs, JSDoc annotations, doc portals, and user guides. Use when adding docstrings to functions or cla",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/code-documenter",
+    "relevant": false
+  },
+  {
+    "id": "opencode/code-reviewer",
+    "name": "code-reviewer",
+    "description": "Analyzes code diffs and files to identify bugs, security vulnerabilities (SQL injection, XSS, insecure deserialization), code smells, N+1 queries, naming issues, and architectural concerns, then produ",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/code-reviewer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/cpp-pro",
+    "name": "cpp-pro",
+    "description": "Writes, optimizes, and debugs C++ applications using modern C++20/23 features, template metaprogramming, and high-performance systems techniques. Use when building or refactoring C++ code requiring co",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "general",
+    "path": "opencode/cpp-pro",
+    "relevant": false
+  },
+  {
+    "id": "opencode/csharp-developer",
+    "name": "csharp-developer",
+    "description": "Use when building C applications with .NET 8+, ASP.NET Core APIs, or Blazor web apps. Builds REST APIs using minimal or controller-based routing, configures database access with Entity Framework Core,",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/csharp-developer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/database-optimizer",
+    "name": "database-optimizer",
+    "description": "Optimizes database queries and improves performance across PostgreSQL and MySQL systems. Use when investigating slow queries, analyzing execution plans, or optimizing database performance. Invoke for ",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "general",
+    "path": "opencode/database-optimizer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/debugging-wizard",
+    "name": "debugging-wizard",
+    "description": "Parses error messages, traces execution flow through stack traces, correlates log entries to identify failure points, and applies systematic hypothesis-driven methodology to isolate and resolve bugs. ",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/debugging-wizard",
+    "relevant": false
+  },
+  {
+    "id": "opencode/devops-engineer",
+    "name": "devops-engineer",
+    "description": "Creates Dockerfiles, configures CI/CD pipelines, writes Kubernetes manifests, and generates Terraform/Pulumi infrastructure templates. Handles deployment automation, GitOps configuration, incident res",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/devops-engineer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/django-expert",
+    "name": "django-expert",
+    "description": "Use when building Django web applications or REST APIs with Django REST Framework. Invoke when working with settings.py, models.py, manage.py, or any Django project file. Creates Django models with pr",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/django-expert",
+    "relevant": false
+  },
+  {
+    "id": "opencode/dotnet-core-expert",
+    "name": "dotnet-core-expert",
+    "description": "Use when building .NET 8 applications with minimal APIs, clean architecture, or cloud-native microservices. Invoke for Entity Framework Core, CQRS with MediatR, JWT authentication, AOT compilation.",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/dotnet-core-expert",
+    "relevant": false
+  },
+  {
+    "id": "opencode/embedded-systems",
+    "name": "embedded-systems",
+    "description": "Use when developing firmware for microcontrollers, implementing RTOS applications, or optimizing power consumption. Invoke for STM32, ESP32, FreeRTOS, bare-metal, power optimization, real-time systems",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "general",
+    "path": "opencode/embedded-systems",
+    "relevant": false
+  },
+  {
+    "id": "opencode/fastapi-expert",
+    "name": "fastapi-expert",
+    "description": "Use when building high-performance async Python APIs with FastAPI and Pydantic V2. Invoke to create REST endpoints, define Pydantic models, implement authentication flows, set up async SQLAlchemy data",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/fastapi-expert",
+    "relevant": false
+  },
+  {
+    "id": "opencode/feature-forge",
+    "name": "feature-forge",
+    "description": "Conducts structured requirements workshops to produce feature specifications, user stories, EARS-format functional requirements, acceptance criteria, and implementation checklists. Use when defining n",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/feature-forge",
+    "relevant": false
+  },
+  {
+    "id": "opencode/fine-tuning-expert",
+    "name": "fine-tuning-expert",
+    "description": "Use when fine-tuning LLMs, training custom models, or adapting foundation models for specific tasks. Invoke for configuring LoRA/QLoRA adapters, preparing JSONL training datasets, setting hyperparamet",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "general",
+    "path": "opencode/fine-tuning-expert",
+    "relevant": false
+  },
+  {
+    "id": "opencode/flutter-expert",
+    "name": "flutter-expert",
+    "description": "Use when building cross-platform applications with Flutter 3+ and Dart. Invoke for widget development, Riverpod/Bloc state management, GoRouter navigation, platform-specific implementations, performan",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/flutter-expert",
+    "relevant": false
+  },
+  {
+    "id": "opencode/fullstack-guardian",
+    "name": "fullstack-guardian",
+    "description": "Builds security-focused full-stack web applications by implementing integrated frontend and backend components with layered security at every level. Covers the complete stack from database to UI, enfo",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/fullstack-guardian",
+    "relevant": false
+  },
+  {
+    "id": "opencode/game-developer",
+    "name": "game-developer",
+    "description": "Use when building game systems, implementing Unity/Unreal Engine features, or optimizing game performance. Invoke to implement ECS architecture, configure physics systems and colliders, set up multipl",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/game-developer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/golang-pro",
+    "name": "golang-pro",
+    "description": "Implements concurrent Go patterns using goroutines and channels, designs and builds microservices with gRPC or REST, optimizes Go application performance with pprof, and enforces idiomatic Go with gen",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "general",
+    "path": "opencode/golang-pro",
+    "relevant": false
+  },
+  {
+    "id": "opencode/graphql-architect",
+    "name": "graphql-architect",
+    "description": "Use when designing GraphQL schemas, implementing Apollo Federation, or building real-time subscriptions. Invoke for schema design, resolvers with DataLoader, query optimization, federation directives.",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/graphql-architect",
+    "relevant": false
+  },
+  {
+    "id": "opencode/java-architect",
+    "name": "java-architect",
+    "description": "Use when building, configuring, or debugging enterprise Java applications with Spring Boot 3.x, microservices, or reactive programming. Invoke to implement WebFlux endpoints, optimize JPA queries and ",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/java-architect",
+    "relevant": false
+  },
+  {
+    "id": "opencode/javascript-pro",
+    "name": "javascript-pro",
+    "description": "Writes, debugs, and refactors JavaScript code using modern ES2023+ features, async/await patterns, ESM module systems, and Node.js APIs. Use when building vanilla JavaScript applications, implementing",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "general",
+    "path": "opencode/javascript-pro",
+    "relevant": false
+  },
+  {
+    "id": "opencode/kotlin-specialist",
+    "name": "kotlin-specialist",
+    "description": "Provides idiomatic Kotlin implementation patterns including coroutine concurrency, Flow stream handling, multiplatform architecture, Compose UI construction, Ktor server setup, and type-safe DSL desig",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/kotlin-specialist",
+    "relevant": false
+  },
+  {
+    "id": "opencode/kubernetes-specialist",
+    "name": "kubernetes-specialist",
+    "description": "Use when deploying or managing Kubernetes workloads. Invoke to create deployment manifests, configure pod security policies, set up service accounts, define network isolation rules, debug pod crashes,",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/kubernetes-specialist",
+    "relevant": false
+  },
+  {
+    "id": "opencode/laravel-specialist",
+    "name": "laravel-specialist",
+    "description": "Build and configure Laravel 10+ applications, including creating Eloquent models and relationships, implementing Sanctum authentication, configuring Horizon queues, designing RESTful APIs with API res",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "general",
+    "path": "opencode/laravel-specialist",
+    "relevant": false
+  },
+  {
+    "id": "opencode/legacy-modernizer",
+    "name": "legacy-modernizer",
+    "description": "Designs incremental migration strategies, identifies service boundaries, produces dependency maps and migration roadmaps, and generates API facade designs for aging codebases. Use when modernizing leg",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/legacy-modernizer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/mcp-developer",
+    "name": "mcp-developer",
+    "description": "Use when building, debugging, or extending MCP servers or clients that connect AI systems with external tools and data sources. Invoke to implement tool handlers, configure resource providers, set up ",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/mcp-developer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/microservices-architect",
+    "name": "microservices-architect",
+    "description": "Designs distributed system architectures, decomposes monoliths into bounded-context services, recommends communication patterns, and produces service boundary diagrams and resilience strategies. Use w",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "general",
+    "path": "opencode/microservices-architect",
+    "relevant": false
+  },
+  {
+    "id": "opencode/ml-pipeline",
+    "name": "ml-pipeline",
+    "description": "Designs and implements production-grade ML pipeline infrastructure: configures experiment tracking with MLflow or Weights & Biases, creates Kubeflow or Airflow DAGs for training orchestration, builds ",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/ml-pipeline",
+    "relevant": false
+  },
+  {
+    "id": "opencode/monitoring-expert",
+    "name": "monitoring-expert",
+    "description": "Configures monitoring systems, implements structured logging pipelines, creates Prometheus/Grafana dashboards, defines alerting rules, and instruments distributed tracing. Implements Prometheus/Grafan",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/monitoring-expert",
+    "relevant": false
+  },
+  {
+    "id": "opencode/nestjs-expert",
+    "name": "nestjs-expert",
+    "description": "Creates and configures NestJS modules, controllers, services, DTOs, guards, and interceptors for enterprise-grade TypeScript backend applications. Use when building NestJS REST APIs or GraphQL service",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/nestjs-expert",
+    "relevant": false
+  },
+  {
+    "id": "opencode/nextjs-developer",
+    "name": "nextjs-developer",
+    "description": "Use when building Next.js 14+ applications with App Router, server components, or server actions. Invoke to configure route handlers, implement middleware, set up API routes, add streaming SSR, write ",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/nextjs-developer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/pandas-pro",
+    "name": "pandas-pro",
+    "description": "Performs pandas DataFrame operations for data analysis, manipulation, and transformation. Use when working with pandas DataFrames, data cleaning, aggregation, merging, or time series analysis. Invoke ",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "general",
+    "path": "opencode/pandas-pro",
+    "relevant": true
+  },
+  {
+    "id": "opencode/php-pro",
+    "name": "php-pro",
+    "description": "Use when building PHP applications with modern PHP 8.3+ features, Laravel, or Symfony frameworks. Invokes strict typing, PHPStan level 9, async patterns with Swoole, and PSR standards. Creates control",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/php-pro",
+    "relevant": false
+  },
+  {
+    "id": "opencode/playwright-expert",
+    "name": "playwright-expert",
+    "description": "Use when writing E2E tests with Playwright, setting up test infrastructure, or debugging flaky browser tests. Invoke to write test scripts, create page objects, configure test fixtures, set up reporte",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/playwright-expert",
+    "relevant": false
+  },
+  {
+    "id": "opencode/postgres-pro",
+    "name": "postgres-pro",
+    "description": "Use when optimizing PostgreSQL queries, configuring replication, or implementing advanced database features. Invoke for EXPLAIN analysis, JSONB operations, extension usage, VACUUM tuning, performance ",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/postgres-pro",
+    "relevant": false
+  },
+  {
+    "id": "opencode/prompt-engineer",
+    "name": "prompt-engineer",
+    "description": "Writes, refactors, and evaluates prompts for LLMs — generating optimized prompt templates, structured output schemas, evaluation rubrics, and test suites. Use when designing prompts for new LLM applic",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "general",
+    "path": "opencode/prompt-engineer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/python-pro",
+    "name": "python-pro",
+    "description": "Use when building Python 3.11+ applications requiring type safety, async programming, or robust error handling. Generates type-annotated Python code, configures mypy in strict mode, writes pytest test",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/python-pro",
+    "relevant": false
+  },
+  {
+    "id": "opencode/rag-architect",
+    "name": "rag-architect",
+    "description": "Designs and implements production-grade RAG systems by chunking documents, generating embeddings, configuring vector stores, building hybrid search pipelines, applying reranking, and evaluating retrie",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/rag-architect",
+    "relevant": false
+  },
+  {
+    "id": "opencode/rails-expert",
+    "name": "rails-expert",
+    "description": "Rails 7+ specialist that optimizes Active Record queries with includes/eager_load, implements Turbo Frames and Turbo Streams for partial page updates, configures Action Cable for WebSocket connections",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/rails-expert",
+    "relevant": false
+  },
+  {
+    "id": "opencode/react-expert",
+    "name": "react-expert",
+    "description": "Use when building React 18+ applications in .jsx or .tsx files, Next.js App Router projects, or create-react-app setups. Creates components, implements custom hooks, debugs rendering issues, migrates ",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/react-expert",
+    "relevant": false
+  },
+  {
+    "id": "opencode/react-native-expert",
+    "name": "react-native-expert",
+    "description": "Builds, optimizes, and debugs cross-platform mobile applications with React Native and Expo. Implements navigation hierarchies (tabs, stacks, drawers), configures native modules, optimizes FlatList re",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/react-native-expert",
+    "relevant": false
+  },
+  {
+    "id": "opencode/rust-engineer",
+    "name": "rust-engineer",
+    "description": "Writes, reviews, and debugs idiomatic Rust code with memory safety and zero-cost abstractions. Implements ownership patterns, manages lifetimes, designs trait hierarchies, builds async applications wi",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/rust-engineer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/salesforce-developer",
+    "name": "salesforce-developer",
+    "description": "Writes and debugs Apex code, builds Lightning Web Components, optimizes SOQL queries, implements triggers, batch jobs, platform events, and integrations on the Salesforce platform. Use when developing",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/salesforce-developer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/secure-code-guardian",
+    "name": "secure-code-guardian",
+    "description": "Use when implementing authentication/authorization, securing user input, or preventing OWASP Top 10 vulnerabilities — including custom security implementations such as hashing passwords with bcrypt/ar",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "general",
+    "path": "opencode/secure-code-guardian",
+    "relevant": false
+  },
+  {
+    "id": "opencode/security-reviewer",
+    "name": "security-reviewer",
+    "description": "Identifies security vulnerabilities, generates structured audit reports with severity ratings, and provides actionable remediation guidance. Use when conducting security audits, reviewing code for vul",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/security-reviewer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/shopify-expert",
+    "name": "shopify-expert",
+    "description": "Builds and debugs Shopify themes (.liquid files, theme.json, sections), develops custom Shopify apps (shopify.app.toml, OAuth, webhooks), and implements Storefront API integrations for headless storef",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/shopify-expert",
+    "relevant": false
+  },
+  {
+    "id": "opencode/spark-engineer",
+    "name": "spark-engineer",
+    "description": "Use when writing Spark jobs, debugging performance issues, or configuring cluster settings for Apache Spark applications, distributed data processing pipelines, or big data workloads. Invoke to write ",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "general",
+    "path": "opencode/spark-engineer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/spec-miner",
+    "name": "spec-miner",
+    "description": "Reverse-engineering specialist that extracts specifications from existing codebases. Use when working with legacy or undocumented systems, inherited projects, or old codebases with no documentation. I",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/spec-miner",
+    "relevant": false
+  },
+  {
+    "id": "opencode/spring-boot-engineer",
+    "name": "spring-boot-engineer",
+    "description": "Generates Spring Boot 3.x configurations, creates REST controllers, implements Spring Security 6 authentication flows, sets up Spring Data JPA repositories, and configures reactive WebFlux endpoints. ",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/spring-boot-engineer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/sql-pro",
+    "name": "sql-pro",
+    "description": "Optimizes SQL queries, designs database schemas, and troubleshoots performance issues. Use when a user asks why their query is slow, needs help writing complex joins or aggregations, mentions database",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/sql-pro",
+    "relevant": true
+  },
+  {
+    "id": "opencode/sre-engineer",
+    "name": "sre-engineer",
+    "description": "Defines service level objectives, creates error budget policies, designs incident response procedures, develops capacity models, and produces monitoring configurations and automation scripts for produ",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "general",
+    "path": "opencode/sre-engineer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/swift-expert",
+    "name": "swift-expert",
+    "description": "Builds iOS/macOS/watchOS/tvOS applications, implements SwiftUI views and state management, designs protocol-oriented architectures, handles async/await concurrency, implements actors for thread safety",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/swift-expert",
+    "relevant": false
+  },
+  {
+    "id": "opencode/terraform-engineer",
+    "name": "terraform-engineer",
+    "description": "Use when implementing infrastructure as code with Terraform across AWS, Azure, or GCP. Invoke for module development (create reusable modules, manage module versioning), state management (migrate back",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "general",
+    "path": "opencode/terraform-engineer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/test-master",
+    "name": "test-master",
+    "description": "Generates test files, creates mocking strategies, analyzes code coverage, designs test architectures, and produces test plans and defect reports across functional, performance, and security testing di",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/test-master",
+    "relevant": false
+  },
+  {
+    "id": "opencode/the-fool",
+    "name": "the-fool",
+    "description": "Use when challenging ideas, plans, decisions, or proposals using structured critical reasoning. Invoke to play devil's advocate, run a pre-mortem, red team, or audit evidence and assumptions.",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/the-fool",
+    "relevant": false
+  },
+  {
+    "id": "opencode/typescript-pro",
+    "name": "typescript-pro",
+    "description": "Implements advanced TypeScript type systems, creates custom type guards, utility types, and branded types, and configures tRPC for end-to-end type safety. Use when building TypeScript applications req",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "general",
+    "path": "opencode/typescript-pro",
+    "relevant": false
+  },
+  {
+    "id": "opencode/vue-expert",
+    "name": "vue-expert",
+    "description": "Builds Vue 3 components with Composition API patterns, configures Nuxt 3 SSR/SSG projects, sets up Pinia stores, scaffolds Quasar/Capacitor mobile apps, implements PWA features, and optimises Vite bui",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/vue-expert",
+    "relevant": false
+  },
+  {
+    "id": "opencode/vue-expert-js",
+    "name": "vue-expert-js",
+    "description": "Creates Vue 3 components, builds vanilla JS composables, configures Vite projects, and sets up routing and state management using JavaScript only — no TypeScript. Generates JSDoc-typed code with @type",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/vue-expert-js",
+    "relevant": false
+  },
+  {
+    "id": "opencode/websocket-engineer",
+    "name": "websocket-engineer",
+    "description": "Use when building real-time communication systems with WebSockets or Socket.IO. Invoke for bidirectional messaging, horizontal scaling with Redis, presence tracking, room management.",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/websocket-engineer",
+    "relevant": false
+  },
+  {
+    "id": "opencode/wordpress-pro",
+    "name": "wordpress-pro",
+    "description": "Develops custom WordPress themes and plugins, creates and registers Gutenberg blocks and block patterns, configures WooCommerce stores, implements WordPress REST API endpoints, applies security harden",
+    "source": "opencode",
+    "license": "MIT",
+    "compat": "coding-agent",
+    "path": "opencode/wordpress-pro",
+    "relevant": false
+  }
+]

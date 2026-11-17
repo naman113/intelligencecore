@@ -1,0 +1,128 @@
+{
+  "libraries": [
+    {
+      "name": "chart.js",
+      "version": "4.5.1",
+      "license": "MIT",
+      "global": "Chart",
+      "tarball": "https://registry.npmjs.org/chart.js/-/chart.js-4.5.1.tgz",
+      "integrity": "sha512-GIjfiT9dbmHRiYi6Nl2yFCq7kkwdkp1W/lp2J99rX0yo9tgJGn3lKQATztIjb5tVtevcBtIdICNWqlq5+E8/Pw==",
+      "dir": "vendor/chart.js-4.5.1",
+      "entry": "chart.umd.min.js",
+      "served_at": "/d/_lib/chart.js-4.5.1/chart.umd.min.js",
+      "files": [
+        {
+          "path": "chart.umd.min.js",
+          "bytes": 208522,
+          "sha256": "48444a82d4edcb5bec0f1965faacdde18d9c17db3063d042abada2f705c9f54a",
+          "sri": "sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ",
+          "csp_hash": "sha256-SERKgtTty1vsDxll+qzd4Y2cF9swY9BCq62i9wXJ9Uo="
+        },
+        {
+          "path": "LICENSE.md",
+          "bytes": 1093,
+          "sha256": "41a84aa2caba645f966a18d9c2056b73e6d3a81d80bc0046bc0011a2634d4cce"
+        }
+      ]
+    },
+    {
+      "name": "ic-render",
+      "version": "1.0.0",
+      "license": "Proprietary",
+      "source": "in-repo",
+      "dir": "vendor/ic-render-1.0.0",
+      "entry": "render.js",
+      "served_at": "/d/_lib/ic-render-1.0.0/render.js",
+      "files": [
+        {
+          "path": "render.js",
+          "bytes": 21446,
+          "sha256": "61b356c23d96fafc2d0e3e7fa77fee5f206d88535d855edeff82803a515ff9d0",
+          "sri": "sha384-FN4yCLDPyVgBUoZP9GDRONnKiVaxoeXekiWKS8sc9ZMXLPAqozyy95xi2j8MuZiF",
+          "csp_hash": "sha256-YbNWwj2W+vwtDj5/p3/uXyBtiFNdhV7e/4KAOlFf+dA="
+        }
+      ]
+    },
+    {
+      "name": "ic-chartlib",
+      "version": "1.0.0",
+      "license": "MIT",
+      "source": "bundle",
+      "global": "Chart",
+      "dir": "vendor/ic-chartlib-1.0.0",
+      "entry": "chartlib.min.js",
+      "served_at": "/d/_lib/ic-chartlib-1.0.0/chartlib.min.js",
+      "components": [
+        {
+          "name": "chart.js",
+          "version": "4.5.1",
+          "tarball": "https://registry.npmjs.org/chart.js/-/chart.js-4.5.1.tgz",
+          "integrity": "sha512-GIjfiT9dbmHRiYi6Nl2yFCq7kkwdkp1W/lp2J99rX0yo9tgJGn3lKQATztIjb5tVtevcBtIdICNWqlq5+E8/Pw==",
+          "file": "chart.umd.min.js",
+          "bytes": 208522,
+          "sha256": "48444a82d4edcb5bec0f1965faacdde18d9c17db3063d042abada2f705c9f54a"
+        },
+        {
+          "name": "chartjs-plugin-annotation",
+          "version": "3.1.0",
+          "tarball": "https://registry.npmjs.org/chartjs-plugin-annotation/-/chartjs-plugin-annotation-3.1.0.tgz",
+          "integrity": "sha512-EkAed6/ycXD/7n0ShrlT1T2Hm3acnbFhgkIEJLa0X+M6S16x0zwj1Fv4suv/2bwayCT3jGPdAtI9uLcAMToaQQ==",
+          "file": "chartjs-plugin-annotation.min.js",
+          "bytes": 38359,
+          "sha256": "ff03786a60f6c93ccacfe0fbb6c2e3c671d7930856a3689f2f393113d8d655ec"
+        },
+        {
+          "name": "chartjs-chart-matrix",
+          "version": "3.1.0",
+          "tarball": "https://registry.npmjs.org/chartjs-chart-matrix/-/chartjs-chart-matrix-3.1.0.tgz",
+          "integrity": "sha512-pdo8DnhFXOisjbLDgfkzZH1w0xmjGqiaAMgkQSHCEMzxQENsXTgkXImIyweDiO7SqlE5PuzjhklyBCiorQhRmw==",
+          "file": "chartjs-chart-matrix.min.js",
+          "bytes": 3671,
+          "sha256": "7e0cafdcfed5636319fb779f209230d38b6a3703b4b5f462ecb501fc6008f661"
+        }
+      ],
+      "files": [
+        {
+          "path": "chartlib.min.js",
+          "bytes": 250554,
+          "sha256": "e75e6e6fdc7824f553b416e4c6b57dacb5e8e3e42fcf42d1a00cb5ea2bc2632d",
+          "sri": "sha384-7q0capCcXwQ/7HFlYmsT+it43lwnQZmCY1cj/hs4Gh0NaXsfiWckUxcQBtWg52GG",
+          "csp_hash": "sha256-515ub9x4JPVTtBbkxrV9rLXo4+Qvz0LRoAy16ivCYy0="
+        },
+        {
+          "path": "LICENSE-chart.js.md",
+          "bytes": 1093,
+          "sha256": "41a84aa2caba645f966a18d9c2056b73e6d3a81d80bc0046bc0011a2634d4cce"
+        },
+        {
+          "path": "LICENSE-chartjs-plugin-annotation.md",
+          "bytes": 1110,
+          "sha256": "868e144ac8fc605036f5a4403fd1007dcb70d69150619b95bc87c200bcbdb8c5"
+        },
+        {
+          "path": "LICENSE-chartjs-chart-matrix.txt",
+          "bytes": 1075,
+          "sha256": "7b6c618678f9e1269ac981159fd4892cf98f113366411e6a9323fad606944289"
+        }
+      ]
+    },
+    {
+      "name": "ic-render",
+      "version": "2.0.0",
+      "license": "Proprietary",
+      "source": "in-repo",
+      "dir": "vendor/ic-render-2.0.0",
+      "entry": "render.js",
+      "served_at": "/d/_lib/ic-render-2.0.0/render.js",
+      "files": [
+        {
+          "path": "render.js",
+          "bytes": 153113,
+          "sha256": "e8a04ca69bd4f4870b9b873b45b5bdaa872153ec51836f9f5dea86a8a5523438",
+          "sri": "sha384-NJqLOp+bZ2kX/sU7ZxCl09DOBh82IIAyRhYtMvAw1JUfVvsp/VheSLlR7kHiSQt5",
+          "csp_hash": "sha256-6KBMppvU9IcLm4c7RbW9qochU+xRg2+fXeqGqKVSNDg="
+        }
+      ]
+    }
+  ]
+}

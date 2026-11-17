@@ -1,0 +1,548 @@
+#!/usr/bin/env bash
+# agentctl — manage an installed Agentic System deployment.
+set -euo pipefail
+
+REPO_DIR="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+META="$REPO_DIR/deploy/.installmeta"
+[[ -f "$META" ]] && source "$META"
+APP_PORT="${APP_PORT:-8080}"
+APP_URL="${APP_URL:-${SITE:-http://127.0.0.1:$APP_PORT}}"
+DASH_URL="${DASH_URL:-}"
+IP_ONLY="${IP_ONLY:-0}"
+
+# True when .env selects the VM overlay (ui + dashboards) via COMPOSE_FILE.
+vm_layout(){ grep -qE '^COMPOSE_FILE=.*docker-compose\.vm\.yml' "$REPO_DIR/.env" 2>/dev/null; }
+# Non-loopback TCP listener ports (same pipeline as install.sh).
+public_listeners(){
+  ss -H -ltn 2>/dev/null | awk '{print $4}' \
+    | grep -Ev '^(127\.|\[::1\]|::1|\[::ffff:127\.)' | sed -E 's/.*:([0-9]+)$/\1/' | sort -nu || true
+}
+http_code(){ curl -s -o /dev/null -w '%{http_code}' --max-time 5 "$1" 2>/dev/null || true; }
+
+# Phase 11: GOLIVE-04 backups (helpers)
+export MSYS_NO_PATHCONV=1   # Git Bash must not rewrite container paths
+PG_CONTAINER="${PG_CONTAINER:-agentic-postgres}"
+BACKUP_DIR="${BACKUP_DIR:-$REPO_DIR/backups}"
+BACKUP_KEEP_DAYS="${BACKUP_KEEP_DAYS:-14}"
+BACKUP_KEEP_MIN="${BACKUP_KEEP_MIN:-3}"
+_pg(){ docker exec -i "$PG_CONTAINER" "$@"; }
+_valid_db(){ [[ "$1" =~ ^[a-z_][a-z0-9_]{0,62}$ ]]; }
+# _prune_backups DIR KEEP_DAYS KEEP_MIN: keep the newest KEEP_MIN always, delete
+# older-than-KEEP_DAYS among the rest together with their .sha256 sidecar.
+_prune_backups(){
+  local dir="$1" days="$2" min="$3" n=0 f
+  while IFS= read -r f; do
+    n=$((n+1))
+    [[ $n -le $min ]] && continue
+    if [[ -n "$(find "$f" -mtime +"$days" 2>/dev/null)" ]]; then rm -f -- "$f" "$f.sha256"; fi
+  done < <(ls -1 "$dir"/agent_memory-*.dump 2>/dev/null | sort -r)
+}
+_count_summary(){
+  local db="$1" t n
+  echo "  tables (public): $(_pg psql -U agent -d "$db" -tAc "SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE'" | tr -d '\r')"
+  for t in system_configs business_context actions dashboards dashboard_versions metric_history watches; do
+    if [[ "$(_pg psql -U agent -d "$db" -tAc "SELECT to_regclass('public.$t') IS NOT NULL" | tr -d '\r')" == t ]]; then
+      n="$(_pg psql -U agent -d "$db" -tAc "SELECT count(*) FROM public.$t" | tr -d '\r')"
+      echo "  rows $t: $n"
+    fi
+  done
+}
+# end Phase 11 backups (helpers)
+# Phase 14: WH-01 compose helpers (the warehouse build never aborts update/rollback/resume)
+# Core services = every compose service except the warehouse; empty output (config failed)
+# makes the caller fall back to building everything, the v1.0 behaviour.
+_p14_core_services() {
+  docker compose config --services 2>/dev/null | grep -vx 'warehouse' || true
+}
+# Build/start the warehouse on its own. A failed image build (no apt egress, rotated PGDG
+# revision) only warns; in warehouse mode (WAREHOUSE_URL set) the caller exits 1 after the
+# API restart via P14_WH_UP_FAILED.
+_p14_wh_up() {
+  if docker compose config --services 2>/dev/null | grep -qx 'warehouse'; then
+    if ! docker compose up -d --build warehouse; then
+      echo "WARNING: the warehouse image could not be built or started; the previous warehouse container (if any) keeps serving."
+      if grep -qE '^WAREHOUSE_URL=.+' "$REPO_DIR/.env" 2>/dev/null; then P14_WH_UP_FAILED=1; fi
+    fi
+  fi
+  return 0
+}
+# end Phase 14 compose helpers
+# Phase 15 (SRC-05): build the ic-sync image; never fatal (data sources then report
+# "sync runner not installed").
+_p15_sync_build() {
+  if [[ -d "$REPO_DIR/infra/ic-sync" ]]; then
+    docker build -q -t agentic-sync:latest "$REPO_DIR/infra/ic-sync" >/dev/null       || echo "WARNING: the agentic-sync image could not be built; data sources will report: sync runner not installed."
+  fi
+  return 0
+}
+# Phase 14: WH-09 warehouse backups (helpers)
+# The warehouse dump is an ALLOWLIST (-n ic_meta -n model): foreign servers, user mappings,
+# private ic_fdw_* schemas and mirrored views are never selected, so the source password
+# (which lives in pg_user_mapping) can never reach a file. Everything else is re-derivable
+# from the live business database by the linker, so only ic_meta (and, from Phase 16, model) is kept.
+WH_CONTAINER="${WH_CONTAINER:-agentic-warehouse}"
+WH_ADMIN_USER="${WH_ADMIN_USER:-wh_admin}"
+WH_BACKUP_KEEP_DAYS="${WH_BACKUP_KEEP_DAYS:-7}"
+WH_BACKUP_KEEP_MIN="${WH_BACKUP_KEEP_MIN:-3}"
+_wh(){ docker exec -i "$WH_CONTAINER" "$@"; }
+_wh_running(){ [[ "$(docker inspect -f '{{.State.Running}}' "$WH_CONTAINER" 2>/dev/null | tr -d '\r')" == true ]]; }
+# _prune_wh_backups DIR KEEP_DAYS KEEP_MIN: same policy as _prune_backups, warehouse dumps only.
+_prune_wh_backups(){
+  local dir="$1" days="$2" min="$3" n=0 f
+  while IFS= read -r f; do
+    n=$((n+1))
+    [[ $n -le $min ]] && continue
+    if [[ -n "$(find "$f" -mtime +"$days" 2>/dev/null)" ]]; then rm -f -- "$f" "$f.sha256"; fi
+  done < <(ls -1 "$dir"/warehouse-*.dump 2>/dev/null | sort -r)
+}
+# _wh_backup: never fails the caller (a warehouse problem must not fail the agent_memory backup).
+_wh_backup(){
+  local WF TXT
+  if ! _wh_running; then echo "warehouse backup: skipped ($WH_CONTAINER is not running)"; return 0; fi
+  if [[ "$(_wh psql -U "$WH_ADMIN_USER" -d warehouse -tAc "SELECT to_regnamespace('ic_meta') IS NOT NULL" 2>/dev/null | tr -d '\r')" != t ]]; then
+    echo "warehouse backup: skipped (warehouse not bootstrapped yet)"; return 0
+  fi
+  WF="$BACKUP_DIR/warehouse-$(date -u +%Y%m%dT%H%M%SZ).dump"
+  if ! _wh pg_dump -U "$WH_ADMIN_USER" -d warehouse -Fc -n ic_meta -n model > "$WF.partial" 2>/dev/null; then
+    rm -f "$WF.partial"; echo "warehouse backup: skipped (dump failed)" >&2; return 0
+  fi
+  if ! _wh pg_restore --list < "$WF.partial" > /dev/null 2>&1; then
+    rm -f "$WF.partial"; echo "warehouse backup: skipped (dump did not verify)" >&2; return 0
+  fi
+  if ! TXT="$(_wh pg_restore -f - < "$WF.partial" 2>/dev/null)"; then
+    rm -f "$WF.partial"; echo "warehouse backup: skipped (dump could not be scanned)" >&2; return 0
+  fi
+  if grep -qiE 'CREATE SERVER|USER MAPPING' <<<"$TXT"; then
+    rm -f "$WF.partial"; echo "warehouse backup: REFUSED (the dump contains a server or user mapping)" >&2; return 0
+  fi
+  mv "$WF.partial" "$WF" || { rm -f "$WF.partial"; return 0; }
+  (cd "$BACKUP_DIR" && sha256sum "$(basename "$WF")" > "$(basename "$WF").sha256") || true
+  _prune_wh_backups "$BACKUP_DIR" "$WH_BACKUP_KEEP_DAYS" "$WH_BACKUP_KEEP_MIN" || true
+  echo "warehouse backup: $WF ($(du -h "$WF" | cut -f1)), kept $(ls -1 "$BACKUP_DIR"/warehouse-*.dump 2>/dev/null | wc -l | tr -d ' ')"
+  return 0
+}
+# _wh_restore FILE DB FORCE: scratch database warehouse_restore by default; the live
+# warehouse needs --force and is restored as wh_owner so the linker keeps ownership.
+_wh_restore(){
+  local file="$1" db="$2" force="$3"
+  [[ "$db" == agent_memory_restore ]] && db=warehouse_restore   # untouched Phase 11 default
+  _valid_db "$db" || { echo "refusing: '$db' is not a safe database name" >&2; return 1; }
+  case "$db" in
+    postgres|langfuse|agent_memory|template*) echo "refusing: restore target '$db' is protected" >&2; return 1;;
+  esac
+  if [[ "$db" == warehouse && "$force" != 1 ]]; then
+    echo "refusing: restoring over the live warehouse needs --force (default target is the scratch DB warehouse_restore)" >&2; return 1
+  fi
+  _wh_running || { echo "refusing: $WH_CONTAINER is not running" >&2; return 1; }
+  if [[ -f "$file.sha256" ]]; then
+    (cd "$(dirname "$file")" && sha256sum -c --status "$(basename "$file").sha256") \
+      || { echo "refusing: sha256 mismatch, the backup is corrupt" >&2; return 1; }
+  fi
+  if [[ "$db" == warehouse ]]; then
+    if ! _wh pg_restore -U "$WH_ADMIN_USER" --no-owner --no-acl --exit-on-error --role=wh_owner --clean --if-exists -d warehouse < "$file"; then
+      echo "restore FAILED over the live warehouse (it can always be rebuilt: delete the warehouse volume and restart)." >&2; return 1
+    fi
+  else
+    _wh dropdb -U "$WH_ADMIN_USER" --if-exists "$db"
+    _wh createdb -U "$WH_ADMIN_USER" -T template0 "$db"
+    _wh pg_restore -U "$WH_ADMIN_USER" --no-owner --no-acl --exit-on-error -d "$db" < "$file" || return 1
+  fi
+  echo "  rows ic_meta.source_catalog: $(_wh psql -U "$WH_ADMIN_USER" -d "$db" -tAc "SELECT count(*) FROM ic_meta.source_catalog" | tr -d '\r')"
+  echo "  rows ic_meta.link_state: $(_wh psql -U "$WH_ADMIN_USER" -d "$db" -tAc "SELECT count(*) FROM ic_meta.link_state" | tr -d '\r')"
+  if [[ "$db" == warehouse ]]; then echo "restored over the live warehouse (as wh_owner); the linker rebuilds links on its next tick."
+  else echo "restored into $db (scratch). Drop it with: docker exec $WH_CONTAINER dropdb -U $WH_ADMIN_USER $db"; fi
+}
+# end Phase 14 warehouse backups (helpers)
+
+case "${1:-help}" in
+  start)    sudo systemctl start agentic-api && echo "started";;
+  stop)     sudo systemctl stop agentic-api && echo "stopped";;
+  restart)  sudo systemctl restart agentic-api && echo "restarted";;
+  status)
+    systemctl is-active --quiet agentic-api && echo "● agentic-api: running" || echo "○ agentic-api: STOPPED"
+    systemctl is-active --quiet caddy && echo "● caddy: running" || echo "○ caddy: STOPPED"
+    # NB: no 2>/dev/null here. The usual failure is "permission denied on the
+    # docker socket" right after install (the docker group needs a fresh login),
+    # and silently printing an empty table taught operators to ignore it.
+    (cd "$REPO_DIR" && docker compose ps --format 'table {{.Name}}\t{{.Status}}') || {
+      echo "  ⚠️  could not query docker — if this says 'permission denied', log out"
+      echo "      and back in (or run: newgrp docker) so the docker group applies."
+    }
+    HEALTH="$(curl -fsS "http://127.0.0.1:${APP_PORT}/health" 2>/dev/null || true)"
+    if [[ -z "$HEALTH" ]]; then
+      echo "○ gateway /health: NOT RESPONDING"
+    elif [[ "$HEALTH" == *'"ok":true'* ]]; then
+      echo "● gateway /health: ok"
+    else
+      echo "○ gateway /health: DEGRADED"
+      echo "    $(sed -n 's/.*"reason":"\([^"]*\)".*/\1/p' <<<"$HEALTH")"
+    fi
+    if vm_layout; then
+      CODE="$(http_code http://127.0.0.1:8090/)"
+      if [[ "$CODE" == 200 ]]; then echo "● ui (127.0.0.1:8090): ok"
+      else echo "○ ui (127.0.0.1:8090): NOT RESPONDING ($CODE)"; fi
+      # nginx answers 404 uniformly for an unknown slug; 502 means it cannot reach the gateway.
+      CODE="$(http_code http://127.0.0.1:8091/d/_probe/)"
+      if [[ "$CODE" == 404 ]]; then echo "● dashboards (127.0.0.1:8091): ok"
+      elif [[ "$CODE" == 502 ]]; then echo "○ dashboards (127.0.0.1:8091): GATEWAY UNREACHABLE (502)"
+      else echo "○ dashboards (127.0.0.1:8091): NOT RESPONDING ($CODE)"; fi
+    else
+      echo "○ ui/dashboards: not provisioned (re-run install.sh to add them)"
+    fi
+    # Phase 11: GOLIVE-04 last backup
+    LB="$(ls -1t "$BACKUP_DIR"/agent_memory-*.dump 2>/dev/null | head -1 || true)"
+    if [[ -n "$LB" && -n "$(find "$LB" -mmin -2880 2>/dev/null)" ]]; then
+      echo "● last backup: $(date -r "$LB" '+%F %H:%M') ($(ls -1 "$BACKUP_DIR"/agent_memory-*.dump | wc -l | tr -d ' ') kept)"
+    elif [[ -n "$LB" ]]; then echo "○ last backup: OLD ($(date -r "$LB" '+%F %H:%M')) - check agentic-backup.timer"
+    else echo "○ last backup: NONE (run: agentctl backup)"; fi
+    ALLOWED=" 22 80 443 "; [[ "$IP_ONLY" == 1 ]] && ALLOWED=" 22 80 443 8443 "
+    PUB="$(public_listeners | tr '\n' ' ')"
+    UNEXPECTED=""
+    for p in $PUB; do [[ "$ALLOWED" == *" $p "* ]] || UNEXPECTED+="$p "; done
+    if [[ -z "$UNEXPECTED" ]]; then echo "● public listeners: ${PUB:-none}"
+    else echo "○ public listeners: UNEXPECTED ${UNEXPECTED}"; fi
+    ;;
+  logs)     journalctl -u agentic-api -f -n "${2:-100}";;
+  url)
+    echo "UI:         ${APP_URL}/"
+    echo "Console:    ${APP_URL}/dashboard"
+    echo "Webhook:    ${APP_URL}/webhook/whatsapp"
+    if [[ -n "$DASH_URL" ]]; then echo "Dashboards: ${DASH_URL}/d/<slug>/?t=<view token>"
+    else echo "Dashboards: not provisioned (re-run install.sh)"; fi
+    ;;
+  update)
+    cd "$REPO_DIR"
+    git pull --ff-only
+    bash "$REPO_DIR/deploy/ensure-settings-key.sh" "$REPO_DIR/.env"  # Phase 11: GOLIVE-02 add-if-missing, never overwrite
+    bash "$REPO_DIR/deploy/ensure-warehouse-secrets.sh" "$REPO_DIR/.env" >/dev/null  # Phase 14: WH-02 add-if-missing, never overwrite
+    # --frozen: install exactly the committed uv.lock. Without it every VM
+    # re-resolves unpinned ranges and two clients on the same commit drift.
+    (cd backend && /usr/local/bin/uv sync --frozen -q)
+    docker compose up -d --build $(_p14_core_services)  # Phase 14: warehouse is built separately below
+    _p14_wh_up  # Phase 14: WH-01 non-fatal warehouse build
+    _p15_sync_build  # Phase 15: SRC-05 non-fatal sync image build
+    # dangling layers only, left behind by rebuilds
+    docker image prune -f >/dev/null 2>&1 || true
+    [[ -d sandbox ]] && docker build -q -t agentic-sandbox:latest ./sandbox >/dev/null
+    sudo systemctl restart agentic-api
+    echo "updated + restarted (NB: schema changes apply on boot only if additive —"
+    echo "CREATE TABLE IF NOT EXISTS; altered columns need a manual migration)"
+    if [[ "${P14_WH_UP_FAILED:-0}" == 1 ]]; then
+      echo "WARNING: the warehouse could not be built or started; the previous warehouse container (if any) keeps serving. See GO_LIVE section 13."
+      exit 1
+    fi
+    ;;
+  rollback)
+    # `git reset --hard <ref> && agentctl update` does NOT work: update starts
+    # with `git pull --ff-only`, which fast-forwards straight back onto the bad
+    # commit and exits 0. This is the only safe way back.
+    REF="${2:-}"
+    [[ -z "$REF" ]] && { echo "usage: agentctl rollback <tag|commit>   (e.g. agentctl rollback v0.1.0)"; exit 1; }
+    cd "$REPO_DIR"
+    git fetch --tags --quiet || true
+    git rev-parse --verify --quiet "${REF}^{commit}" >/dev/null || { echo "unknown ref: $REF"; exit 1; }
+    # A ref from before docker-compose.vm.yml cannot be combined with an .env
+    # that selects it: every compose call would fail mid-rollback. Refuse first.
+    if vm_layout && ! git cat-file -e "${REF}:docker-compose.vm.yml" 2>/dev/null; then
+      echo "refusing: ${REF} predates docker-compose.vm.yml but .env selects it (COMPOSE_FILE)."
+      echo "  Roll back to a newer ref, or remove the COMPOSE_FILE and COMPOSE_PATH_SEPARATOR lines from .env first (ui and dashboards then stop being managed)."
+      exit 1
+    fi
+    echo "rolling back to ${REF} (detached HEAD — run 'agentctl resume' to rejoin the release line)"
+    git checkout --quiet --detach "$REF"
+    (cd backend && /usr/local/bin/uv sync --frozen -q)
+    docker compose up -d --build $(_p14_core_services)  # Phase 14: warehouse is built separately below
+    _p14_wh_up  # Phase 14: WH-01 non-fatal warehouse build
+    _p15_sync_build  # Phase 15: SRC-05 non-fatal sync image build
+    [[ -d sandbox ]] && docker build -q -t agentic-sandbox:latest ./sandbox >/dev/null
+    sudo systemctl restart agentic-api
+    echo "rolled back to $(git describe --tags --always)"
+    if [[ "${P14_WH_UP_FAILED:-0}" == 1 ]]; then
+      echo "WARNING: the warehouse could not be built or started; the previous warehouse container (if any) keeps serving. See GO_LIVE section 13."
+      exit 1
+    fi
+    ;;
+  resume)
+    # Leave a rollback's detached HEAD and rejoin the shipped line.
+    cd "$REPO_DIR"
+    git checkout --quiet release && git pull --ff-only
+    (cd backend && /usr/local/bin/uv sync --frozen -q)
+    docker compose up -d --build $(_p14_core_services)  # Phase 14: warehouse is built separately below
+    _p14_wh_up  # Phase 14: WH-01 non-fatal warehouse build
+    _p15_sync_build  # Phase 15: SRC-05 non-fatal sync image build
+    sudo systemctl restart agentic-api
+    echo "resumed on release @ $(git describe --tags --always)"
+    if [[ "${P14_WH_UP_FAILED:-0}" == 1 ]]; then
+      echo "WARNING: the warehouse could not be built or started; the previous warehouse container (if any) keeps serving. See GO_LIVE section 13."
+      exit 1
+    fi
+    ;;
+  # Phase 11: GOLIVE-03 read-only role kit
+  readonly-role)
+    shift
+    RO_ROLE="intelligence_corner"; RO_SCHEMAS=""; RO_PACK=""; RO_REVOKE=""; RO_TIMEOUT="30s"
+    RO_HOST=""; RO_SAVE=0; RO_PRINT=0; RO_RESET=0; RO_ROTATE=0
+    ro_usage(){ echo "usage: agentctl readonly-role [--role r] [--schemas a,b] [--pack file] [--revoke s.t,s.t] [--timeout 30s] [--reset-revoke] [--host h[:port]] [--save] [--rotate-password] [--print-sql]" >&2; exit 2; }
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --role) RO_ROLE="${2:?}"; shift 2;;
+        --schemas) RO_SCHEMAS="${2:?}"; shift 2;;
+        --pack) RO_PACK="${2:?}"; shift 2;;
+        --revoke) RO_REVOKE="${2:?}"; shift 2;;
+        --timeout) RO_TIMEOUT="${2:?}"; shift 2;;
+        --host) RO_HOST="${2:?}"; shift 2;;
+        --reset-revoke) RO_RESET=1; shift;;
+        --save) RO_SAVE=1; shift;;
+        --rotate-password) RO_ROTATE=1; shift;;
+        --print-sql) RO_PRINT=1; shift;;
+        *) ro_usage;;
+      esac
+    done
+    # the role name is interpolated into the existence probe: same rule as readonlykit.ROLE_RE
+    [[ "$RO_ROLE" =~ ^[a-z_][a-z0-9_]{0,62}$ ]] || { echo "invalid role name" >&2; exit 2; }
+    [[ -n "$RO_PACK" ]] && RO_PACK="$(readlink -f "$RO_PACK")"  # backend/ is the cwd of the python child
+    [[ -n "$RO_PACK" ]] && command -v cygpath >/dev/null 2>&1 && RO_PACK="$(cygpath -w "$RO_PACK")"  # Git Bash on a Windows dev box
+    UV_BIN="${UV_BIN:-/usr/local/bin/uv}"
+    ro_kit(){ (cd "$REPO_DIR/backend" && "$UV_BIN" run --frozen python -m app.readonlykit "$@"); }
+    RO_ARGS=(--role "$RO_ROLE" --timeout "$RO_TIMEOUT")
+    [[ -n "$RO_SCHEMAS" ]] && RO_ARGS+=(--schemas "$RO_SCHEMAS")
+    [[ -n "$RO_PACK" ]] && RO_ARGS+=(--pack "$RO_PACK")
+    [[ -n "$RO_REVOKE" ]] && RO_ARGS+=(--revoke "$RO_REVOKE")
+    [[ "$RO_RESET" == 1 ]] && RO_ARGS+=(--reset-revoke)
+    if [[ "$RO_PRINT" == 1 ]]; then
+      # needs no connection, so it runs before the admin URL prompt
+      if [[ -z "${IC_RO_PASSWORD:-}" ]]; then IC_RO_PASSWORD="$(openssl rand -hex 24 | tr -d '\r\n')"; fi
+      export IC_RO_PASSWORD
+      echo "note: the SQL below contains the generated role password" >&2
+      ro_kit render "${RO_ARGS[@]}"
+      exit 0
+    fi
+    if [[ -z "${ADMIN_DATABASE_URL:-}" ]]; then
+      read -rsp "Admin Postgres URL for the client DB (primary): " ADMIN_DATABASE_URL; echo >&2
+    fi
+    [[ -n "$ADMIN_DATABASE_URL" ]] || { echo "no admin URL given" >&2; exit 2; }
+    export ADMIN_DATABASE_URL
+    # Phase 11: admin login travels in PG* env vars, never argv (WR-05)
+    RO_PG_KEYS=" PGHOST PGPORT PGUSER PGPASSWORD PGDATABASE PGSSLMODE PGSSLROOTCERT PGSSLCERT PGSSLKEY PGOPTIONS PGAPPNAME PGCONNECT_TIMEOUT PGTARGETSESSIONATTRS "
+    ro_unset_pg(){ unset PGHOST PGHOSTADDR PGPORT PGUSER PGPASSWORD PGDATABASE PGSERVICE PGSSLMODE PGSSLROOTCERT PGSSLCERT PGSSLKEY PGOPTIONS PGAPPNAME PGCONNECT_TIMEOUT PGTARGETSESSIONATTRS; }
+    ro_unset_pg
+    RO_PGENV="$(ro_kit pgenv)" || { echo "the admin URL is not a valid postgres URL" >&2; exit 2; }
+    while IFS= read -r ro_line; do
+      ro_line="${ro_line%$'\r'}"   # Windows python writes CRLF; values never contain CR (pgenv rejects it)
+      [[ -n "$ro_line" ]] || continue
+      ro_k="${ro_line%%=*}"; ro_v="${ro_line#*=}"
+      case "$RO_PG_KEYS" in *" $ro_k "*) ;; *) echo "unexpected pgenv output" >&2; exit 1;; esac
+      export "$ro_k=$ro_v"
+    done < <(printf '%s\n' "$RO_PGENV")
+    RO_PGENV=""
+    # An env PSQL override must forward PGHOST, PGPORT, PGUSER, PGPASSWORD and PGDATABASE itself
+    # (docker exec/run: -e NAME, no value, so the value is copied from the environment).
+    if [[ -z "${PSQL:-}" ]]; then
+      if command -v psql >/dev/null 2>&1; then PSQL="psql"
+      else
+        if [[ -n "${PGSSLROOTCERT:-}${PGSSLCERT:-}${PGSSLKEY:-}" ]]; then
+          echo "certificate files need a host psql client" >&2; exit 2
+        fi
+        PSQL="docker run --rm -i --network host -e PGHOST -e PGPORT -e PGUSER -e PGPASSWORD -e PGDATABASE -e PGSSLMODE -e PGOPTIONS -e PGAPPNAME -e PGCONNECT_TIMEOUT -e PGTARGETSESSIONATTRS pgvector/pgvector:0.8.7-pg16-bookworm psql"
+      fi
+    fi
+    # does the role exist? (decides keep or issue a password)
+    # shellcheck disable=SC2086
+    RO_EXISTS="$(printf "SELECT 1 FROM pg_roles WHERE rolname = '%s';\n" "$RO_ROLE" | $PSQL -X -tA -v ON_ERROR_STOP=1 -f - | tr -d '[:space:]')" \
+      || { echo "could not connect with the admin URL" >&2; exit 1; }
+    # password decision: given (IC_RO_PASSWORD in env), new (role absent or --rotate-password), kept
+    if [[ -n "${IC_RO_PASSWORD:-}" ]]; then
+      RO_PW_MODE="given"
+    elif [[ -z "$RO_EXISTS" || "$RO_ROTATE" == 1 ]]; then
+      RO_PW_MODE="new"; IC_RO_PASSWORD="$(openssl rand -hex 24 | tr -d '\r\n')"
+    else
+      RO_PW_MODE="kept"; IC_RO_PASSWORD=""
+    fi
+    export IC_RO_PASSWORD
+    # shellcheck disable=SC2086
+    ro_kit render "${RO_ARGS[@]}" | $PSQL -X -v ON_ERROR_STOP=1 -q -f - >/dev/null \
+      || { echo "role kit failed" >&2; exit 1; }
+    ro_unset_pg   # later children (curl, python) must not inherit PGPASSWORD
+    if [[ "$RO_PW_MODE" == "kept" ]]; then
+      echo "role $RO_ROLE updated; its password is unchanged, so the business DB URL already saved on Setup keeps working. To issue a new password add --rotate-password (with --save to store it)." >&2
+      if [[ -n "$RO_HOST" ]]; then echo "note: --host rewrites the saved URL only together with --rotate-password" >&2; fi
+      if [[ "$RO_SAVE" != 1 ]]; then exit 0; fi
+    else
+      HOST_ARGS=(--role "$RO_ROLE"); [[ -n "$RO_HOST" ]] && HOST_ARGS+=(--host "$RO_HOST")
+      IC_URL="$(ro_kit url "${HOST_ARGS[@]}")"
+      if [[ "$RO_SAVE" != 1 ]]; then
+        echo "$IC_URL"
+        if [[ "$RO_PW_MODE" == "new" && -n "$RO_EXISTS" ]]; then
+          echo "the role password changed: store this URL on Setup > Business data now; the URL saved before stops working" >&2
+        fi
+        echo "Store it on Setup > Business data (it is saved encrypted), then run: agentctl selftest" >&2
+        exit 0
+      fi
+    fi
+    OPS_KEY="${OPS_KEY:-$(sed -n 's/^OPS_KEY=//p' "$REPO_DIR/.env" 2>/dev/null | head -1 | tr -d '\r')}"
+    [[ -n "$OPS_KEY" ]] || { echo "OPS_KEY not found (env or $REPO_DIR/.env)" >&2; exit 1; }
+    PYBIN=""; for c in python3 python; do "$c" -c '' >/dev/null 2>&1 && { PYBIN="$c"; break; }; done
+    # Phase 11: a minimal server may have no system python; the backend venv always has one
+    if [[ -z "$PYBIN" ]]; then
+      PYBIN="$REPO_DIR/backend/.venv/bin/python"
+      [[ -x "$PYBIN" ]] || PYBIN="$REPO_DIR/backend/.venv/Scripts/python.exe"
+    fi
+    [[ -x "$PYBIN" || -n "$(command -v "$PYBIN")" ]] || { echo "python not found" >&2; exit 1; }
+    # header file (not argv) so OPS_KEY never shows in ps; removed right after use
+    HDR="$(umask 077; mktemp)"; trap 'rm -f "$HDR"' EXIT
+    printf 'x-ops-key: %s\n' "$OPS_KEY" > "$HDR"
+    HDR_ARG="$HDR"; command -v cygpath >/dev/null 2>&1 && HDR_ARG="$(cygpath -w "$HDR")"
+    API="http://127.0.0.1:$APP_PORT"
+    if [[ "$RO_PW_MODE" != "kept" ]]; then
+      IC_URL="$IC_URL" "$PYBIN" -c 'import json,os,sys; sys.stdout.write(json.dumps({"values":{"tenant_database_url":os.environ["IC_URL"]}}))' \
+        | curl -fsS -X PUT -H "@$HDR_ARG" -H 'content-type: application/json' \
+            --data-binary @- "$API/api/config" >/dev/null || { echo "saving the URL failed" >&2; exit 1; }
+    fi
+    RES="$(curl -fsS -X POST -H "@$HDR_ARG" "$API/api/config/test/business_db")" \
+      || { echo "business_db test call failed" >&2; exit 1; }
+    printf '%s' "$RES" | "$PYBIN" -c 'import json,sys; d=json.load(sys.stdin); print(d.get("detail","")); sys.exit(0 if d.get("ok") else 1)'
+    ;;
+  # end Phase 11 readonly-role
+  # Phase 11: GOLIVE-04 backups
+  backup)
+    shift
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --dir) BACKUP_DIR="${2:?}"; shift 2;;
+        --keep-days) BACKUP_KEEP_DAYS="${2:?}"; shift 2;;
+        *) echo "usage: agentctl backup [--dir d] [--keep-days n]" >&2; exit 2;;
+      esac
+    done
+    umask 077
+    mkdir -p "$BACKUP_DIR" && chmod 700 "$BACKUP_DIR"
+    BF="$BACKUP_DIR/agent_memory-$(date -u +%Y%m%dT%H%M%SZ).dump"
+    if ! _pg pg_dump -U agent -d agent_memory -Fc > "$BF.partial"; then
+      rm -f "$BF.partial"; echo "backup failed: pg_dump" >&2; exit 1
+    fi
+    if ! _pg pg_restore --list < "$BF.partial" > /dev/null; then
+      rm -f "$BF.partial"; echo "backup failed: dump did not verify (pg_restore --list)" >&2; exit 1
+    fi
+    mv "$BF.partial" "$BF"
+    (cd "$BACKUP_DIR" && sha256sum "$(basename "$BF")" > "$(basename "$BF").sha256")
+    _wh_backup || true  # Phase 14: WH-09 warehouse dump under its own retention; never fails this backup
+    _prune_backups "$BACKUP_DIR" "$BACKUP_KEEP_DAYS" "$BACKUP_KEEP_MIN"
+    KEPT="$(ls -1 "$BACKUP_DIR"/agent_memory-*.dump 2>/dev/null | wc -l | tr -d ' ')"
+    echo "backup: $BF ($(du -h "$BF" | cut -f1)), kept $KEPT"
+    ;;
+  restore)
+    shift
+    RS_FILE="${1:-}"; if [[ -n "$RS_FILE" && "$RS_FILE" != --* ]]; then shift; else RS_FILE=""; fi
+    RS_DB="agent_memory_restore"; RS_FORCE=0
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --into) RS_DB="${2:?}"; shift 2;;
+        --force) RS_FORCE=1; shift;;
+        *) RS_FILE=""; break;;
+      esac
+    done
+    [[ -n "$RS_FILE" ]] || { echo "usage: agentctl restore <file> [--into db] [--force]" >&2; exit 2; }
+    [[ -f "$RS_FILE" ]] || { echo "no such backup file: $RS_FILE" >&2; exit 1; }
+    if [[ "$(basename "$RS_FILE")" == warehouse-*.dump ]]; then _wh_restore "$RS_FILE" "$RS_DB" "$RS_FORCE"; exit $?; fi  # Phase 14: WH-09
+    _valid_db "$RS_DB" || { echo "refusing: '$RS_DB' is not a safe database name" >&2; exit 1; }
+    case "$RS_DB" in
+      postgres|langfuse|template*) echo "refusing: restore target '$RS_DB' is protected" >&2; exit 1;;
+    esac
+    if [[ "$RS_DB" == agent_memory && "$RS_FORCE" != 1 ]]; then
+      echo "refusing: restoring over the live database needs --force (default target is the scratch DB agent_memory_restore)" >&2; exit 1
+    fi
+    if [[ -f "$RS_FILE.sha256" ]]; then
+      (cd "$(dirname "$RS_FILE")" && sha256sum -c --status "$(basename "$RS_FILE").sha256") \
+        || { echo "refusing: sha256 mismatch, the backup is corrupt" >&2; exit 1; }
+    fi
+    if [[ "$RS_DB" != agent_memory ]]; then
+      _pg dropdb -U agent --if-exists "$RS_DB"
+      _pg createdb -U agent -T template0 "$RS_DB"
+      _pg pg_restore -U agent --no-owner --exit-on-error -d "$RS_DB" < "$RS_FILE"
+      _count_summary "$RS_DB"
+      echo "restored into $RS_DB (scratch). Inspect, then drop it with: docker exec $PG_CONTAINER dropdb -U agent $RS_DB"
+    else
+      RS_OLD="agent_memory_before_restore_$(date -u +%Y%m%d%H%M%S)"
+      sudo systemctl stop agentic-api
+      _pg psql -U agent -d postgres -qc "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='agent_memory' AND pid<>pg_backend_pid()" >/dev/null
+      _pg psql -U agent -d postgres -v ON_ERROR_STOP=1 -qc "ALTER DATABASE agent_memory RENAME TO $RS_OLD"
+      _pg createdb -U agent -T template0 agent_memory
+      if ! _pg pg_restore -U agent --no-owner --exit-on-error -d agent_memory < "$RS_FILE"; then
+        echo "restore FAILED. The previous data is intact as $RS_OLD (drop the partial copy, then rename it back to agent_memory)." >&2
+        exit 1
+      fi
+      sudo systemctl start agentic-api
+      _count_summary agent_memory
+      echo "restored over agent_memory. The previous database was kept as $RS_OLD (drop it when satisfied)."
+      echo "If Setup shows a secret as 'cannot be decrypted', this server's SETTINGS_ENCRYPTION_KEY differs from the one that made the backup"
+    fi
+    ;;
+  # end Phase 11 backups
+  # Phase 14: WH-09 / D-09 warehouse enable|disable|status
+  warehouse)
+    WH_URL_ENV="$REPO_DIR/.env"
+    case "${2:-status}" in
+      enable)
+        bash "$REPO_DIR/deploy/ensure-warehouse-secrets.sh" "$WH_URL_ENV" >/dev/null || { echo "could not provision the warehouse credentials" >&2; exit 1; }
+        (cd "$REPO_DIR" && docker compose up -d --build warehouse) || { echo "warehouse build/start failed; .env was not changed" >&2; exit 1; }
+        WH_OK=0
+        for _ in $(seq 1 60); do
+          if [[ "$(docker inspect -f '{{.State.Health.Status}}' "$WH_CONTAINER" 2>/dev/null | tr -d '\r')" == healthy ]]; then WH_OK=1; break; fi
+          sleep 2
+        done
+        [[ "$WH_OK" == 1 ]] || { echo "the warehouse did not become ready within 120 s; .env was not changed" >&2; exit 1; }
+        if grep -q '^WAREHOUSE_URL=' "$WH_URL_ENV" 2>/dev/null; then
+          sed -i "s|^WAREHOUSE_URL=.*|WAREHOUSE_URL=postgresql://127.0.0.1:5434/warehouse|" "$WH_URL_ENV"
+        else
+          echo "WAREHOUSE_URL=postgresql://127.0.0.1:5434/warehouse" >> "$WH_URL_ENV"
+        fi
+        sudo systemctl restart agentic-api
+        for _ in $(seq 1 45); do
+          [[ "$(http_code "$APP_URL/health")" == 200 ]] && break
+          sleep 2
+        done
+        echo "warehouse mode ON"
+        (cd "$REPO_DIR/backend" && /usr/local/bin/uv run python -m app.selftest 2>&1 | grep -iE 'warehouse|business data' || true)
+        ;;
+      disable)
+        sed -i '/^WAREHOUSE_URL=/d' "$WH_URL_ENV" 2>/dev/null || true
+        sudo systemctl restart agentic-api
+        echo "warehouse mode OFF: business reads use the direct path again (v1.0). The warehouse container keeps running; stop it with: docker compose stop warehouse"
+        ;;
+      status)
+        if _wh_running; then
+          echo "● warehouse container: running ($(docker inspect -f '{{.State.Health.Status}}' "$WH_CONTAINER" 2>/dev/null | tr -d '\r'))"
+        else echo "○ warehouse container: NOT RUNNING"; fi
+        if grep -qE '^WAREHOUSE_URL=.+' "$WH_URL_ENV" 2>/dev/null; then echo "● warehouse mode: ON"; else echo "○ warehouse mode: off (direct business reads, v1.0)"; fi
+        if _wh_running; then
+          echo "  last link: $(_wh psql -U "$WH_ADMIN_USER" -d warehouse -tAc "SELECT status, tables_linked, linked_at FROM ic_meta.link_state WHERE source='business_db'" 2>/dev/null | tr -d '\r' | head -1)"
+        fi
+        ;;
+      *) echo "usage: agentctl warehouse enable|disable|status" >&2; exit 2;;
+    esac
+    ;;
+  # end Phase 14 warehouse
+  selftest) cd "$REPO_DIR/backend" && /usr/local/bin/uv run python -m app.selftest;;
+  # Quick 009: knowledge graph status and the one-off backfill (learnings and
+  # closed cases written while the graph was down). Idempotent and bounded.
+  graph-status|graph-backfill)
+    GB_KEY="$(sed -n 's/^OPS_KEY=//p' "$REPO_DIR/.env" | head -1)"
+    [[ -n "$GB_KEY" ]] || { echo "no OPS_KEY in $REPO_DIR/.env" >&2; exit 1; }
+    GB_API="http://127.0.0.1:$APP_PORT"
+    _gb_json(){ python3 -c 'import json,sys; d=json.load(sys.stdin); b=d.get("backfill") or {}; print("graph:", d.get("state"), "-", d.get("reason") or "%s episodes" % d.get("episodes")); print("pending:", d.get("pending")); print("backfill:", {k: b.get(k) for k in ("running","learnings","cases","stopped")})'; }
+    if [[ "$1" == graph-status ]]; then
+      curl -fsS -H "x-ops-key: $GB_KEY" "$GB_API/api/memory/status" | _gb_json; exit 0
+    fi
+    GB_LIMIT="${2:-50}"
+    [[ "$GB_LIMIT" =~ ^[0-9]+$ ]] || { echo "usage: agentctl graph-backfill [limit]" >&2; exit 1; }
+    curl -fsS -X POST -H "x-ops-key: $GB_KEY" "$GB_API/api/memory/backfill?limit=$GB_LIMIT" >/dev/null \
+      || { echo "backfill refused (is the graph connected? agentctl graph-status)" >&2; exit 1; }
+    for _ in $(seq 1 360); do
+      GB_OUT="$(curl -fsS -H "x-ops-key: $GB_KEY" "$GB_API/api/memory/status" || true)"
+      grep -q '"running":true' <<<"$GB_OUT" || break
+      sleep 5
+    done
+    _gb_json <<<"$GB_OUT"
+    ;;
+  *)
+    echo "usage: agentctl start|stop|restart|status|logs [n]|url|update|rollback <ref>|resume|selftest|graph-status|graph-backfill [limit]|readonly-role [--pack f] [--schemas s] [--host h] [--save] [--rotate-password]|backup [--dir d] [--keep-days n]|restore <file> [--into db] [--force]|warehouse enable|disable|status";;  # Phase 11, 14
+esac

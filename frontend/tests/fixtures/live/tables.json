@@ -1,0 +1,14 @@
+{
+  "tables": [
+    {
+      "approved_at": "2026-10-25T00:00:00+00:00",
+      "description": "One row per customer account.",
+      "object_kind": "table",
+      "pending": null,
+      "ref": "business_db.public.customers",
+      "schema": "public",
+      "status": "approved",
+      "table": "customers"
+    }
+  ]
+}

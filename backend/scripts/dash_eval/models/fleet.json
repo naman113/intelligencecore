@@ -1,0 +1,204 @@
+[
+ {
+  "object": "table",
+  "op": "create",
+  "definition": {
+   "name": "vehicles",
+   "relation": "public.vehicles",
+   "role": "dimension",
+   "grain": "one row per vehicle",
+   "primary_key": [
+    "vehicle_id"
+   ]
+  }
+ },
+ {
+  "object": "table",
+  "op": "create",
+  "definition": {
+   "name": "fuel_fills",
+   "relation": "public.fuel_fills",
+   "role": "fact",
+   "grain": "one row per fuel fill",
+   "primary_key": [
+    "fill_id"
+   ],
+   "agg_time_dimension": "public.fuel_fills.fill_time"
+  }
+ },
+ {
+  "object": "table",
+  "op": "create",
+  "definition": {
+   "name": "trips",
+   "relation": "public.trips",
+   "role": "fact",
+   "grain": "one row per vehicle trip day",
+   "primary_key": [
+    "trip_id"
+   ],
+   "agg_time_dimension": "public.trips.trip_date"
+  }
+ },
+ {
+  "object": "table",
+  "op": "create",
+  "definition": {
+   "name": "certificates",
+   "relation": "public.certificates",
+   "role": "fact",
+   "grain": "one row per vehicle certificate",
+   "primary_key": [
+    "certificate_id"
+   ]
+  }
+ },
+ {
+  "object": "table",
+  "op": "create",
+  "definition": {
+   "name": "budgets",
+   "relation": "public.budgets",
+   "role": "fact",
+   "grain": "one row per month",
+   "primary_key": [
+    "month"
+   ],
+   "agg_time_dimension": "public.budgets.month"
+  }
+ },
+ {
+  "object": "relationship",
+  "op": "create",
+  "definition": {
+   "name": "fuel_fills_vehicle_id_to_vehicles",
+   "from_relation": "public.fuel_fills",
+   "from_columns": [
+    "vehicle_id"
+   ],
+   "to_relation": "public.vehicles",
+   "to_columns": [
+    "vehicle_id"
+   ],
+   "cardinality": "many_to_one",
+   "origin": "foreign_key"
+  }
+ },
+ {
+  "object": "relationship",
+  "op": "create",
+  "definition": {
+   "name": "trips_vehicle_id_to_vehicles",
+   "from_relation": "public.trips",
+   "from_columns": [
+    "vehicle_id"
+   ],
+   "to_relation": "public.vehicles",
+   "to_columns": [
+    "vehicle_id"
+   ],
+   "cardinality": "many_to_one",
+   "origin": "foreign_key"
+  }
+ },
+ {
+  "object": "relationship",
+  "op": "create",
+  "definition": {
+   "name": "certificates_vehicle_id_to_vehicles",
+   "from_relation": "public.certificates",
+   "from_columns": [
+    "vehicle_id"
+   ],
+   "to_relation": "public.vehicles",
+   "to_columns": [
+    "vehicle_id"
+   ],
+   "cardinality": "many_to_one",
+   "origin": "foreign_key"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "fuel_litres",
+   "type": "simple",
+   "base_relation": "public.fuel_fills",
+   "agg": "sum",
+   "expr": "litres",
+   "label": "Fuel litres",
+   "description": "Litres of fuel filled",
+   "unit": "L"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "fuel_spend",
+   "type": "simple",
+   "base_relation": "public.fuel_fills",
+   "agg": "sum",
+   "expr": "amount",
+   "label": "Fuel spend",
+   "description": "Money spent on fuel"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "km",
+   "type": "simple",
+   "base_relation": "public.trips",
+   "agg": "sum",
+   "expr": "km",
+   "label": "Kilometres",
+   "description": "Kilometres driven",
+   "unit": "km"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "fuel_per_km",
+   "type": "ratio",
+   "numerator": {
+    "name": "fuel_litres"
+   },
+   "denominator": {
+    "name": "km"
+   },
+   "label": "Litres per km",
+   "description": "Fuel litres divided by kilometres driven"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "distinct_vehicles",
+   "type": "simple",
+   "base_relation": "public.fuel_fills",
+   "agg": "count_distinct",
+   "expr": "vehicle_id",
+   "label": "Vehicles fuelled",
+   "description": "Distinct vehicles that filled fuel"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "fuel_budget",
+   "type": "simple",
+   "base_relation": "public.budgets",
+   "agg": "sum",
+   "expr": "fuel_budget",
+   "label": "Fuel budget",
+   "description": "Owner-set fuel budget by month"
+  }
+ }
+]

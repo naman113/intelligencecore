@@ -1,0 +1,160 @@
+/* The Divide.
+   One vertical rule down the page. Left of it, quietly, is everything the
+   assistant finished on its own. Right of it, in gold, is everything it stopped
+   and handed back. The rule is the only structural device on the page and it
+   carries the whole idea, so nothing else here is allowed to compete with it. */
+
+.today-head {
+  margin-bottom: var(--s6);
+}
+.today-date {
+  font-family: var(--display);
+  font-stretch: var(--display-wide);
+  font-size: var(--fs-title);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.today-line {
+  color: var(--t3);
+  margin-top: var(--s2);
+  font-size: var(--fs-base);
+}
+
+.divide {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1px minmax(300px, 400px);
+  align-items: start;
+}
+.divide-rule {
+  align-self: stretch;
+  background: linear-gradient(180deg, var(--line-lit) 0%, var(--line) 70%, transparent 100%);
+  min-height: 200px;
+}
+.side { min-width: 0; }
+.side-left { padding-right: var(--s6); }
+.side-right { padding-left: var(--s6); }
+
+.side-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+  margin-bottom: var(--s4);
+  min-height: 26px;
+}
+.side-count {
+  font-family: var(--display);
+  font-stretch: var(--display-wide);
+  font-size: var(--fs-lead);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--owed);
+}
+
+/* ── Left: the log ─────────────────────────────────────────────────────── */
+
+.tl-hour {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  margin: var(--s5) 0 var(--s2);
+}
+.tl-hour:first-child { margin-top: 0; }
+.tl-hour-num {
+  font-family: var(--display);
+  font-stretch: var(--display-wide);
+  font-size: var(--fs-tiny);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--t4);
+}
+.tl-hour-rule { flex: 1; height: 1px; background: var(--line); }
+
+.tl-item {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  gap: var(--s3);
+  padding: 7px 0;
+}
+.tl-time {
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  color: var(--t4);
+  padding-top: 2px;
+}
+.tl-body { min-width: 0; }
+.tl-title {
+  color: var(--t2);
+  font-size: var(--fs-small);
+}
+.tl-title a { color: inherit; }
+.tl-title a:hover { color: var(--signal-hi); }
+.tl-detail {
+  color: var(--t4);
+  font-size: var(--fs-tiny);
+  margin-top: 1px;
+}
+.tl-failed .tl-title { color: var(--broken-hi); }
+
+/* ── Right: the queue ──────────────────────────────────────────────────── */
+
+.owed-list { display: flex; flex-direction: column; gap: var(--s3); }
+
+.owed-kicker {
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--owed);
+}
+.owed-title {
+  font-size: var(--fs-base);
+  font-weight: 500;
+  color: var(--t1);
+  margin-top: 3px;
+  line-height: 1.35;
+}
+.owed-body {
+  color: var(--t3);
+  font-size: var(--fs-small);
+  margin-top: var(--s2);
+}
+.owed-actions {
+  display: flex;
+  gap: var(--s2);
+  flex-wrap: wrap;
+  margin-top: var(--s3);
+}
+
+/* The reward state: no card, no border, nothing to click. */
+.rewarded { padding: var(--s5) 0; }
+.rewarded-title {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  font-family: var(--display);
+  font-stretch: var(--display-wide);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--settled-hi);
+}
+.rewarded-body {
+  color: var(--t3);
+  margin-top: var(--s2);
+  max-width: 34ch;
+}
+
+@media (max-width: 980px) {
+  .divide { grid-template-columns: 1fr; }
+  .divide-rule { display: none; }
+  /* On a phone the queue comes first — approving from the sofa is the point. */
+  .side-right { padding-left: 0; order: 1; }
+  .side-left {
+    padding-right: 0;
+    order: 2;
+    margin-top: var(--s6);
+    padding-top: var(--s5);
+    border-top: 1px solid var(--line);
+  }
+  .today-date { font-size: var(--fs-head); }
+}

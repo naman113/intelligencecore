@@ -1,0 +1,100 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   Second Brain — design tokens
+
+   THE RULE: --owed (gold) appears if and only if a human owes something.
+   A proposed action, a group waiting for approval, an overdue expectation,
+   an unmatched sender, a connection that isn't configured. Never decoration,
+   never a hover state, never a chart series. The payoff is that gold anywhere
+   on screen — including a dot in the rail — means "you have work", and that
+   reads at a glance without anyone explaining it.
+
+   --signal (blue) is the system acting: links, focus, running work.
+   --settled (green) is terminal and good. --broken (red) is terminal and bad.
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Ground and surfaces — brand navy, four steps of elevation */
+  --ground:    #080C14;
+  --surface:   #0E1420;
+  --raised:    #141D2B;
+  --raised-2:  #1A2536;
+  --line:      #1E2D42;
+  --line-lit:  #2A3E58;
+
+  /* Meaning */
+  --signal:    #2B7FD4;
+  --signal-lo: #164A82;
+  --signal-hi: #5BA0E0;
+  --owed:      #D4952B;
+  --owed-hi:   #E8B44C;
+  --settled:   #38A169;
+  --settled-hi:#68D391;
+  --broken:    #E5534B;
+  --broken-hi: #F2837C;
+  /* Quick 006: the "warning" severity of a finding. Orange on purpose, never gold:
+     gold stays reserved for "a human owes something". */
+  --warn:      #E07A3A;
+  --warn-hi:   #F29A63;
+
+  /* Text */
+  --t1: #F0F4F8;
+  --t2: #A0AEC0;
+  --t3: #718096;
+  --t4: #4A5568;
+
+  /* Tinted washes for pills and card edges (alpha keeps them on any surface) */
+  --signal-wash:  rgba(43, 127, 212, 0.14);
+  --owed-wash:    rgba(212, 149, 43, 0.13);
+  --settled-wash: rgba(56, 161, 105, 0.14);
+  --broken-wash:  rgba(229, 83, 75, 0.14);
+  --warn-wash:    rgba(224, 122, 58, 0.14);
+
+  /* Type */
+  --display: 'Archivo Variable', 'Archivo', system-ui, sans-serif;
+  /* Archivo's width axis, held just past normal. Applied wherever --display is,
+     so the display voice stays consistent. */
+  --display-wide: 108%;
+  --body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Menlo, monospace;
+
+  --fs-micro: 11px;
+  --fs-tiny:  12px;
+  --fs-small: 13px;
+  --fs-base:  15px;
+  --fs-lead:  18px;
+  --fs-head:  24px;
+  --fs-title: 34px;
+  --fs-hero:  48px;
+
+  /* Space — 4px base, named by use rather than by number */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+  --s8: 64px;
+
+  --radius:    10px;
+  --radius-sm: 6px;
+  --radius-lg: 14px;
+
+  --rail-w: 236px;
+  --page-max: 1240px;
+
+  /* Motion. Every duration flows through these so reduced-motion can zero them
+     in one place rather than in every component. */
+  --t-fast: 120ms;
+  --t-mid:  220ms;
+  --t-slow: 420ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --t-fast: 0ms;
+    --t-mid:  0ms;
+    --t-slow: 0ms;
+  }
+}

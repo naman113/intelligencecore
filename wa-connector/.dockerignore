@@ -1,0 +1,9 @@
+node_modules/
+wa-sessions/
+logs/
+*.log
+.env
+.git/
+railway.toml
+test.html
+test/

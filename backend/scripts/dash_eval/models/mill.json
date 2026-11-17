@@ -1,0 +1,402 @@
+[
+ {
+  "object": "table",
+  "op": "create",
+  "definition": {
+   "name": "suppliers",
+   "relation": "public.suppliers",
+   "role": "dimension",
+   "grain": "one row per supplier",
+   "primary_key": [
+    "supplier_id"
+   ]
+  }
+ },
+ {
+  "object": "table",
+  "op": "create",
+  "definition": {
+   "name": "customers",
+   "relation": "public.customers",
+   "role": "dimension",
+   "grain": "one row per customer",
+   "primary_key": [
+    "customer_id"
+   ]
+  }
+ },
+ {
+  "object": "table",
+  "op": "create",
+  "definition": {
+   "name": "qualities",
+   "relation": "public.qualities",
+   "role": "dimension",
+   "grain": "one row per paper quality",
+   "primary_key": [
+    "quality_id"
+   ]
+  }
+ },
+ {
+  "object": "table",
+  "op": "create",
+  "definition": {
+   "name": "rolls_inward",
+   "relation": "public.rolls_inward",
+   "role": "fact",
+   "grain": "one row per roll weighed in",
+   "primary_key": [
+    "roll_id"
+   ],
+   "agg_time_dimension": "public.rolls_inward.weigh_time"
+  }
+ },
+ {
+  "object": "table",
+  "op": "create",
+  "definition": {
+   "name": "grns",
+   "relation": "public.grns",
+   "role": "fact",
+   "grain": "one row per goods receipt note",
+   "primary_key": [
+    "grn_id"
+   ],
+   "agg_time_dimension": "public.grns.grn_date"
+  }
+ },
+ {
+  "object": "table",
+  "op": "create",
+  "definition": {
+   "name": "dispatches",
+   "relation": "public.dispatches",
+   "role": "fact",
+   "grain": "one row per dispatch",
+   "primary_key": [
+    "dispatch_id"
+   ],
+   "agg_time_dimension": "public.dispatches.dispatch_time"
+  }
+ },
+ {
+  "object": "table",
+  "op": "create",
+  "definition": {
+   "name": "stock_daily",
+   "relation": "public.stock_daily",
+   "role": "fact",
+   "grain": "one row per quality per day",
+   "primary_key": [
+    "day",
+    "quality_id"
+   ],
+   "agg_time_dimension": "public.stock_daily.day"
+  }
+ },
+ {
+  "object": "table",
+  "op": "create",
+  "definition": {
+   "name": "invoices",
+   "relation": "public.invoices",
+   "role": "fact",
+   "grain": "one row per invoice",
+   "primary_key": [
+    "invoice_id"
+   ]
+  }
+ },
+ {
+  "object": "table",
+  "op": "create",
+  "definition": {
+   "name": "gst_monthly",
+   "relation": "public.gst_monthly",
+   "role": "fact",
+   "grain": "one row per month",
+   "primary_key": [
+    "month"
+   ],
+   "agg_time_dimension": "public.gst_monthly.month"
+  }
+ },
+ {
+  "object": "relationship",
+  "op": "create",
+  "definition": {
+   "name": "rolls_inward_quality_id_to_qualities",
+   "from_relation": "public.rolls_inward",
+   "from_columns": [
+    "quality_id"
+   ],
+   "to_relation": "public.qualities",
+   "to_columns": [
+    "quality_id"
+   ],
+   "cardinality": "many_to_one",
+   "origin": "foreign_key"
+  }
+ },
+ {
+  "object": "relationship",
+  "op": "create",
+  "definition": {
+   "name": "rolls_inward_supplier_id_to_suppliers",
+   "from_relation": "public.rolls_inward",
+   "from_columns": [
+    "supplier_id"
+   ],
+   "to_relation": "public.suppliers",
+   "to_columns": [
+    "supplier_id"
+   ],
+   "cardinality": "many_to_one",
+   "origin": "foreign_key"
+  }
+ },
+ {
+  "object": "relationship",
+  "op": "create",
+  "definition": {
+   "name": "grns_supplier_id_to_suppliers",
+   "from_relation": "public.grns",
+   "from_columns": [
+    "supplier_id"
+   ],
+   "to_relation": "public.suppliers",
+   "to_columns": [
+    "supplier_id"
+   ],
+   "cardinality": "many_to_one",
+   "origin": "foreign_key"
+  }
+ },
+ {
+  "object": "relationship",
+  "op": "create",
+  "definition": {
+   "name": "dispatches_customer_id_to_customers",
+   "from_relation": "public.dispatches",
+   "from_columns": [
+    "customer_id"
+   ],
+   "to_relation": "public.customers",
+   "to_columns": [
+    "customer_id"
+   ],
+   "cardinality": "many_to_one",
+   "origin": "foreign_key"
+  }
+ },
+ {
+  "object": "relationship",
+  "op": "create",
+  "definition": {
+   "name": "stock_daily_quality_id_to_qualities",
+   "from_relation": "public.stock_daily",
+   "from_columns": [
+    "quality_id"
+   ],
+   "to_relation": "public.qualities",
+   "to_columns": [
+    "quality_id"
+   ],
+   "cardinality": "many_to_one",
+   "origin": "foreign_key"
+  }
+ },
+ {
+  "object": "relationship",
+  "op": "create",
+  "definition": {
+   "name": "invoices_customer_id_to_customers",
+   "from_relation": "public.invoices",
+   "from_columns": [
+    "customer_id"
+   ],
+   "to_relation": "public.customers",
+   "to_columns": [
+    "customer_id"
+   ],
+   "cardinality": "many_to_one",
+   "origin": "foreign_key"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "rolls_in",
+   "type": "simple",
+   "base_relation": "public.rolls_inward",
+   "agg": "count",
+   "expr": "roll_id",
+   "label": "Rolls in",
+   "description": "Rolls weighed in"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "kg_in",
+   "type": "simple",
+   "base_relation": "public.rolls_inward",
+   "agg": "sum",
+   "expr": "kg",
+   "label": "Kg in",
+   "description": "Kilograms weighed in",
+   "unit": "kg"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "grns",
+   "type": "simple",
+   "base_relation": "public.grns",
+   "agg": "count",
+   "expr": "grn_id",
+   "label": "GRNs",
+   "description": "Goods receipt notes"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "grn_value",
+   "type": "simple",
+   "base_relation": "public.grns",
+   "agg": "sum",
+   "expr": "value",
+   "label": "GRN value",
+   "description": "Value of goods receipt notes"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "rolls_out",
+   "type": "simple",
+   "base_relation": "public.dispatches",
+   "agg": "sum",
+   "expr": "rolls",
+   "label": "Rolls out",
+   "description": "Rolls dispatched"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "kg_out",
+   "type": "simple",
+   "base_relation": "public.dispatches",
+   "agg": "sum",
+   "expr": "kg",
+   "label": "Kg out",
+   "description": "Kilograms dispatched",
+   "unit": "kg"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "dispatches",
+   "type": "simple",
+   "base_relation": "public.dispatches",
+   "agg": "count",
+   "expr": "dispatch_id",
+   "label": "Dispatches",
+   "description": "Dispatches made"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "stock_kg",
+   "type": "simple",
+   "base_relation": "public.stock_daily",
+   "agg": "sum",
+   "expr": "kg_on_hand",
+   "label": "Stock kg",
+   "description": "Kilograms on hand at the last day of the period",
+   "non_additive_dimension": {
+    "name": "public.stock_daily.day",
+    "window_choice": "max",
+    "window_groupings": []
+   },
+   "additivity": "semi_additive",
+   "unit": "kg"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "receivables_open",
+   "type": "simple",
+   "base_relation": "public.invoices",
+   "agg": "sum",
+   "expr": "amount - paid_amount",
+   "label": "Receivables open",
+   "description": "Unpaid invoice amounts right now"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "receivables_overdue",
+   "type": "simple",
+   "base_relation": "public.invoices",
+   "agg": "sum",
+   "expr": "amount - paid_amount",
+   "label": "Receivables overdue",
+   "description": "Unpaid amounts on overdue invoices right now",
+   "filter": [
+    {
+     "dimension": "public.invoices.is_overdue",
+     "op": "=",
+     "values": [
+      true
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "avg_roll_kg",
+   "type": "simple",
+   "base_relation": "public.rolls_inward",
+   "agg": "average",
+   "expr": "kg",
+   "label": "Average roll kg",
+   "description": "Average weight of a roll weighed in",
+   "unit": "kg"
+  }
+ },
+ {
+  "object": "measure",
+  "op": "create",
+  "definition": {
+   "name": "gst_payable",
+   "type": "simple",
+   "base_relation": "public.gst_monthly",
+   "agg": "sum",
+   "expr": "gst_payable",
+   "label": "GST payable",
+   "description": "GST payable by month"
+  }
+ }
+]

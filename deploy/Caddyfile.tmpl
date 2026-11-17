@@ -1,0 +1,45 @@
+# Phase 9 (DEPLOY-01): rendered by install.sh, which validates the result with
+# `caddy validate` before reload.
+# Placeholders are replaced by sed. Their values are validated hostnames or IPs,
+# the gateway port, and either an empty line or `tls internal`.
+# Agent HTML renders only on the dash site. The app site never forwards /d/ to
+# the gateway and strips X-IC-Dashboards-Proxy.
+# Never add a `log` directive: view tokens ride in query strings. Both sites carry
+# handle_errors so Caddy's default error logger (which would write the full URI and
+# X-Ops-Key header on upstream 5xx) only sees the handled error at DEBUG (WR-01).
+# No `encode` on the app site: it could buffer the SSE log stream.
+
+__APP_SITE__ {
+	__TLS__
+	handle_errors {
+		respond "{err.status_code} {err.status_text}" {err.status_code}
+	}
+	request_header -X-IC-Dashboards-Proxy
+	# Phase 12 (WR-12): header-only policy for the legacy console; it uses inline handlers, so no script-src.
+	@legacy_console path /dashboard
+	header @legacy_console {
+		defer
+		Content-Security-Policy "frame-ancestors 'none'; object-src 'none'; base-uri 'none'"
+		Referrer-Policy "no-referrer"
+		X-Content-Type-Options "nosniff"
+	}
+	@gateway path /api/* /health /dashboard /webhook/*
+	handle @gateway {
+		reverse_proxy 127.0.0.1:__APP_PORT__
+	}
+	handle /d/* {
+		respond 404
+	}
+	handle {
+		reverse_proxy 127.0.0.1:8090
+	}
+}
+
+__DASH_SITE__ {
+	__TLS__
+	handle_errors {
+		respond "Service unavailable" 503
+	}
+	request_header -X-IC-Dashboards-Proxy
+	reverse_proxy 127.0.0.1:8091
+}

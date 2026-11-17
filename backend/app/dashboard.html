@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Agentic System — Ops</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root { --bg:#0f1115; --card:#181b22; --border:#2a2f3a; --text:#e6e9ef; --muted:#8b93a3; --accent:#4f8cff; --ok:#3fb968; --err:#e5534b; --warn:#d9a03f; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:var(--bg); color:var(--text); }
+  header { display:flex; align-items:center; gap:16px; padding:14px 20px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--bg); z-index:2; }
+  header h1 { font-size:16px; margin:0; }
+  header .dot { width:9px; height:9px; border-radius:50%; background:var(--err); display:inline-block; margin-right:6px; }
+  header .dot.ok { background:var(--ok); }
+  input, textarea, button, select { background:var(--card); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:8px 10px; font:inherit; }
+  button { cursor:pointer; } button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  main { display:grid; grid-template-columns: 1.2fr 1fr; gap:16px; padding:16px 20px; max-width:1400px; margin:0 auto; }
+  section { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; }
+  section h2 { margin:0 0 10px; font-size:13px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--border); vertical-align:top; }
+  th { color:var(--muted); font-weight:500; }
+  tr.clickable { cursor:pointer; } tr.clickable:hover { background:#1f2430; }
+  .badge { padding:1px 8px; border-radius:99px; font-size:11px; }
+  .badge.done { background:rgba(63,185,104,.15); color:var(--ok); }
+  .badge.failed { background:rgba(229,83,75,.15); color:var(--err); }
+  .badge.running { background:rgba(217,160,63,.15); color:var(--warn); }
+  .badge.queued { background:rgba(139,147,163,.15); color:var(--muted); }
+  pre { background:#0c0e12; border:1px solid var(--border); border-radius:8px; padding:10px; overflow:auto; max-height:340px; font-size:12px; white-space:pre-wrap; word-break:break-word; }
+  .muted { color:var(--muted); } .full { grid-column:1 / -1; }
+  .row { display:flex; gap:8px; margin-bottom:8px; } .row > * { flex:1; }
+  .learning { border-bottom:1px solid var(--border); padding:8px 0; display:flex; gap:10px; align-items:flex-start; }
+  .learning .kind { font-size:11px; color:var(--accent); min-width:76px; text-transform:uppercase; }
+  .learning button { padding:2px 8px; font-size:11px; }
+  @media (max-width: 900px){ main { grid-template-columns:1fr; } }
+  .agents { display:grid; grid-template-columns:repeat(auto-fill, minmax(250px,1fr)); gap:10px; }
+  .agent { border:1px solid var(--border); border-radius:10px; padding:10px; background:#141822; }
+  .agent h3 { margin:0 0 2px; font-size:13px; }
+  .agent .role { color:var(--muted); font-size:12px; margin-bottom:6px; }
+  .agent .model { font-size:11px; color:var(--accent); margin-bottom:6px; }
+  .agent .tool { font-size:12px; padding:2px 0; border-top:1px dashed var(--border); }
+  .agent .tool b { color:var(--text); font-weight:600; }
+  .agent .guard { font-size:11px; color:var(--warn); margin-top:6px; }
+  .bar { height:8px; background:#0c0e12; border-radius:4px; overflow:hidden; margin:2px 0 8px; }
+  .bar i { display:block; height:100%; background:var(--accent); }
+  .logline { display:block; } .logline .lv-ERROR{color:var(--err)} .logline .lv-WARNING{color:var(--warn)} .logline .lv-INFO{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <h1>🤖 Agentic System — Ops</h1>
+  <span id="conn"><span class="dot"></span><span class="muted">checking…</span></span>
+  <span style="flex:1"></span>
+  <input id="opskey" type="password" placeholder="ops key" style="width:260px">
+  <button class="primary" onclick="saveKey()">Connect</button>
+</header>
+<main>
+  <section class="full" id="setupSection">
+    <h2>⚙️ Setup — connections
+      <span id="setupBadges" style="float:right; display:flex; gap:6px; flex-wrap:wrap"></span>
+    </h2>
+    <div id="setupBanner" style="display:none; margin-bottom:10px; padding:8px 12px; border:1px solid var(--warn); border-radius:8px; color:var(--warn); font-size:13px"></div>
+    <div id="setupCards" class="agents muted">—</div>
+  </section>
+
+  <section>
+    <h2>Task runs <span class="muted" id="runsMeta"></span></h2>
+    <table id="runs"><thead><tr><th>#</th><th>thread</th><th>status</th><th>result</th><th>when</th></tr></thead><tbody></tbody></table>
+  </section>
+  <section>
+    <h2>Run detail — tool calls <span class="muted" id="detailMeta">(click a run)</span></h2>
+    <pre id="detail">—</pre>
+  </section>
+  <section class="full">
+    <h2>🗂️ Cases <span class="muted" id="casesMeta"></span>
+      <select id="caseFilter" onchange="loadCases()" style="float:right; font-size:12px; padding:4px 8px">
+        <option value="">all</option><option value="open">open</option>
+        <option value="pending_ack">pending ack</option><option value="closed">closed</option>
+        <option value="dismissed">dismissed</option>
+      </select>
+    </h2>
+    <div style="display:grid; grid-template-columns:1fr 1.2fr; gap:14px">
+      <div id="cases" class="muted" style="max-height:520px; overflow:auto">—</div>
+      <div id="caseDetail" class="muted" style="max-height:520px; overflow:auto">click a case</div>
+    </div>
+  </section>
+
+  <section class="full">
+    <h2>🐕 Watchdog — active monitors</h2>
+    <div class="row" style="margin-bottom:10px; flex-wrap:wrap">
+      <input id="w-phone" placeholder="owner phone (e.g. 919000000101)" style="max-width:220px">
+      <input id="w-title" placeholder="title" style="max-width:180px">
+      <input id="w-cond" placeholder="condition (what to detect)">
+      <input id="w-cad" type="number" value="15" title="minutes" style="max-width:80px">
+      <label class="muted" style="font-size:12px; display:flex; gap:4px; align-items:center"><input type="checkbox" id="w-oneshot"> one-shot</label>
+      <button class="primary" onclick="createWatch()">Add watch</button>
+      <button onclick="proposeKpi()">Propose KPI watches</button>
+    </div>
+    <div id="watches" class="muted">—</div>
+    <div id="kpi-proposals"></div>
+  </section>
+
+  <section class="full">
+    <h2>✅ Approvals <span class="muted" id="apprMeta"></span></h2>
+    <div id="approvals" class="muted">—</div>
+  </section>
+
+  <!-- ── Phase 8: dashboards and context approvals (UI-09) ── -->
+  <section class="full" id="p8Dashboards">
+    <h2>Dashboards</h2>
+    <div class="muted">versions and rollback; dashboard pages open on the dashboards origin, never here</div>
+    <div id="p8DashList" class="muted">—</div>
+  </section>
+
+  <section class="full" id="p8ContextApprovals">
+    <h2>Pending context approvals <span class="muted" id="p8CtxMeta"></span></h2>
+    <div id="p8CtxList" class="muted">—</div>
+  </section>
+  <!-- ── end Phase 8 ── -->
+
+  <section class="full">
+    <h2>📄 Documents <span class="muted" id="docsMeta"></span>
+      <span class="muted" style="font-weight:400; font-size:12px">
+        — invoices/quotations/agreements: extracted to fields you approve above</span>
+    </h2>
+    <div class="row" style="margin-bottom:10px; flex-wrap:wrap; align-items:center">
+      <input type="file" id="doc-file" style="max-width:280px">
+      <input id="doc-instruction" placeholder="optional instruction (e.g. 'extract line items')"
+             style="flex:1; min-width:220px">
+      <button class="primary" style="max-width:120px" onclick="uploadDoc()">Upload</button>
+    </div>
+    <div id="doc-status" class="muted" style="margin-bottom:8px"></div>
+    <div id="documents" class="muted">—</div>
+  </section>
+
+  <section class="full">
+    <h2>📘 Playbooks <span class="muted" id="pbMeta"></span>
+      <span class="muted" style="font-weight:400; font-size:12px">
+        — drafts the system proposes stay inert until you activate them</span>
+    </h2>
+    <div id="playbooks" class="muted">—</div>
+  </section>
+
+  <section class="full">
+    <h2>🧩 Skills <span class="muted" id="skillsMeta">(procedures the agent can pull in — installed does nothing until you enable it)</span></h2>
+    <div id="skillsInstalled" class="muted">—</div>
+    <div class="row" style="margin-top:10px; flex-wrap:wrap; align-items:center">
+      <input id="skill-q" placeholder="search the curated library…" style="max-width:280px"
+             onkeydown="if(event.key==='Enter')searchSkillLibrary()">
+      <button onclick="searchSkillLibrary()">Search library</button>
+      <span id="skillLibStatus" class="muted" style="font-size:12px"></span>
+    </div>
+    <div id="skillLibrary"></div>
+    <pre id="skillPreview" style="display:none; max-height:320px; margin-top:8px"></pre>
+    <details style="margin-top:10px">
+      <summary class="muted">Create a skill (drafts with skill-creator; off-mission skills are blocked)</summary>
+      <div class="row" style="margin-top:8px; flex-wrap:wrap">
+        <input id="skill-goal" placeholder="describe the procedure…" style="min-width:320px">
+        <button onclick="draftSkill()">Draft with AI</button>
+      </div>
+      <div class="row" style="margin-top:6px; flex-wrap:wrap">
+        <input id="skill-new-name" placeholder="slug" style="max-width:200px">
+        <input id="skill-new-desc" placeholder="one-line description" style="min-width:300px">
+      </div>
+      <textarea id="skill-new-body" rows="8" style="width:100%; margin-top:6px"
+                placeholder="---&#10;name: my-skill&#10;description: what and when&#10;---&#10;&#10;The procedure…"></textarea>
+      <div class="row" style="margin-top:6px">
+        <button class="primary" onclick="createSkill()">Create (starts disabled)</button>
+        <label class="muted" style="font-size:12px"><input type="checkbox" id="skill-new-triage">
+          triage policy — steers what becomes a case (owner-authored only)</label>
+        <span id="skillCreateStatus" class="muted" style="font-size:12px"></span>
+      </div>
+    </details>
+  </section>
+
+  <section class="full">
+    <h2>🛢️ Watched DB tables <span class="muted">(ambient DB-awareness — new rows become events)</span>
+      <button style="float:right; font-size:12px" onclick="proposeDbSources()">Propose from knowledge base</button>
+    </h2>
+    <div class="row" style="margin-bottom:10px; flex-wrap:wrap; align-items:center">
+      <input id="db-add-table" placeholder="table name (e.g. Machines)" style="max-width:220px"
+             onkeydown="if(event.key==='Enter')addDbTableManual()">
+      <input id="db-add-wm" placeholder="watermark column (optional)" style="max-width:200px">
+      <button class="primary" style="max-width:110px" onclick="addDbTableManual()">Add table</button>
+      <span style="flex:1"></span>
+      <label class="muted" style="font-size:12px; display:flex; gap:6px; align-items:center">
+        poll every
+        <input id="db-poll-secs" type="number" min="5" style="max-width:80px" title="seconds"
+               onkeydown="if(event.key==='Enter')saveDbPoll()"> s
+        <button onclick="saveDbPoll()">set</button>
+      </label>
+    </div>
+    <div id="db-add-status" class="muted" style="margin-bottom:8px"></div>
+    <div id="dbsources" class="muted">—</div>
+    <div id="dbproposals"></div>
+  </section>
+
+  <section class="full">
+    <h2>🎓 Onboarding <span class="muted" id="obMeta">(teach the assistant about your business — once)</span></h2>
+    <div class="row" style="margin-bottom:8px; flex-wrap:wrap; align-items:center">
+      <select id="ob-target" onchange="obSwitch()" style="max-width:280px"></select>
+      <button class="primary" onclick="obStart()">Start / resume interview</button>
+      <button onclick="obReset()">Start over</button>
+    </div>
+    <div id="ob-log" style="max-height:340px; overflow:auto; padding:8px;
+         border:1px solid #2a2a2a; border-radius:6px; background:#0e0e0e"
+         class="muted">Not started. Pick a target and start the interview —
+         it will ask the first question.</div>
+    <div class="row" style="margin-top:8px">
+      <input id="ob-msg" placeholder="your answer…" style="flex:1"
+             onkeydown="if(event.key==='Enter')obSend()">
+      <button class="primary" onclick="obSend()">Send</button>
+    </div>
+    <div id="ob-applied" class="muted" style="margin-top:8px"></div>
+  </section>
+
+  <section class="full">
+    <h2>💬 Chats <span class="muted" id="chatsMeta">(a group stays silent until you activate it)</span></h2>
+    <div id="chats" class="muted">—</div>
+  </section>
+
+  <section class="full">
+    <h2>👥 People registry <span class="muted" id="peopleMeta"></span></h2>
+    <div class="row" style="margin-bottom:10px; flex-wrap:wrap">
+      <input id="p-name" placeholder="name" style="max-width:160px">
+      <input id="p-aliases" placeholder="aliases (comma-sep)" style="max-width:180px">
+      <input id="p-email" placeholder="email" style="max-width:180px">
+      <input id="p-wa" placeholder="whatsapp (digits)" style="max-width:160px">
+      <input id="p-role" placeholder="role" style="max-width:120px">
+      <button class="primary" onclick="createPerson()">Add person</button>
+    </div>
+    <div id="people" class="muted">—</div>
+    <div style="margin-top:14px">
+      <h2 style="margin:0 0 8px">Unmatched senders <span class="muted">(create/attach a person, then re-resolve)</span></h2>
+      <div id="unmatched" class="muted">—</div>
+    </div>
+  </section>
+
+  <section class="full">
+    <h2>Agents &amp; capabilities</h2>
+    <!-- Phase 13 (GOLIVE-01): keep in step with llmclient.CURRENT_MODELS (tests/test_console_models.py) -->
+    <datalist id="model-options">
+      <option value="auto"><option value="claude-opus-5-5"><option value="claude-sonnet-5-5">
+      <option value="claude-haiku-5-5"><option value="claude-fable-5-1">
+      <option value="gpt-4o"><option value="gpt-4o-mini">
+    </datalist>
+    <div id="agents" class="agents muted">—</div>
+  </section>
+
+  <section>
+    <h2>Learnings (agent memory)</h2>
+    <div id="learnings" class="muted" style="max-height:360px; overflow:auto">—</div>
+  </section>
+  <section>
+    <h2>Resources <span class="muted" id="statsMeta"></span></h2>
+    <div id="resources" class="muted">—</div>
+  </section>
+
+  <section class="full">
+    <h2>Live logs
+      <label style="float:right; font-size:11px; text-transform:none; letter-spacing:0">
+        <input type="checkbox" id="follow" checked> follow
+      </label>
+    </h2>
+    <pre id="logs" style="max-height:680px">—</pre>
+  </section>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+let KEY = localStorage.getItem('opskey') || '';
+$('#opskey').value = KEY;
+
+function saveKey(){ KEY = $('#opskey').value.trim(); localStorage.setItem('opskey', KEY); refresh(); }
+async function api(path, opts={}){
+  const res = await fetch(path, {...opts, headers:{'x-ops-key':KEY, 'content-type':'application/json', ...(opts.headers||{})}});
+  if(!res.ok) throw new Error(await errText(res));
+  return res.json();
+}
+// Multipart uploads must NOT carry a JSON content-type — the browser has to set
+// its own boundary — so this one omits it and passes the FormData straight on.
+async function apiUpload(path, formData){
+  const res = await fetch(path, {method:'POST', headers:{'x-ops-key':KEY}, body:formData});
+  if(!res.ok) throw new Error(await errText(res));
+  return res.json();
+}
+// FastAPI puts the actionable message in `detail`. Throwing the bare status
+// turned every failure into "error: 422" next to the Save button, hiding
+// messages the backend went to real trouble to produce.
+async function errText(res){
+  try{
+    const d = (await res.json()).detail;
+    if(typeof d === 'string') return d;
+    if(d) return JSON.stringify(d);
+  }catch(_){}
+  return `HTTP ${res.status}`;
+}
+// Escapes quotes too: this output is interpolated into title="..." and
+// onclick="fn('...')" attributes, and values like a mail From header
+// (`"Display Name" <a@b.com>`) legitimately contain double quotes.
+function esc(s){
+  return String(s??'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function ago(ts){ if(!ts) return ''; const s=(Date.now()-new Date(ts))/1e3;
+  return s<60?`${s|0}s ago`:s<3600?`${s/60|0}m ago`:s<86400?`${s/3600|0}h ago`:`${s/86400|0}d ago`; }
+
+async function refresh(){
+  try{
+    const runs = await api('/api/runs?limit=30');
+    $('#conn').innerHTML = '<span class="dot ok"></span><span class="muted">connected</span>';
+    $('#runsMeta').textContent = `(${runs.length})`;
+    $('#runs tbody').innerHTML = runs.map(r=>`
+      <tr class="clickable" onclick="detail(${r.id})">
+        <td>${r.id}</td><td>${esc(r.thread_id)}</td>
+        <td><span class="badge ${r.status}">${r.status}</span></td>
+        <td>${esc((r.error||r.result_summary||'').slice(0,110))}</td>
+        <td class="muted">${ago(r.created_at)}</td>
+      </tr>`).join('');
+    loadLearnings();
+  }catch(e){
+    $('#conn').innerHTML = '<span class="dot"></span><span class="muted">unauthorized / offline</span>';
+  }
+}
+async function detail(id){
+  $('#detailMeta').textContent = `(run ${id})`;
+  try{
+    const [tools, arts, mem] = await Promise.all([
+      api(`/api/runs/${id}/tools`),
+      api(`/api/runs/${id}/artifacts`).catch(()=>[]),
+      api(`/api/runs/${id}/memory`).catch(()=>null),
+    ]);
+    const trace = tools.length
+      ? tools.map(t=>`▶ ${t.tool}  (${t.latency_ms}ms)\n  args: ${JSON.stringify(t.args).slice(0,400)}\n  result: ${String(t.result_digest).slice(0,400)}\n`).join('\n')
+      : 'no tool calls recorded for this run';
+    // Files a run produced used to be reachable only via WhatsApp, so anything
+    // started from the dashboard or the inbox folder was written and stranded.
+    $('#detail').innerHTML = esc(trace) + (arts.length ? `\n\n<b>Artifacts</b>\n` + arts.map(a=>
+      `  <a href="#" class="artifact-dl" data-run="${id}" data-name="${esc(a.name)}">${esc(a.name)}</a>`
+      + `  <span class="muted">(${(a.bytes/1024).toFixed(1)} kB)</span>`).join('\n') : '')
+      + memoryText(mem);
+    // The artifact route is ops-key gated and a plain <a href> cannot set a
+    // header, so fetch it and hand the browser a blob.
+    $('#detail').querySelectorAll('a.artifact-dl').forEach(a=>{
+      a.addEventListener('click', async ev=>{
+        ev.preventDefault();
+        try{
+          const res = await fetch(`/api/runs/${a.dataset.run}/artifacts/${encodeURIComponent(a.dataset.name)}`,
+                                  {headers:{'x-ops-key':KEY}});
+          if(!res.ok) throw new Error(await errText(res));
+          const url = URL.createObjectURL(await res.blob());
+          const tmp = Object.assign(document.createElement('a'), {href:url, download:a.dataset.name});
+          tmp.click(); URL.revokeObjectURL(url);
+        }catch(e){ alert('download failed: '+e.message); }
+      });
+    });
+  }catch(e){ $('#detail').textContent = 'error: '+e.message; }
+}
+// Quick 019: the memory a run used (GET /api/runs/{id}/memory) and what it stored.
+function memoryText(m){
+  if(!m) return '';
+  const now = s => s && s!=='active' ? `  [${s} since]` : '';
+  const lines = [];
+  const u = m.recorded ? m.used : null;
+  if(!u){ lines.push('  none recorded for this run'); }
+  else{
+    (u.lessons||[]).forEach(l=>lines.push(`  lesson #${l.id}: ${l.text}${now(l.status)}`));
+    (u.learnings||[]).forEach(l=>lines.push(`  learning #${l.id}: ${l.text}${now(l.status)}`));
+    (u.graph||[]).forEach(g=>lines.push(`  graph ${g.kind} (${g.block==='group'?'this group':g.group_id||'global'}): ${g.text}`));
+    (u.cases||[]).forEach(c=>lines.push(`  case #${c.id}: ${c.text}`));
+    if(u.group&&u.group.purpose) lines.push('  group purpose');
+    if(u.group&&u.group.members) lines.push('  group members');
+    if(!lines.length) lines.push('  nothing in memory matched');
+    lines.push(`  ${u.chars} of ${u.budget_chars} chars${u.dropped?`, ${u.dropped} left out for space`:''}`);
+  }
+  const stored = (m.stored||[]).map(s=>`  #${s.id} [${s.kind}] ${s.outcome}: ${s.content}${now(s.status)}`);
+  return `\n\n<b>Memory used</b>\n` + esc(lines.join('\n'))
+    + `\n\n<b>Learned from this run</b>\n` + esc(stored.length ? stored.join('\n') : '  nothing stored');
+}
+async function loadLearnings(){
+  try{
+    const ls = await api('/api/learnings');
+    $('#learnings').innerHTML = ls.length ? ls.map(l=>`
+      <div class="learning">
+        <span class="kind">${l.kind}${l.revisions>0?`<br><span style="color:var(--warn)">rev ${l.revisions}</span>`:''}</span>
+        <span style="flex:1">${esc(l.content)}<br><span class="muted">${esc(l.scope_label||'')}${l.status && l.status!=='active' ? ' · '+esc(l.status) : ''}</span></span>
+        <button onclick="delLearning(${l.id})">✕</button>
+      </div>`).join('') : 'nothing learned yet — it fills up as tasks complete';
+  }catch(e){}
+}
+async function delLearning(id){
+  await api(`/api/learnings/${id}`, {method:'DELETE'}); loadLearnings();
+}
+async function sendTest(){
+  $('#tstatus').textContent = 'queued…';
+  try{
+    await api('/api/test-message', {method:'POST', body: JSON.stringify({phone:$('#tphone').value, message:$('#tmsg').value})});
+    $('#tmsg').value=''; $('#tstatus').textContent='queued — watch the runs table (reply send to a fake number will fail; read result there)';
+  }catch(e){ $('#tstatus').textContent = 'error: '+e.message; }
+}
+// ── Agents & capabilities (prompts editable) ───────────────
+let agentsLoaded = false;
+async function loadAgents(force){
+  if(agentsLoaded && !force) return;
+  try{
+    const ags = await api('/api/agents');
+    $('#agents').classList.remove('muted');
+    $('#agents').innerHTML = ags.map(a=>`
+      <div class="agent">
+        <h3>${esc(a.name)} ${a.customized?'<span class="badge running">customized</span>':''}</h3>
+        <div class="role">${esc(a.role)}</div>
+        <div class="model">model: ${esc(a.model)}</div>
+        ${a.tools.map(t=>`<div class="tool"><b>${esc(t.name)}</b><br>${esc(t.description.split('\n')[0].slice(0,120))}</div>`).join('')}
+        <div class="guard">🛡 ${a.guardrails.map(esc).join(' · ')}</div>
+        ${!a.config ? '<div class="muted" style="font-size:11px; margin-top:8px">Background service — not configurable</div>' : `
+        <details style="margin-top:8px">
+          <summary style="cursor:pointer; font-size:12px; color:var(--accent)">⚙️ Configure agent</summary>
+          <div style="margin-top:6px">
+            <label class="muted" style="font-size:11px">Prompt</label>
+            <textarea id="cfg-prompt-${a.config_key}" rows="8"
+              style="width:100%; font-size:12px; font-family:ui-monospace,monospace">${esc(a.config.prompt)}</textarea>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px">
+              <label class="muted" style="font-size:11px">Model
+                <input id="cfg-model-${a.config_key}" value="${esc(a.config.model)}" list="model-options" style="width:100%"></label>
+              <label class="muted" style="font-size:11px">Temperature (0–2)
+                <input id="cfg-temp-${a.config_key}" type="number" step="0.1" min="0" max="2" value="${a.config.temperature}" style="width:100%"></label>
+              <label class="muted" style="font-size:11px">Max tokens (256–32000)
+                <input id="cfg-maxtok-${a.config_key}" type="number" min="256" max="32000" value="${a.config.max_tokens}" style="width:100%"></label>
+              <label class="muted" style="font-size:11px">Recursion limit (1–100)
+                <input id="cfg-rec-${a.config_key}" type="number" min="1" max="100" value="${a.config.recursion_limit}" style="width:100%"></label>
+            </div>
+            ${a.tool_superset.length ? `
+            <div style="margin-top:6px">
+              <label class="muted" style="font-size:11px">Tools (subset of code-defined superset — cannot be expanded here)</label>
+              <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:4px">
+                ${a.tool_superset.map(t=>`
+                  <label style="font-size:11px; display:flex; gap:4px; align-items:center">
+                    <input type="checkbox" class="cfg-tool-${a.config_key}" value="${esc(t)}"
+                      ${a.config.tools.includes(t)?'checked':''}> ${esc(t)}
+                  </label>`).join('')}
+              </div>
+            </div>` : ''}
+            <div style="display:flex; gap:6px; margin-top:8px">
+              <button class="primary" style="font-size:12px" onclick="saveCfg('${a.config_key}')">Save</button>
+              <button style="font-size:12px" onclick="resetCfg('${a.config_key}')" ${a.customized?'':'disabled'}>Reset to defaults</button>
+              <span class="muted" id="cfg-status-${a.config_key}" style="font-size:11px; align-self:center"></span>
+            </div>
+          </div>
+        </details>`}
+      </div>`).join('');
+    agentsLoaded = true;
+  }catch(e){ $('#agents').innerHTML = '<span class="muted">render error: '+esc(e.message)+'</span>'; }
+}
+async function saveCfg(key){
+  const el = $(`#cfg-status-${key}`);
+  const tools = [...document.querySelectorAll(`.cfg-tool-${key}:checked`)].map(c=>c.value);
+  const body = {
+    prompt: $(`#cfg-prompt-${key}`).value,
+    model: $(`#cfg-model-${key}`).value,
+    temperature: parseFloat($(`#cfg-temp-${key}`).value),
+    max_tokens: parseInt($(`#cfg-maxtok-${key}`).value),
+    recursion_limit: parseInt($(`#cfg-rec-${key}`).value),
+    tools,
+  };
+  try{
+    await api(`/api/agents/${key}/config`, {method:'PUT', body: JSON.stringify(body)});
+    el.textContent = 'saved — applies to the next task';
+    setTimeout(()=>loadAgents(true), 1200);
+  }catch(e){ el.textContent = 'error: '+e.message; }
+}
+async function resetCfg(key){
+  await api(`/api/agents/${key}/config`, {method:'DELETE'});
+  loadAgents(true);
+}
+
+// ── Resources ──────────────────────────────────────────────
+async function loadStats(){
+  try{
+    const s = await api('/api/stats');
+    const sys = s.system||{}, p = s.process||{}, q = s.queue||{};
+    const bar = (pct)=>`<div class="bar"><i style="width:${Math.min(100,pct||0)}%"></i></div>`;
+    $('#resources').classList.remove('muted');
+    $('#resources').innerHTML = `
+      <div>System CPU ${sys.cpu_percent??'?'}% ${bar(sys.cpu_percent)}
+      System memory ${sys.memory_used_gb??'?'} / ${sys.memory_total_gb??'?'} GB (${sys.memory_percent??'?'}%) ${bar(sys.memory_percent)}
+      Gateway process: ${p.memory_mb??'?'} MB · ${p.threads??'?'} threads</div>
+      <div style="margin-top:6px"><b>Queue:</b> ${Object.entries(q).map(([k,v])=>`${k}: ${v}`).join(' · ')||'empty'}</div>
+      <table style="margin-top:8px"><thead><tr><th>container</th><th>cpu</th><th>memory</th></tr></thead><tbody>
+        ${(s.containers||[]).map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.cpu)}</td><td>${esc(c.mem)}</td></tr>`).join('') || '<tr><td colspan=3 class=muted>docker stats unavailable</td></tr>'}
+      </tbody></table>`;
+    $('#statsMeta').textContent = '(live)';
+  }catch(e){ $('#statsMeta').textContent = '(offline)'; }
+}
+
+// ── Live logs (SSE via fetch so we can send the auth header) ──
+let logsStreaming = false;
+async function streamLogs(){
+  if(logsStreaming || !KEY) return;
+  logsStreaming = true;
+  try{
+    const res = await fetch('/api/logs/stream', {headers:{'x-ops-key':KEY}});
+    if(!res.ok) throw new Error(res.status);
+    $('#logs').textContent = '';
+    const reader = res.body.getReader(); const dec = new TextDecoder();
+    let buf = '';
+    while(true){
+      const {done, value} = await reader.read();
+      if(done) break;
+      buf += dec.decode(value, {stream:true});
+      const parts = buf.split('\n\n'); buf = parts.pop();
+      for(const part of parts){
+        if(!part.startsWith('data: ')) continue;
+        const e = JSON.parse(part.slice(6));
+        const line = document.createElement('span');
+        line.className = 'logline';
+        line.innerHTML = `<span class="lv-${e.level}">${e.ts} ${e.level.padEnd(7)} [${esc(e.logger)}]</span> ${esc(e.msg)}\n`;
+        $('#logs').appendChild(line);
+        while($('#logs').childNodes.length > 400) $('#logs').removeChild($('#logs').firstChild);
+        if($('#follow').checked) $('#logs').scrollTop = $('#logs').scrollHeight;
+      }
+    }
+  }catch(e){ $('#logs').textContent = 'log stream disconnected — refresh page'; }
+  logsStreaming = false;
+}
+
+// ── Watchdog ───────────────────────────────────────────────
+async function loadWatches(){
+  try{
+    const ws = await api('/api/watches');
+    $('#watches').classList.remove('muted');
+    $('#watches').innerHTML = ws.length ? `<table>
+      <thead><tr><th>#</th><th>title</th><th>kind</th><th>status</th><th>every</th><th>fires</th><th>compiled</th><th>last check</th><th></th></tr></thead>
+      <tbody>${ws.map(w=>`<tr>
+        <td>${w.id}</td>
+        <td title="${esc(w.condition)}">${esc(w.title)}${w.one_shot?' <span class="muted">(1-shot)</span>':''}</td>
+        <td>${w.kind}</td>
+        <td><span class="badge ${w.status==='active'?'running':w.status==='awaiting_confirmation'?'queued':'done'}">${w.status}</span></td>
+        <td class="muted">${Math.round(w.cadence_seconds/60)}m</td>
+        <td>${w.fire_count}</td>
+        <td class="muted" title="${esc(w.compiled_sql||w.compile_error||'not compiled yet')}">${w.compiled_sql?'✓ SQL':w.compile_error?'⚠ err':'…'}</td>
+        <td class="muted">${w.last_checked_at?ago(w.last_checked_at):'—'}</td>
+        <td>
+          ${w.status==='paused'
+            ? `<button style="font-size:11px" onclick="setWatch(${w.id},'active')">▶</button>`
+            : `<button style="font-size:11px" onclick="setWatch(${w.id},'paused')">⏸</button>`}
+          <button style="font-size:11px" onclick="delWatch(${w.id})">✕</button>
+        </td></tr>`).join('')}</tbody></table>` : 'no watches yet — add one above or ask on WhatsApp: "let me know when that order is marked delivered"';
+  }catch(e){}
+}
+async function createWatch(){
+  const body = {
+    thread_id: $('#w-phone').value.trim(),
+    title: $('#w-title').value.trim(),
+    condition: $('#w-cond').value.trim(),
+    cadence_seconds: Math.max(5, parseInt($('#w-cad').value||'15'))*60,
+    one_shot: $('#w-oneshot').checked,
+  };
+  try{ await api('/api/watches', {method:'POST', body: JSON.stringify(body)});
+    $('#w-title').value=''; $('#w-cond').value=''; loadWatches();
+  }catch(e){ alert('error: '+e.message); }
+}
+async function setWatch(id, status){ await api(`/api/watches/${id}`, {method:'PATCH', body:JSON.stringify({status})}); loadWatches(); }
+async function delWatch(id){ await api(`/api/watches/${id}`, {method:'DELETE'}); loadWatches(); }
+async function proposeKpi(){
+  try{
+    const r = await api('/api/watches/propose-kpi', {method:'POST', body:'{}'});
+    $('#kpi-proposals').innerHTML = '<div class="muted" style="margin-top:8px">Proposed KPI monitors — click to activate for the owner phone above:</div>' +
+      r.proposals.map((p,i)=>`<div class="learning">
+        <span class="kind">KPI</span>
+        <span style="flex:1"><b>${esc(p.title)}</b><br><span class="muted">${esc(p.condition.slice(0,160))}</span></span>
+        <button onclick='activateKpi(${i})'>+ add</button>
+      </div>`).join('');
+    window._kpiProps = r.proposals;
+  }catch(e){ alert('error: '+e.message); }
+}
+async function activateKpi(i){
+  const p = window._kpiProps[i];
+  const phone = $('#w-phone').value.trim();
+  if(!phone){ alert('enter owner phone above first'); return; }
+  await api('/api/watches', {method:'POST', body: JSON.stringify({...p, thread_id: phone})});
+  loadWatches();
+}
+
+// ── Cases ───────────────────────────────────────────────────
+async function loadCases(){
+  try{
+    const st = $('#caseFilter').value;
+    const cs = await api('/api/cases' + (st?`?status=${st}`:''));
+    $('#casesMeta').textContent = `(${cs.length})`;
+    $('#cases').innerHTML = cs.length ? `<table><thead><tr>
+        <th>#</th><th>title</th><th>status</th><th>expectations</th></tr></thead><tbody>
+      ${cs.map(c=>`<tr class="clickable" onclick="caseDetail(${c.id})">
+        <td>${c.id}</td><td>${esc(c.title)}${c.origin?` <span class="muted">(${esc(c.origin)})</span>`:''}</td>
+        <td><span class="badge ${c.status==='open'?'running':c.status==='pending_ack'?'queued':'done'}">${c.status}</span></td>
+        <td class="muted">${c.violated_exp?`<span style="color:var(--err)">${c.violated_exp}⚠</span> `:''}${c.open_exp} open · ${c.satisfied_exp} done</td>
+      </tr>`).join('')}</tbody></table>` : 'no cases yet';
+  }catch(e){ $('#cases').textContent = 'error: '+e.message; }
+}
+async function caseDetail(id){
+  try{
+    const d = await api(`/api/cases/${id}`);
+    const c = d.case;
+    const parts = d.participants.map(p=>`${esc(p.name)}<span class="muted">(${p.role||'?'})</span>`).join(', ') || '<span class="muted">none</span>';
+    const exps = d.expectations.map(e=>`<div class="learning">
+      <span class="kind">${e.status}</span>
+      <span style="flex:1">${esc(e.description)}<br>
+        <span class="muted">owner: ${e.owner?esc(e.owner):(e.owed_by==='assistant'?'the assistant':'<span style="color:var(--warn)">unassigned</span>')} ·
+        due: ${e.due_at?esc(e.due_at.slice(0,16)):'—'} · reminders: ${e.reminder_count}</span></span>
+      ${e.status==='open'||e.status==='violated'?`<button onclick="dismissExp(${e.id})">dismiss</button>`:''}
+    </div>`).join('') || '<span class="muted">no expectations</span>';
+    const tl = d.timeline.map(t=>`<div style="padding:4px 0; border-bottom:1px solid var(--border)">
+      <span class="muted">${esc((t.occurred_at||'').slice(0,16))} · ${t.source}${t.provenance==='self'?' · self':''}</span> —
+      <b>${esc(t.actor)}</b>: ${esc((t.content||'').slice(0,240))}</div>`).join('') || '<span class="muted">no events</span>';
+    const acts = d.actions.map(a=>`<div class="learning"><span class="kind">${a.tier}</span>
+      <span style="flex:1"><b>${a.kind}</b> — <span class="badge ${a.status==='executed'?'done':a.status==='proposed'?'queued':'failed'}">${a.status}</span>
+      <br><span class="muted">${esc(JSON.stringify(a.payload).slice(0,160))}</span></span></div>`).join('');
+    const aliases = (c.aliases||[]).map(a=>esc(a)).join(' · ');
+    const facts = (d.facts||[]).map(f=>`<div style="padding:2px 0; border-bottom:1px solid var(--border)">
+      <b>${esc(f.field)}</b> = ${esc(f.value)} <span class="muted">(per ${esc(f.src||'unattributed')}, ${esc((f.observed_at||'').slice(0,10))})</span></div>`).join('');
+    $('#caseDetail').innerHTML = `
+      <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px">
+        <b style="flex:1">#${c.id} ${esc(c.title)}</b>
+        ${c.status==='pending_ack'?`<button class="primary" onclick="ackCase(${c.id})">Acknowledge close</button>`:''}
+        ${c.status==='open'?`<button class="primary" onclick="closeCase(${c.id})">Close (done)</button>`:''}
+        ${c.status==='open'||c.status==='pending_ack'?`<button onclick="dismissCase(${c.id})">Dismiss</button>`:''}
+      </div>
+      ${aliases?`<div class="muted" style="margin-bottom:6px">aka: ${aliases}</div>`:''}
+      ${c.summary?`<div class="muted" style="margin-bottom:8px">${esc(c.summary)}</div>`:''}
+      <div style="margin-bottom:6px"><b>Participants:</b> ${parts}</div>
+      <div style="margin-bottom:6px"><b>Expectations</b></div>${exps}
+      ${facts?`<div style="margin:8px 0 6px"><b>Facts</b></div>${facts}`:''}
+      ${acts?`<div style="margin:8px 0 6px"><b>Actions taken</b></div>${acts}`:''}
+      <div style="margin:8px 0 6px"><b>Timeline</b></div>
+      <div style="max-height:260px; overflow:auto">${tl}</div>
+      <div style="display:flex; gap:6px; margin-top:8px">
+        <input id="cn-${id}" placeholder="add a note / fact to this case" style="flex:1">
+        <button onclick="addCaseNote(${id})">Add note</button>
+      </div>`;
+  }catch(e){ $('#caseDetail').textContent = 'error: '+e.message; }
+}
+async function ackCase(id){ await api(`/api/cases/${id}/ack`, {method:'POST', body:'{}'}); loadCases(); caseDetail(id); }
+async function addCaseNote(id){ const text=($(`#cn-${id}`)?.value||'').trim(); if(!text) return; await api(`/api/cases/${id}/note`, {method:'POST', body: JSON.stringify({text})}); loadCases(); caseDetail(id); }
+async function closeCase(id){ await api(`/api/cases/${id}/close`, {method:'POST', body:'{}'}); loadCases(); caseDetail(id); }
+async function dismissCase(id){ await api(`/api/cases/${id}/dismiss`, {method:'POST', body:'{}'}); loadCases(); caseDetail(id); }
+async function dismissExp(id){ await api(`/api/expectations/${id}/dismiss`, {method:'POST', body:'{}'}); loadCases(); }
+
+// ── Watched DB tables (ambient DB poller) ───────────────────
+let _dbSources = [];
+async function loadDbSources(){
+  try{
+    try{ const p = await api('/api/db-poll-seconds');
+      const el=$('#db-poll-secs'); if(el && document.activeElement!==el) el.value = p.seconds; }catch(e){}
+    _dbSources = await api('/api/db-sources');
+    $('#dbsources').innerHTML = _dbSources.length ? `<table><thead><tr>
+        <th>table</th><th>watermark column</th><th>label</th><th></th></tr></thead><tbody>
+      ${_dbSources.map((s,i)=>`<tr>
+        <td>${esc(s.table)}</td><td class="muted">${esc(s.watermark_column)}</td>
+        <td class="muted">${esc(s.label)}</td>
+        <td><button onclick="removeDbSource(${i})">remove</button></td>
+      </tr>`).join('')}</tbody></table>` : 'not watching any tables yet — click "Propose from knowledge base"';
+  }catch(e){ $('#dbsources').textContent = 'error: '+e.message; }
+}
+async function proposeDbSources(){
+  $('#dbproposals').innerHTML = '<div class="muted" style="margin-top:8px">reading knowledge base…</div>';
+  try{
+    const r = await api('/api/db-sources/propose', {method:'POST', body:'{}'});
+    window._dbProps = r.proposals || [];
+    $('#dbproposals').innerHTML = r.proposals.length ? '<div class="muted" style="margin-top:8px">Proposed tables to watch — click add:</div>' +
+      r.proposals.map((p,i)=>`<div class="learning" style="${p.recommended?'':'opacity:.5'}">
+        <span class="kind" style="${p.recommended?'color:var(--ok)':'color:var(--muted)'}">${p.recommended?'business':'system?'}</span>
+        <span style="flex:1"><b>${esc(p.table)}</b> · watermark ${esc(p.watermark_column)}<br>
+          <span class="muted">${esc(p.reason)}</span></span>
+        <button onclick="addDbSource(${i})">+ watch</button>
+      </div>`).join('') : '<div class="muted" style="margin-top:8px">no new tables proposed</div>';
+  }catch(e){ $('#dbproposals').textContent = 'error: '+e.message; }
+}
+async function addDbSource(i){
+  const p = window._dbProps[i];
+  const next = [..._dbSources, {table:p.table, watermark_column:p.watermark_column, label:p.label}];
+  await api('/api/db-sources', {method:'PUT', body: JSON.stringify({sources: next})});
+  loadDbSources(); proposeDbSources();
+}
+async function removeDbSource(i){
+  const next = _dbSources.filter((_,j)=>j!==i);
+  await api('/api/db-sources', {method:'PUT', body: JSON.stringify({sources: next})});
+  loadDbSources();
+}
+async function saveDbPoll(){
+  const s = parseInt($('#db-poll-secs').value, 10);
+  if(!s || s < 5){ $('#db-add-status').textContent = 'poll interval must be ≥ 5s'; return; }
+  try{
+    const r = await api('/api/db-poll-seconds', {method:'PUT', body: JSON.stringify({seconds: s})});
+    $('#db-add-status').textContent = `✓ DB poll interval set to ${r.seconds}s (live, no restart)`;
+  }catch(e){ $('#db-add-status').textContent = 'error: '+e.message; }
+}
+async function addDbTableManual(){
+  const table = $('#db-add-table').value.trim();
+  const wm = $('#db-add-wm').value.trim();
+  if(!table){ return; }
+  $('#db-add-status').textContent = 'checking…';
+  try{
+    const r = await api('/api/db-sources/add', {method:'POST', body: JSON.stringify({table, watermark_column: wm||null})});
+    if(r.error){
+      let msg = r.error;
+      if(r.columns && r.columns.length) msg += ' — columns: ' + r.columns.join(', ');
+      $('#db-add-status').textContent = msg;
+    } else {
+      $('#db-add-status').textContent = `✓ watching ${r.added} (watermark ${r.watermark_column||''})${r.note?' — '+r.note:''}`;
+      $('#db-add-table').value=''; $('#db-add-wm').value='';
+      loadDbSources();
+    }
+  }catch(e){ $('#db-add-status').textContent = 'error: '+e.message; }
+}
+
+// ── Approvals ───────────────────────────────────────────────
+async function loadApprovals(){
+  try{
+    const as = await api('/api/actions?status=proposed');
+    $('#apprMeta').textContent = as.length ? `(${as.length} awaiting)` : '(none)';
+    $('#approvals').innerHTML = as.length ? `<table><thead><tr>
+        <th>#</th><th>playbook</th><th>kind</th><th>tier</th><th>payload</th><th></th></tr></thead><tbody>
+      ${as.map(a=>`<tr>
+        <td>${a.id}</td><td class="muted">${esc(a.playbook_name||'')}</td>
+        <td><b>${esc(a.kind)}</b></td><td class="muted">${esc(a.tier)}</td>
+        <td>${renderPayload(a.kind, a.payload)}</td>
+        <td style="white-space:nowrap">
+          <button class="primary" onclick="approveAction(${a.id})">approve</button>
+          <button onclick="rejectAction(${a.id})">reject</button>
+        </td></tr>`).join('')}</tbody></table>` : 'no actions awaiting approval';
+  }catch(e){ $('#approvals').textContent = 'error: '+e.message; }
+}
+
+// asyncpg hands jsonb back as a string unless a codec is registered, so every
+// payload reader has to cope with both shapes.
+function asObj(v){
+  if(v && typeof v === 'object') return v;
+  try{ return JSON.parse(v||'{}'); }catch(_){ return {}; }
+}
+
+// A blind 180-char truncation of the raw JSON defeated the entire point of the
+// human gate: for an extracted invoice the cut landed inside the title before
+// the first field, so the operator approved without seeing a single amount,
+// date, confidence or source quote.
+function renderPayload(kind, payload){
+  const p = asObj(payload);
+  if(kind !== 'record_extracted_data'){
+    return `<span class="muted">${esc(JSON.stringify(p).slice(0,180))}</span>`;
+  }
+  const rec = asObj(p.record);
+  const fields = rec.fields || rec.data || [];
+  const list = Array.isArray(fields) ? fields
+             : Object.entries(fields).map(([k,v])=>({name:k, value:v}));
+  if(!list.length) return `<span class="muted">${esc(JSON.stringify(p).slice(0,180))}</span>`;
+  const rows = list.map(f=>{
+    const conf = f.confidence==null ? null : Number(f.confidence);
+    const low  = conf!=null && conf < 0.8;
+    return `<tr${low?' style="background:rgba(220,150,0,.12)"':''}>
+      <td>${esc(f.name ?? f.field ?? '')}</td>
+      <td><b>${esc(String(f.value ?? ''))}</b></td>
+      <td class="muted">${conf==null?'':(conf*100).toFixed(0)+'%'}</td>
+      <td class="muted" style="max-width:340px">${esc(String(f.source_quote ?? f.quote ?? ''))}</td>
+    </tr>`;
+  }).join('');
+  return `<details><summary>${esc(rec.doc_type||p.doc_type||'extracted record')} —
+      ${list.length} field(s)${list.some(f=>f.confidence!=null && f.confidence<0.8)
+        ? ' <b style="color:#e0a000">· low-confidence values, check these</b>' : ''}</summary>
+    <table style="margin-top:6px"><thead><tr>
+      <th>field</th><th>value</th><th>conf</th><th>source quote</th></tr></thead>
+      <tbody>${rows}</tbody></table></details>`;
+}
+async function approveAction(id){
+  try{ await api(`/api/actions/${id}/approve`, {method:'POST', body:'{}'}); loadApprovals(); loadCases(); }
+  catch(e){ alert('error: '+e.message); }
+}
+async function rejectAction(id){
+  try{ await api(`/api/actions/${id}/reject`, {method:'POST', body:'{}'}); loadApprovals(); }
+  catch(e){ alert('error: '+e.message); }
+}
+
+// ── Documents (docintel intake + audit) ─────────────────────
+const DOC_BADGE = {extracted:'#3a86ff', recorded:'#2ea043', rejected:'#8b949e', failed:'#da3633'};
+async function loadDocuments(){
+  try{
+    const ds = await api('/api/documents?limit=50');
+    $('#docsMeta').textContent = ds.length ? `(${ds.length})` : '(none yet)';
+    $('#documents').innerHTML = ds.length ? `<table><thead><tr>
+        <th>#</th><th>file</th><th>type</th><th>source</th><th>status</th>
+        <th>summary</th><th>when</th><th></th></tr></thead><tbody>
+      ${ds.map(d=>`<tr>
+        <td>${d.id}</td><td>${esc(d.filename)}</td>
+        <td class="muted">${esc(d.doc_type||'')}</td>
+        <td class="muted">${esc(d.source||'')}</td>
+        <td><span style="color:${DOC_BADGE[d.status]||'#8b949e'}">${esc(d.status||'')}</span></td>
+        <td class="muted">${esc((d.summary||'').slice(0,90))}</td>
+        <td class="muted">${ago(d.created_at)}</td>
+        <td>${d.task_run_id ? `<button onclick="detail(${d.task_run_id})">run</button>` : ''}</td>
+      </tr>`).join('')}</tbody></table>`
+      : 'no documents yet — upload one above, WhatsApp an attachment, or drop a PDF in the watched inbox folder';
+  }catch(e){ $('#documents').textContent = 'error: '+e.message; }
+}
+async function uploadDoc(){
+  const f = $('#doc-file').files[0];
+  if(!f){ $('#doc-status').textContent = 'pick a file first'; return; }
+  const fd = new FormData();
+  fd.append('file', f);
+  fd.append('instruction', $('#doc-instruction').value||'');
+  $('#doc-status').textContent = `uploading ${f.name}…`;
+  try{
+    const r = await apiUpload('/api/documents/upload', fd);
+    $('#doc-status').textContent = `queued as run ${r.queued} — extraction will appear under Approvals`;
+    $('#doc-file').value=''; $('#doc-instruction').value='';
+    loadDocuments(); refresh();
+  }catch(e){ $('#doc-status').textContent = 'error: '+e.message; }
+}
+
+// ── Playbooks (autonomy governance) ─────────────────────────
+async function loadPlaybooks(){
+  try{
+    const ps = await api('/api/playbooks');
+    const drafts = ps.filter(p=>p.status==='draft').length;
+    $('#pbMeta').textContent = `(${ps.length}${drafts?`, ${drafts} awaiting your approval`:''})`;
+    $('#playbooks').innerHTML = ps.length ? `<table><thead><tr>
+        <th>#</th><th>name</th><th>trigger</th><th>goal</th><th>tier</th>
+        <th>proposed by</th><th>status</th><th></th></tr></thead><tbody>
+      ${ps.map(p=>{
+        const t = asObj(p.trigger);
+        const trig = t.type==='cron' ? `daily ${String(t.hour??'?').padStart(2,'0')}:${String(typeof t.minute==='number'?t.minute:0).padStart(2,'0')}${typeof t.tz==='string'&&t.tz?' '+esc(t.tz):''}`
+                   : t.type ? esc(t.type) : '—';
+        return `<tr${p.status==='draft'?' style="background:rgba(58,134,255,.10)"':''}>
+        <td>${p.id}</td><td><b>${esc(p.name)}</b></td>
+        <td class="muted">${trig}</td>
+        <td class="muted">${esc((p.goal||'').slice(0,80))}</td>
+        <td class="muted">${esc(p.autonomy_tier||'')}</td>
+        <td class="muted">${esc(p.proposed_by||'')}</td>
+        <td>${esc(p.status)}</td>
+        <td style="white-space:nowrap">
+          ${p.status!=='active' ? `<button class="primary" onclick="setPlaybook(${p.id},'active')">activate</button>` : ''}
+          ${p.status==='active' ? `<button onclick="setPlaybook(${p.id},'draft')">pause</button>` : ''}
+          ${p.status!=='archived' ? `<button onclick="setPlaybook(${p.id},'archived')">archive</button>` : ''}
+        </td></tr>`;}).join('')}</tbody></table>` : 'no playbooks';
+  }catch(e){ $('#playbooks').textContent = 'error: '+e.message; }
+}
+async function setPlaybook(id, status){
+  try{ await api(`/api/playbooks/${id}`, {method:'PATCH', body:JSON.stringify({status})}); loadPlaybooks(); }
+  catch(e){ alert('error: '+e.message); }
+}
+
+// ── Skills (procedure library) ──────────────────────────────
+// Installed is not enabled: the checkbox is the consent step that puts a
+// skill in the supervisor's index. Library search is on-demand only — the 5s
+// poll refreshes just the installed table.
+async function loadSkills(){
+  try{
+    const ss = await api('/api/skills');
+    const on = ss.filter(s=>s.enabled).length;
+    $('#skillsMeta').textContent = `(${ss.length} installed, ${on} enabled — a skill does nothing until you enable it)`;
+    $('#skillsInstalled').innerHTML = ss.length ? `<table><thead><tr>
+        <th>name</th><th>source</th><th>license</th><th>description</th><th>enabled</th><th></th></tr></thead><tbody>
+      ${ss.map(s=>`<tr>
+        <td><b>${esc(s.name)}</b>${s.compat==='coding-agent'?' <span class="badge">coding-agent</span>':''}${s.scope==='triage'?' <span class="badge">triage policy</span>':''}</td>
+        <td class="muted">${esc(s.source||'')}</td>
+        <td class="muted">${esc(s.license||'')}</td>
+        <td class="muted">${esc((s.description||'').slice(0,120))}</td>
+        <td><input type="checkbox" ${s.enabled?'checked':''} onchange="toggleSkill('${esc(s.name)}', this)"></td>
+        <td><button onclick="deleteSkill('${esc(s.name)}')">delete</button></td>
+      </tr>`).join('')}</tbody></table>` : 'no skills installed — search the library below';
+  }catch(e){ $('#skillsInstalled').textContent = 'error: '+e.message; }
+}
+async function toggleSkill(name, el){
+  try{ await api(`/api/skills/${encodeURIComponent(name)}`, {method:'PATCH', body:JSON.stringify({enabled:el.checked})}); }
+  catch(e){ el.checked = !el.checked; alert('error: '+e.message); }
+  loadSkills();
+}
+async function deleteSkill(name){
+  if(!confirm(`Delete skill '${name}'? A library skill can be re-installed; a custom one is gone.`)) return;
+  try{ await api(`/api/skills/${encodeURIComponent(name)}`, {method:'DELETE'}); loadSkills(); }
+  catch(e){ alert('error: '+e.message); }
+}
+async function searchSkillLibrary(){
+  const q = $('#skill-q').value.trim();
+  $('#skillLibStatus').textContent = 'searching…';
+  try{
+    const r = await api(`/api/skills/library?q=${encodeURIComponent(q)}`);
+    if(!r.library_available){
+      $('#skillLibStatus').textContent = 'library not present on this install';
+      $('#skillLibrary').innerHTML = ''; return;
+    }
+    // Only the hand-curated shelf is shown; the rest of the vendored catalog
+    // targets terminal coding agents and would drown these thirteen.
+    const ls = (r.skills || []).filter(s => s.relevant === true);
+    $('#skillLibStatus').textContent = `${ls.length} curated skill(s)`;
+    $('#skillLibrary').innerHTML = ls.length ? `<table><thead><tr>
+        <th>skill</th><th>description</th><th></th></tr></thead><tbody>
+      ${ls.map(s=>{
+        const id = s.id || `${s.source}/${s.name}`;
+        return `<tr>
+        <td><b>${esc(id)}</b></td>
+        <td class="muted">${esc((s.description||'').slice(0,140))}</td>
+        <td style="white-space:nowrap">
+          <button onclick="previewSkill('${esc(id)}')">preview</button>
+          <button class="primary" onclick="installSkill('${esc(id)}')">install</button>
+        </td></tr>`;}).join('')}</tbody></table>` : '';
+  }catch(e){ $('#skillLibStatus').textContent = 'error: '+e.message; }
+}
+async function previewSkill(id){
+  try{
+    // id is "source/name", which is exactly the library detail route's path.
+    const r = await api(`/api/skills/library/${id}`);
+    const pre = $('#skillPreview');
+    pre.style.display = 'block';
+    pre.textContent = r.body || '(empty SKILL.md)';   // textContent: no markup interpreted
+  }catch(e){ alert('error: '+e.message); }
+}
+async function draftSkill(){
+  const goal = $('#skill-goal').value.trim();
+  if(!goal) return;
+  $('#skillCreateStatus').textContent = 'drafting…';
+  try{
+    const d = await api('/api/skills/draft', {method:'POST', body:JSON.stringify({goal})});
+    $('#skill-new-name').value = d.name || '';
+    $('#skill-new-desc').value = d.description || '';
+    $('#skill-new-body').value = d.body || '';
+    $('#skillCreateStatus').textContent = 'draft ready — review, then create';
+  }catch(e){ $('#skillCreateStatus').textContent = 'error: '+e.message; }
+}
+async function createSkill(){
+  const name = $('#skill-new-name').value.trim();
+  const body = $('#skill-new-body').value;
+  if(!name || !body.trim()){ $('#skillCreateStatus').textContent = 'slug and body required'; return; }
+  try{
+    await api('/api/skills', {method:'POST', body:JSON.stringify({
+      name, description: $('#skill-new-desc').value.trim(), body,
+      scope: $('#skill-new-triage').checked ? 'triage' : 'agent'})});
+    $('#skillCreateStatus').textContent = 'created (disabled) — enable it above';
+    loadSkills();
+  }catch(e){ $('#skillCreateStatus').textContent = 'error: '+e.message; }
+}
+async function installSkill(id){
+  try{ await api('/api/skills/install', {method:'POST', body:JSON.stringify({id})}); loadSkills(); }
+  catch(e){ alert('install failed: '+e.message); }
+}
+
+// ── Chats ───────────────────────────────────────────────────
+// A group is silent until a human activates it, so this table is the approval
+// queue as much as it is a list.
+let CHATS = [];
+async function loadChats(){
+  try{
+    const {chats} = await api('/api/chats');
+    CHATS = chats || [];
+    const pending = CHATS.filter(c=>c.status==='pending').length;
+    $('#chatsMeta').textContent = `(${CHATS.length}${pending?`, ${pending} awaiting you`:''})`;
+    $('#chats').innerHTML = CHATS.length ? `<table><thead><tr>
+        <th>chat</th><th>status</th><th>purpose</th><th></th></tr></thead><tbody>
+      ${CHATS.map(c=>`<tr>
+        <td>${esc(c.subject||c.jid)}<div class="muted">${esc(c.jid)}</div></td>
+        <td>${c.status==='active'?'✅ active':c.status==='ignored'?'🔇 ignored':'⏳ pending'}</td>
+        <td class="muted">${esc(c.purpose||'—')}</td>
+        <td>
+          ${c.status!=='active'?`<button class="primary" onclick="setChat('${esc(c.jid)}','active')">Activate</button>`:''}
+          ${c.status!=='ignored'?`<button onclick="setChat('${esc(c.jid)}','ignored')">Ignore</button>`:''}
+          <button onclick="obPick('${esc(c.jid)}')">Interview</button>
+        </td></tr>`).join('')}</tbody></table>`
+      : 'no chats seen yet — add the assistant to a WhatsApp group';
+    obTargets();
+  }catch(e){ $('#chats').textContent = 'error: '+e.message; }
+}
+async function setChat(jid, status){
+  try{ await api(`/api/chats/${encodeURIComponent(jid)}`, {method:'PATCH', body:JSON.stringify({status})}); loadChats(); }
+  catch(e){ alert('failed: '+e.message); }
+}
+
+// ── Onboarding interview ────────────────────────────────────
+function obTargets(){
+  const sel = $('#ob-target'); const cur = sel.value;
+  sel.innerHTML = `<option value="business">The business (once)</option>` +
+    CHATS.map(c=>`<option value="chat:${esc(c.jid)}">Group — ${esc(c.subject||c.jid)}</option>`).join('');
+  if(cur) sel.value = cur;
+}
+function obTarget(){
+  const v = $('#ob-target').value || 'business';
+  return v.startsWith('chat:') ? {kind:'chat', jid:v.slice(5)} : {kind:'business', jid:null};
+}
+function obPick(jid){ $('#ob-target').value = 'chat:'+jid; obSwitch(); }
+function obRender(turns){
+  $('#ob-log').innerHTML = (turns||[]).map(t=>
+    `<div style="margin:0 0 10px"><b>${t.role==='user'?'You':'Interviewer'}:</b>
+     <div style="white-space:pre-wrap">${esc(t.content)}</div></div>`).join('')
+    || 'Not started — press “Start / resume interview”.';
+  const log = $('#ob-log'); log.scrollTop = log.scrollHeight;
+}
+async function obSwitch(){
+  const {kind, jid} = obTarget();
+  $('#ob-applied').textContent = '';
+  try{
+    const s = await api(`/api/onboarding?kind=${kind}${jid?`&jid=${encodeURIComponent(jid)}`:''}`);
+    obRender(s.transcript);
+    if(s.status==='complete') $('#ob-applied').textContent = '✅ complete — “Start over” to redo it.';
+  }catch(e){ $('#ob-log').textContent = 'error: '+e.message; }
+}
+async function obPost(message){
+  const {kind, jid} = obTarget();
+  $('#ob-log').insertAdjacentHTML('beforeend', '<div class="muted">thinking…</div>');
+  try{
+    const r = await api('/api/onboarding', {method:'POST',
+      body: JSON.stringify({kind, jid, message})});
+    if(r.error){ $('#ob-log').insertAdjacentHTML('beforeend', `<div class="muted">error: ${esc(r.error)}</div>`); return; }
+    obRender(r.transcript);
+    if(r.done){
+      const lines = Object.entries(r.applied||{}).map(([k,v])=>`${k}: ${Array.isArray(v)?v.join('; '):v}`);
+      $('#ob-applied').innerHTML = '✅ <b>Interview complete.</b><br>' + lines.map(esc).join('<br>');
+      loadChats(); loadAgents();
+    }
+  }catch(e){ $('#ob-log').insertAdjacentHTML('beforeend', `<div class="muted">error: ${esc(e.message)}</div>`); }
+}
+// No message opens the interview: the interviewer speaks first, so the user
+// never faces an empty box wondering what it wants.
+async function obStart(){ await obPost(null); }
+async function obSend(){
+  const box = $('#ob-msg'); const text = box.value.trim();
+  if(!text) return;
+  box.value = '';
+  await obPost(text);
+}
+async function obReset(){
+  if(!confirm('Discard this interview and start over?')) return;
+  const {kind, jid} = obTarget();
+  await api('/api/onboarding/reset', {method:'POST', body: JSON.stringify({kind, jid})});
+  $('#ob-applied').textContent = ''; obRender([]);
+}
+
+// ── People registry ─────────────────────────────────────────
+async function loadPeople(){
+  try{
+    const ps = await api('/api/people');
+    $('#peopleMeta').textContent = `(${ps.length})`;
+    $('#people').innerHTML = ps.length ? `<table><thead><tr>
+        <th>name</th><th>aliases</th><th>email</th><th>whatsapp</th><th>role</th><th>primary</th><th>active</th></tr></thead><tbody>
+      ${ps.map(p=>`<tr>
+        <td>${esc(p.name)}</td>
+        <td class="muted">${(p.aliases||[]).map(esc).join(', ')}</td>
+        <td class="muted">${esc(p.email)}</td>
+        <td class="muted">${esc(p.whatsapp)}</td>
+        <td class="muted">${esc(p.role)}</td>
+        <td>${p.is_primary?'⭐ primary':`<button onclick="makePrimary(${p.id})">make primary</button>`}</td>
+        <td><button onclick="togglePerson(${p.id}, ${!p.active})">${p.active?'✓ active':'inactive'}</button></td>
+      </tr>`).join('')}</tbody></table>` : 'no people yet — add the accounts team above';
+  }catch(e){ $('#people').textContent = 'error: '+e.message; }
+}
+async function makePrimary(id){
+  try{ await api(`/api/people/${id}/primary`, {method:'POST'}); loadPeople(); }
+  catch(e){ alert('failed: '+e.message); }
+}
+async function createPerson(){
+  const body = {
+    name: $('#p-name').value.trim(),
+    aliases: $('#p-aliases').value.split(',').map(s=>s.trim()).filter(Boolean),
+    email: $('#p-email').value.trim() || null,
+    whatsapp: $('#p-wa').value.trim() || null,
+    role: $('#p-role').value.trim() || null,
+  };
+  if(!body.name){ alert('name required'); return; }
+  try{
+    const r = await api('/api/people', {method:'POST', body: JSON.stringify(body)});
+    ['p-name','p-aliases','p-email','p-wa','p-role'].forEach(id=>$('#'+id).value='');
+    if(r.reresolved_events) $('#peopleMeta').textContent += ` — linked ${r.reresolved_events} past event(s)`;
+    loadPeople(); loadUnmatched();
+  }catch(e){ alert('error: '+e.message); }
+}
+async function togglePerson(id, active){
+  await api(`/api/people/${id}`, {method:'PATCH', body: JSON.stringify({active})});
+  loadPeople();
+}
+async function loadUnmatched(){
+  try{
+    const us = await api('/api/people/unmatched');
+    $('#unmatched').innerHTML = us.length ? `<table><thead><tr>
+        <th>raw sender</th><th>sources</th><th>#</th><th>last message</th><th></th></tr></thead><tbody>
+      ${us.map(u=>`<tr>
+        <td>${esc(u.actor_raw)}</td>
+        <td class="muted">${(u.sources||[]).join(', ')}</td>
+        <td>${u.event_count}</td>
+        <td class="muted">${esc((u.last_content||'').slice(0,80))}</td>
+        <td><button class="prefill-person" data-raw="${esc(u.actor_raw)}" data-source="${esc((u.sources||[])[0]||'')}">+ create</button></td>
+      </tr>`).join('')}</tbody></table>` : 'nothing unmatched — every sender resolves';
+    // Values go through data-* + dataset rather than being interpolated into an
+    // inline onclick: the HTML parser decodes &#39; back to a quote BEFORE the
+    // JS is parsed, so escaping alone cannot protect a JS string literal in an
+    // attribute. actor_raw is externally supplied (a mail From header).
+    $('#unmatched').querySelectorAll('button.prefill-person').forEach(b=>{
+      b.addEventListener('click', ()=>prefillPerson(b.dataset.raw, b.dataset.source));
+    });
+  }catch(e){ $('#unmatched').textContent = 'error: '+e.message; }
+}
+function prefillPerson(raw, source){
+  if(source==='email') $('#p-email').value = raw; else $('#p-wa').value = raw;
+  $('#p-name').focus();
+  window.scrollTo({top: $('#people').offsetTop-80, behavior:'smooth'});
+}
+
+// ── Setup — system connections (config service) ─────────────
+const BADGE_STYLE = {
+  ok:             ['ok',   '#3fb968', '✓'],
+  failing:        ['err',  '#e5534b', '✗'],
+  untested:       ['warn', '#d9a03f', '?'],
+  not_configured: ['muted','#8b93a3', '—'],
+};
+let _setupLoaded = false;
+const _dirty = {};   // key → value, staged edits
+
+async function loadSetupStatus(){
+  try{
+    const st = await api('/api/config/status');
+    $('#setupBadges').innerHTML = Object.entries(st).map(([g,s])=>{
+      const [,color,mark] = BADGE_STYLE[s.state] || BADGE_STYLE.not_configured;
+      return `<span class="badge" style="background:${color}22; color:${color}" title="${esc(s.detail||s.state)}">${mark} ${esc(g)}</span>`;
+    }).join('');
+    const missing = Object.entries(st)
+      .filter(([,s])=>s.state==='not_configured' && !s.optional).map(([g])=>g);
+    const banner = $('#setupBanner');
+    if(missing.length){
+      banner.style.display='block';
+      banner.textContent = `Agent is idle — configure: ${missing.join(', ')} below to activate.`;
+    } else banner.style.display='none';
+    return st;
+  }catch(e){ return {}; }
+}
+
+async function loadSetup(force){
+  if(_setupLoaded && !force) return;
+  try{
+    const [cfg, st] = [await api('/api/config'), await loadSetupStatus()];
+    const cards = Object.entries(cfg.groups).map(([g, label])=>{
+      const s = st[g] || {state:'not_configured'};
+      const [,color] = BADGE_STYLE[s.state] || BADGE_STYLE.not_configured;
+      const fields = (cfg.config[g]||[]).map(f=>`
+        <label class="muted" style="font-size:11px; display:block; margin-top:6px">${esc(f.label)}${f.required?' *':''}
+          ${f.set?`<span style="float:right; font-size:10px" title="source: ${f.source}">${f.source}</span>`:''}
+          <input id="sys-${f.key}" type="${f.secret?'password':'text'}" style="width:100%"
+            ${f.secret ? `placeholder="${f.set?esc(f.value):'not set'}"` : `value="${esc(f.value)}"`}
+            oninput="_dirty['${f.key}']=this.value">
+        </label>`).join('');
+      const extra = g==='whatsapp'
+        ? `<div class="muted" style="font-size:11px; margin-top:8px">Webhook URL for the connector:<br>
+             <code style="user-select:all">${location.origin}/webhook/whatsapp</code>
+             (secret = value of WEBHOOK_SECRET in the server .env)</div>` : '';
+      return `
+      <div class="agent">
+        <h3>${esc(label)} <span class="badge" style="float:right; background:${color}22; color:${color}">${esc(s.state.replace('_',' '))}</span></h3>
+        ${fields}${extra}
+        <div style="display:flex; gap:6px; margin-top:10px">
+          <button class="primary" style="font-size:12px" onclick="saveSysGroup('${g}')">Save</button>
+          <button style="font-size:12px" onclick="testSysGroup('${g}')">Test</button>
+          <span class="muted" id="sys-status-${g}" style="font-size:11px; align-self:center">${esc(s.detail||'')}</span>
+        </div>
+      </div>`;
+    }).join('');
+    $('#setupCards').classList.remove('muted');
+    $('#setupCards').innerHTML = cards;
+    _setupLoaded = true;
+  }catch(e){ $('#setupCards').innerHTML = '<span class="muted">error: '+esc(e.message)+'</span>'; }
+}
+
+async function saveSysGroup(group){
+  const el = $(`#sys-status-${group}`);
+  const cfg = await api('/api/config');
+  const keys = (cfg.config[group]||[]).map(f=>f.key);
+  const values = {};
+  for(const k of keys) if(k in _dirty) values[k] = _dirty[k];
+  if(!Object.keys(values).length){ el.textContent = 'nothing changed'; return; }
+  try{
+    await api('/api/config', {method:'PUT', body: JSON.stringify({values})});
+    for(const k of Object.keys(values)) delete _dirty[k];
+    el.textContent = 'saved — applied live';
+    loadSetup(true);
+  }catch(e){ el.textContent = 'error: '+e.message; }
+}
+
+async function testSysGroup(group){
+  const el = $(`#sys-status-${group}`);
+  el.textContent = 'testing…';
+  try{
+    const r = await api(`/api/config/test/${group}`, {method:'POST', body:'{}'});
+    el.textContent = (r.ok?'✓ ':'✗ ') + r.detail;
+    loadSetupStatus();
+  }catch(e){ el.textContent = 'error: '+e.message; }
+}
+
+const _origRefresh = refresh;
+refresh = async function(){ await _origRefresh(); loadSetup(); loadSetupStatus(); loadAgents(); loadStats(); loadWatches(); loadCases(); loadApprovals(); loadDocuments(); loadPlaybooks(); loadSkills(); loadDbSources(); loadPeople(); loadUnmatched(); loadChats(); streamLogs(); };
+// ── Phase 8: dashboards and context approvals (UI-09) ──
+// Interpolation rule: every template interpolation below starts with esc(, ago( or Number(.
+// URLs are built by string concatenation; agent strings reach handlers only
+// through data-* attributes read with this.dataset.
+let _p8OpenSlug = null;
+async function loadP8Dashboards(){
+  const box = $('#p8DashList');
+  try{
+    const ds = await api('/api/dashboards?limit=100');
+    if(!ds.length){ box.textContent = 'no dashboards yet'; return; }
+    let rows = '';
+    for(const d of ds){
+      rows += '<tr><td><b>' + `${esc(d.title)}` + '</b></td><td class="muted">' + `${esc(d.slug)}` + '</td><td>'
+        + (d.current_version == null ? 'not published' : 'v' + `${Number(d.current_version)}`) + '</td><td>'
+        + `${esc(d.latest_status)}` + '</td><td class="muted">' + `${ago(d.last_refreshed_at)}` + '</td><td>'
+        + `${esc(d.current_last_error)}` + '</td><td><button data-slug="' + `${esc(d.slug)}`
+        + '" onclick="p8Versions(this.dataset.slug)">versions</button></td></tr>'
+        + '<tr><td colspan="7" id="p8v-' + `${esc(d.slug)}` + '"></td></tr>';
+    }
+    box.innerHTML = '<table><thead><tr><th>title</th><th>slug</th><th>current</th><th>latest</th><th>refreshed</th><th>error</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+    if(_p8OpenSlug) p8Versions(_p8OpenSlug);
+  }catch(e){ box.textContent = 'error: ' + e.message; }
+}
+async function p8Versions(slug){
+  _p8OpenSlug = slug;
+  const cell = document.getElementById('p8v-' + slug);
+  if(!cell) return;
+  try{
+    const r = await api('/api/dashboards/' + encodeURIComponent(slug));
+    let rows = '';
+    for(const v of (r.versions || [])){
+      rows += '<tr><td>v' + `${Number(v.version)}` + '</td><td>' + `${esc(v.status)}` + '</td><td>' + `${esc(v.title)}`
+        + '</td><td class="muted">' + `${esc(v.change_note)}` + '</td><td class="muted">' + `${esc(v.published_by_name)}`
+        + '</td><td>' + `${esc(v.last_error)}` + '</td><td>'
+        + (v.status === 'retired'
+          ? '<button data-slug="' + `${esc(slug)}` + '" data-version="' + `${Number(v.version)}`
+            + '" onclick="p8Rollback(this.dataset.slug, Number(this.dataset.version))">rollback</button>'
+          : '')
+        + '</td></tr>';
+    }
+    cell.innerHTML = '<table><thead><tr><th>ver</th><th>status</th><th>title</th><th>change note</th><th>approved by</th><th>error</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+  }catch(e){ cell.textContent = 'error: ' + e.message; }
+}
+async function p8Rollback(slug, version){
+  if(!confirm('Roll back ' + slug + ' to version ' + version + '?')) return;
+  try{
+    await api('/api/dashboards/' + encodeURIComponent(slug) + '/rollback', {method:'POST', body: JSON.stringify({version: version})});
+    loadP8Dashboards();
+  }catch(e){
+    let m = 'error: ' + e.message;
+    if(/decided_by/.test(e.message)) m += ' (mark a primary person in the People registry)';
+    alert(m);
+  }
+}
+async function loadP8ContextApprovals(){
+  const box = $('#p8CtxList');
+  try{
+    const as = (await api('/api/actions?status=proposed&kind=context_change&limit=200')).filter(a => a.kind === 'context_change');
+    let total = as.length;
+    try{
+      const r = await api('/api/context/sources');
+      total = (r.sources || []).reduce((n, s) => n + (Number(s.pending) || 0), 0);
+    }catch(e){ total = as.length; }
+    $('#p8CtxMeta').textContent = (total || as.length)
+      ? '(' + total + ' awaiting' + (total > as.length ? ', newest ' + as.length + ' shown' : '') + ')' : '(none)';
+    if(!as.length){ box.textContent = 'no context changes awaiting approval'; return; }
+    let rows = '';
+    for(const a of as){
+      const p = asObj(a.payload);
+      rows += '<tr><td>' + `${Number(a.id)}` + '</td><td>' + `${esc(p.kind)}` + '</td><td class="muted">' + `${esc(p.ref)}`
+        + '</td><td>' + renderPayload('context_change', p) + '</td><td style="white-space:nowrap">'
+        + `<button class="primary" onclick="approveAction(${Number(a.id)})">approve</button> `
+        + `<button onclick="rejectAction(${Number(a.id)})">reject</button>` + '</td></tr>';
+    }
+    box.innerHTML = '<table><thead><tr><th>#</th><th>kind</th><th>ref</th><th>change</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+  }catch(e){ box.textContent = 'error: ' + e.message; }
+}
+const _p8RenderPayload = renderPayload;
+renderPayload = function(kind, payload){
+  const p = asObj(payload);
+  if(kind === 'context_change'){
+    const before = p.before ? '<div class="muted">before: ' + `${esc(p.before)}` + '</div>' : '';
+    return '<div><b>' + `${esc(p.kind)}` + '</b> ' + `${esc(p.ref)}` + '</div>' + before + '<div>after: ' + `${esc(p.text)}` + '</div>';
+  }
+  if(kind === 'publish_dashboard'){
+    return '<div><b>' + `${esc(p.title)}` + '</b> v' + `${Number(p.version || p.draft_version || 0)}` + '</div><div class="muted">'
+      + `${esc(p.change_note)}` + '</div><div class="muted">' + `${esc(p.path || p.draft_url)}` + '</div>';
+  }
+  return _p8RenderPayload(kind, payload);
+};
+const _p8Approve = approveAction;
+approveAction = async function(id){ await _p8Approve(id); loadP8ContextApprovals(); };
+const _p8Reject = rejectAction;
+rejectAction = async function(id){ await _p8Reject(id); loadP8ContextApprovals(); };
+// Quick 020: a learning nobody could attribute (a group, an unregistered sender)
+// waits for the owner: show what would be remembered and where it came from.
+const _q20RenderPayload = renderPayload;
+renderPayload = function(kind, payload){
+  if(kind === 'activate_learning'){
+    const p = asObj(payload);
+    return '<div><b>Remember this ' + `${esc(p.kind || 'fact')}` + '?</b> ' + `${esc(p.content)}` + '</div><div class="muted">from '
+      + `${esc(p.origin_label)}` + ' · applies to ' + `${esc(p.applies_to)}` + '</div>';
+  }
+  return _q20RenderPayload(kind, payload);
+};
+const _p8Refresh = refresh;
+refresh = async function(){ await _p8Refresh(); loadP8Dashboards(); loadP8ContextApprovals(); };
+// ── end Phase 8 ──
+// ── Phase 12: skill View button (UI-11) ──
+async function p12ViewSkill(name){
+  try {
+    const r = await api('/api/skills/' + encodeURIComponent(name));
+    const pre = $('#skillPreview');
+    pre.style.display = 'block';
+    pre.textContent = r.body || '(empty SKILL.md)';
+  } catch (e) { alert('Could not load skill: ' + e.message); }
+}
+function p12AddViewButtons(){
+  const rows = document.querySelectorAll('#skillsInstalled tbody tr');
+  rows.forEach(tr => {
+    const b = tr.querySelector('b');
+    if (!b || tr.querySelector('.p12-view')) return;
+    const name = b.textContent;
+    const btn = document.createElement('button');
+    btn.className = 'p12-view';
+    btn.textContent = 'view';
+    btn.addEventListener('click', () => p12ViewSkill(name));
+    const cell = tr.lastElementChild;
+    if (cell) cell.appendChild(btn);
+  });
+}
+const _p12LoadSkills = loadSkills;
+loadSkills = async function(){ await _p12LoadSkills(); p12AddViewButtons(); };
+// ── end Phase 12 (UI-11) ──
+setInterval(refresh, 5000); refresh();
+</script>
+</body>
+</html>

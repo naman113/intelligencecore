@@ -1,0 +1,120 @@
+services:
+  postgres:
+    # Stateful images are pinned to an exact tag (Quick 009): a floating tag
+    # changes the database under a running install on the next pull. This is
+    # the same image pg16 pointed at when it was pinned.
+    image: pgvector/pgvector:0.8.7-pg16-bookworm
+    container_name: agentic-postgres
+    # Without a restart policy the containers stay down after a host reboot or
+    # a dockerd upgrade, and the gateway crash-loops against a DB that is not
+    # there. unless-stopped brings them back but still honours `agentctl stop`.
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: agent
+      POSTGRES_PASSWORD: agent
+      POSTGRES_DB: agent_memory
+    ports:
+      # Loopback only: secret settings in system_configs are AES-GCM ciphertext
+      # (the key lives in .env, never in this DB) but the DB uses default credentials. Docker-published ports bypass ufw, so a 0.0.0.0
+      # bind on a client VM is publicly reachable even "behind" a firewall.
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infra/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agent -d agent_memory"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  falkordb:
+    # Quick 009: pinned. `latest` became FalkorDB 6 on 2026-10-22, whose
+    # fulltext-index procedure the locked graphiti-core (0.29.2) cannot call, so
+    # the graph never initialised. v4.22.2 is proven with that graphiti. Change
+    # this tag only together with graphiti-core in backend/uv.lock.
+    image: falkordb/falkordb:v4.22.2
+    container_name: agentic-falkordb
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6379:6379"    # redis protocol (graphiti driver)
+      - "127.0.0.1:3000:3000"    # falkordb browser UI (ssh-tunnel to view)
+    volumes:
+      # The image's real data dir. /data is a plain directory in the 4.x
+      # images, so a volume mounted there never held the graph (Quick 009).
+      - falkordata:/var/lib/falkordb/data
+
+  # Quick 005: the app's langfuse SDK (4.x, OpenTelemetry) needs a Langfuse server
+  # 3.63.0 or newer. This v2 server answers its trace export with HTTP 404, so the
+  # app does not attach the handler to it (the Setup Test says why) and traces
+  # live in-app instead: System > Runs and System > Usage, from the llm_usage table.
+  # Kept so an existing VM's container and data are not orphaned by an update.
+  langfuse:
+    image: langfuse/langfuse:2.95.11   # same image as the floating `2` tag when pinned
+    container_name: agentic-langfuse
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://agent:agent@postgres:5432/langfuse
+      NEXTAUTH_URL: http://localhost:3001
+      # install.sh generates real values into .env on client VMs; the
+      # defaults below only apply on dev machines where 3001 is loopback-only.
+      NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-local-dev-nextauth-secret-change-me}
+      SALT: ${LANGFUSE_SALT:-local-dev-salt-change-me}
+      TELEMETRY_ENABLED: "false"
+    ports:
+      - "127.0.0.1:3001:3000"
+
+  # Phase 14 (WH-01): analytics warehouse. Loopback only; project-scoped volume (see the
+  # volumes note below); no service depends on it (zero-config boot).
+  warehouse:
+    build:
+      context: ./infra/warehouse
+    image: agentic-warehouse:16
+    container_name: agentic-warehouse
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: wh_admin
+      # :- (never :?) so an old .env still boots every v1.0 service; only this container
+      # waits for its secret (ensure-warehouse-secrets.sh generates it).
+      POSTGRES_PASSWORD: ${WAREHOUSE_ADMIN_PASSWORD:-}
+      POSTGRES_DB: warehouse
+    ports:
+      - "127.0.0.1:5434:5432"
+    volumes:
+      - whdata:/var/lib/postgresql/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wh_admin -d warehouse"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    # Phase 15 (SRC-08): CSV loads reach only the warehouse on sync_internal
+    # Quick 028 (WR-11): sync_egress holds only the warehouse, so database sync containers reach the
+    # warehouse and external source hosts but not agent-memory Postgres, FalkorDB or Langfuse
+    networks: [default, sync_internal, sync_egress]
+    deploy:
+      resources:
+        limits: {cpus: "1.0", memory: 1536M}
+
+# Phase 15 (SRC-08): internal (no egress) network holding only the warehouse; project-scoped,
+# no explicit name. ic-sync csv jobs attach here.
+networks:
+  sync_internal:
+    internal: true
+  # Quick 028 (WR-11): non-internal (external source hosts must stay reachable); syncrunner finds it
+  # by this label. Only the warehouse is a member. SYNC_NETWORK is an override, not the mechanism.
+  sync_egress:
+    labels:
+      ic.sync.role: egress
+
+volumes:
+  # Deliberately left project-scoped (real names: agenticsystem_pgdata,
+  # agenticsystem_falkordata). Adding an explicit `name:` here would point
+  # existing client VMs at a fresh empty volume and strand their graph memory.
+  # The backup procedure uses the prefixed names — see DEPLOYMENT_PLAYBOOK §7.
+  pgdata:
+  falkordata:
+  whdata:   # Phase 14: project-scoped like pgdata (no explicit name)

@@ -1,0 +1,17 @@
+# Python packages for the agent sandbox. Shared by Dockerfile (the per-run docker
+# image) and Dockerfile.service (the always-on sandbox-runner service), so the two
+# images cannot drift. statsmodels and scikit-learn back the analytics skills
+# (forecasting, statistical-tests, anomaly-detection, trend-and-seasonality,
+# driver-analysis in skills_library/intelligence-corner); they are pinned, the
+# rest float.
+pandas
+numpy
+scipy
+matplotlib
+openpyxl
+xlsxwriter
+reportlab
+tabulate
+python-docx
+statsmodels==0.15.0
+scikit-learn==1.9.1

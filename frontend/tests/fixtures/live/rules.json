@@ -1,0 +1,38 @@
+{
+  "rules": [
+    {
+      "kind": "rule",
+      "origin": "agent",
+      "pending": null,
+      "ref": "rule:open-invoices",
+      "status": "approved",
+      "tables": [
+        "business_db.public.invoices"
+      ],
+      "text": "An invoice is open until payments cover its total.",
+      "title": "Open invoices",
+      "updated_at": "2026-10-25T00:00:00+00:00"
+    },
+    {
+      "kind": "kpi",
+      "origin": null,
+      "pending": {
+        "action_id": 4,
+        "before": null,
+        "created_at": "2026-10-25T00:00:00+00:00",
+        "edited_by": null,
+        "origin": "agent",
+        "text": "Average days between invoice date and full payment."
+      },
+      "ref": "kpi:days-sales-outstanding",
+      "status": "proposed",
+      "tables": [
+        "business_db.public.invoices",
+        "business_db.public.payments"
+      ],
+      "text": null,
+      "title": "Days sales outstanding",
+      "updated_at": null
+    }
+  ]
+}

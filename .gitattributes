@@ -1,0 +1,48 @@
+# This repo is now edited on Windows but every artifact it produces runs on
+# Linux (the client VM, and every container image built from it). Git's CRLF
+# conversion on checkout would otherwise turn install.sh / agentctl / entrypoints
+# into files whose shebang line ends in \r — which fails as
+# "bad interpreter: /usr/bin/env bash^M", a error that reads like a
+# missing interpreter rather than a line-ending problem.
+#
+# Scoped deliberately: no blanket `* text=auto`, which would renormalize the
+# whole tree and produce a diff touching every file.
+
+*.sh        text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.py        text eol=lf
+Dockerfile  text eol=lf
+agentctl    text eol=lf
+
+# Vendored skills ship SKILL.md/docs that are parsed at runtime inside Linux
+# containers (skillservice fence detection); a CRLF checkout on the Windows
+# dev machine would ride the bind mount straight into the gateway. Scoped to
+# skills_library/ so the rest of the repo's .md files are not renormalized.
+skills_library/**/*.md  text eol=lf
+
+# PowerShell is the one thing here that is Windows-native.
+*.ps1       text eol=crlf
+
+# Binary — never touch.
+*.png       binary
+*.pdf       binary
+*.ttf       binary
+*.svg       -text
+
+# Phase 1: vendored dashboard libraries
+# These bytes are integrity-pinned by sha256 in tests and served verbatim to
+# browsers; core.autocrlf would rewrite them on a Windows checkout.
+dashboards/vendor/** binary
+
+# Phase 4: dashboards origin config (byte-stable image on a Windows checkout)
+dashboards/nginx.conf text eol=lf
+
+# Phase 9: Caddy site template rendered on Linux client VMs
+deploy/Caddyfile.tmpl text eol=lf
+
+# Phase 9: uv reads this inside Linux; a CR would make the version unparseable
+.python-version text eol=lf
+
+# Phase 11: role kit is fed to psql on Linux
+deploy/readonly-role.sql text eol=lf

@@ -1,0 +1,225 @@
+/* Ask panel: the system channel. Blue and neutral only.
+
+   Quick 003: no scrim. The panel sits beside the page and the page keeps
+   working; on a wide screen the page makes room for it (.shell.ask-docked). */
+.ask-sheet {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(440px, 100%);
+  z-index: 61;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-left: 1px solid var(--line-lit);
+  box-shadow: -12px 0 40px rgba(0, 0, 0, 0.35);
+  color: var(--t1);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@media (max-width: 600px) {
+  .ask-sheet { width: 100%; border-left: none; }
+}
+@media (min-width: 1100px) {
+  .shell.ask-docked .page { margin-right: 440px; }
+  .ask-sheet { box-shadow: none; }
+}
+
+.ask-head { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.ask-bar { display: flex; align-items: center; gap: var(--s2); }
+.ask-titles { min-width: 0; padding: 0 var(--s1); }
+.ask-titles h2 { margin: 2px 0 0; font-family: var(--display); font-stretch: var(--display-wide); font-size: var(--fs-base); font-weight: 600; }
+.ask-bar .btn.is-on { background: var(--raised-2); color: var(--t1); }
+.ask-note { margin: 8px 0 0; color: var(--t3); font-size: var(--fs-tiny); }
+.ask-operator { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ask-operator label { color: var(--t2); font-size: var(--fs-small); }
+.ask-operator input {
+  background: var(--raised);
+  border: 1px solid var(--line);
+  color: var(--t1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: var(--fs-small);
+}
+.ask-operator input:focus { outline: 1px solid var(--signal); }
+.ask-hint { color: var(--t3); font-size: var(--fs-tiny); }
+.ask-operator .ask-hint { width: 100%; color: var(--t2); }
+.ask-thread { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.ask-empty { margin: auto 0; color: var(--t3); font-size: var(--fs-small); text-align: center; }
+.ask-loading { display: flex; align-items: center; gap: var(--s2); color: var(--t3); font-size: var(--fs-small); }
+.ask-msg { max-width: 92%; padding: 8px 12px; border-radius: 8px; background: var(--raised); border: 1px solid var(--line); }
+.ask-msg-user { align-self: flex-end; background: var(--signal-wash); border-color: var(--signal-lo); }
+.ask-msg-system { color: var(--t3); }
+.ask-text { white-space: pre-wrap; overflow-wrap: anywhere; font-size: var(--fs-small); }
+.ask-text a { color: var(--signal-hi); }
+/* Quick 021: which question an answer belongs to, when another message sits between. */
+.ask-replying {
+  margin-bottom: 4px;
+  padding-left: 8px;
+  border-left: 2px solid var(--line-lit);
+  color: var(--t3);
+  font-size: var(--fs-tiny);
+  overflow-wrap: anywhere;
+}
+
+/* Quick 007: files the reply delivered. System channel, so blue and neutral only. */
+.ask-files { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.ask-file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--line-lit);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  min-width: 0;
+}
+.ask-file-icon {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--signal-wash);
+  color: var(--signal-hi);
+}
+.ask-file-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ask-file-name {
+  font-size: var(--fs-small);
+  color: var(--t1);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ask-file-meta { display: flex; gap: 8px; flex-wrap: wrap; font-size: var(--fs-micro); color: var(--t3); }
+.ask-file-type { font-family: var(--mono); letter-spacing: 0.04em; color: var(--t2); }
+.ask-file-wa { display: flex; align-items: center; gap: 4px; font-size: var(--fs-micro); color: var(--signal-hi); }
+.ask-file-error { font-size: var(--fs-micro); color: var(--broken-hi); overflow-wrap: anywhere; }
+.ask-file-get { flex: none; gap: 6px; }
+.ask-file.is-gone .ask-file-icon { background: var(--raised-2); color: var(--t4); }
+.ask-file.is-gone .ask-file-name { color: var(--t3); }
+@media (max-width: 380px) {
+  .ask-file { flex-wrap: wrap; }
+  .ask-file-get { width: 100%; justify-content: center; }
+}
+
+/* Working: three dots breathing in turn, the live step, elapsed time. */
+.ask-live {
+  align-self: flex-start;
+  max-width: 92%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--signal-lo);
+  background: var(--signal-wash);
+  font-size: var(--fs-small);
+}
+.ask-pulse { display: inline-flex; gap: 4px; flex: none; }
+.ask-pulse i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--signal-hi);
+  opacity: 0.3;
+  animation: ask-breathe 1.6s ease-in-out infinite;
+}
+.ask-pulse i:nth-child(2) { animation-delay: 0.2s; }
+.ask-pulse i:nth-child(3) { animation-delay: 0.4s; }
+@keyframes ask-breathe {
+  0%, 70%, 100% { opacity: 0.3; transform: scale(0.85); }
+  35% { opacity: 1; transform: scale(1); }
+}
+.ask-step { color: var(--t1); min-width: 0; overflow-wrap: anywhere; animation: ask-fade var(--t-mid) var(--ease) both; }
+@keyframes ask-fade { from { opacity: 0; } to { opacity: 1; } }
+.ask-elapsed { margin-left: auto; padding-left: 6px; font-family: var(--mono); font-size: var(--fs-micro); color: var(--t3); flex: none; }
+
+.ask-failed { align-items: center; }
+.ask-waiting {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: 6px 10px;
+  border: 1px solid var(--line-lit);
+  border-radius: var(--radius-sm);
+  color: var(--t2);
+  font-size: var(--fs-small);
+}
+.ask-error { margin: 0 16px 8px; }
+
+/* Ask button badges and chat-list markers. */
+.ask-btn { gap: 6px; }
+.ask-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; background: var(--t4); }
+.ask-dot-working { background: var(--signal-hi); animation: ask-glow 1.6s ease-in-out infinite; }
+@keyframes ask-glow {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+.ask-count {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--signal);
+  border-radius: 99px;
+  padding: 1px 6px;
+  min-width: 17px;
+  text-align: center;
+}
+
+.ask-listview { flex: 1; overflow-y: auto; padding: 8px 8px 16px; display: flex; flex-direction: column; gap: 12px; }
+.ask-listview .ask-operator { padding: 8px; border-top: 1px solid var(--line); }
+.ask-chats { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.ask-chat { display: flex; align-items: center; gap: 4px; border-radius: var(--radius-sm); }
+.ask-chat:hover, .ask-chat.is-active { background: var(--raised); }
+.ask-chat.is-active .ask-chat-title { color: var(--t1); font-weight: 500; }
+.ask-chat-pick {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: "dot title pill" "dot meta meta";
+  align-items: center;
+  column-gap: 8px;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  color: var(--t2);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+.ask-chat-pick > :first-child { grid-area: dot; }
+.ask-chat-title { grid-area: title; font-size: var(--fs-small); }
+.ask-chat-pick .pill { grid-area: pill; }
+.ask-chat-meta { grid-area: meta; font-size: var(--fs-micro); color: var(--t3); }
+.ask-chat-tools { display: flex; gap: 2px; padding-right: 4px; flex: none; }
+.ask-chat-edit { flex: 1; display: flex; gap: 6px; padding: 6px 8px; }
+.ask-chat-edit .input { flex: 1; min-width: 0; }
+
+.ask-composer { padding: 12px 16px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+.ask-composer textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  background: var(--raised);
+  border: 1px solid var(--line);
+  color: var(--t1);
+  padding: 8px;
+  border-radius: 4px;
+  font-family: var(--body);
+  font-size: var(--fs-small);
+}
+.ask-composer textarea:focus { outline: 1px solid var(--signal); }
+.ask-actions { display: flex; gap: 8px; align-items: center; justify-content: flex-end; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ask-pulse i { animation: none; opacity: 0.75; transform: none; }
+  .ask-dot-working { animation: none; opacity: 1; }
+  .ask-step { animation: none; }
+}

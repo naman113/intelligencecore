@@ -1,0 +1,47 @@
+# Phase 9 (DEPLOY-01): client-VM overlay. Adds the ui and dashboards containers
+# beside the base file's postgres, falkordb and langfuse.
+#
+# install.sh writes COMPOSE_FILE=docker-compose.yml:docker-compose.vm.yml and
+# COMPOSE_PATH_SEPARATOR=: into .env, so every bare `docker compose` run from the
+# repo dir includes this file. Compose calls must therefore run from the repo dir.
+#
+# NEVER add `app` here: the gateway runs under systemd, and a second one would
+# double-send every autonomous message from the shared task_runs queue.
+# NEVER combine this file with docker-compose.local.yml.
+#
+# The ui image is unchanged. On a VM, Caddy sends /api, /health, /dashboard and
+# /webhook straight to the gateway, so the ui container's own /api proxy is never used.
+
+services:
+  ui:
+    build:
+      context: ./frontend
+    container_name: agentic-ui
+    restart: unless-stopped
+    ports:
+      # Loopback only: Caddy's app site sends non-gateway paths here.
+      - "127.0.0.1:8090:80"
+    deploy:
+      resources:
+        limits: {cpus: "0.25", memory: 128M}
+
+  dashboards:
+    build:
+      context: ./dashboards
+    container_name: agentic-dashboards
+    restart: unless-stopped
+    # Host network is the only way to reach the loopback-bound systemd gateway.
+    # nginx binds loopback only (IC_LISTEN), so nothing new is publicly reachable.
+    network_mode: host
+    environment:
+      IC_LISTEN: "127.0.0.1:8091"
+      IC_GATEWAY: "http://127.0.0.1:${APP_PORT:-8080}"
+    # The image default probes host :80, which is Caddy on a host network.
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8091/d/_lib/chart.js-4.5.1/chart.umd.min.js"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+    deploy:
+      resources:
+        limits: {cpus: "0.25", memory: 128M}
